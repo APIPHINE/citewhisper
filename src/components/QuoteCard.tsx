@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Copy, Check, ChevronDown, ChevronUp, ExternalLink, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +10,11 @@ import { useToast } from '@/hooks/use-toast';
 interface QuoteCardProps {
   quote: Quote;
   delay?: number;
+  isAnyExpanded?: boolean;
+  onExpand?: (expanded: boolean) => void;
 }
 
-const QuoteCard = ({ quote, delay = 0 }: QuoteCardProps) => {
+const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteCardProps) => {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -60,7 +62,13 @@ const QuoteCard = ({ quote, delay = 0 }: QuoteCardProps) => {
 
   // Toggle expanded status
   const toggleExpanded = () => {
-    setExpanded(!expanded);
+    const newExpandedState = !expanded;
+    setExpanded(newExpandedState);
+    
+    // Notify parent component about expansion state
+    if (onExpand) {
+      onExpand(newExpandedState);
+    }
     
     // Prevent body scrolling when expanded
     if (!expanded) {
@@ -73,19 +81,26 @@ const QuoteCard = ({ quote, delay = 0 }: QuoteCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ 
+        opacity: isAnyExpanded && !expanded ? 0 : 1, 
+        y: 0,
+        transition: { 
+          duration: 0.5, 
+          ease: [0.25, 0.1, 0.25, 1],
+        }
+      }}
       transition={{ 
         duration: 0.5, 
         ease: [0.25, 0.1, 0.25, 1],
         delay: delay * 0.08 
       }}
-      className="group relative z-10"
+      className={`group relative z-10 ${isAnyExpanded && !expanded ? 'pointer-events-none' : ''}`}
       style={{ minHeight: '280px' }} // Ensure minimum height for all cards
     >
       {/* Main Card */}
       <div 
-        className={`rounded-2xl border transition-all duration-350 ease-apple 
-          ${expanded ? 'border-accent shadow-elevation' : 'border-border hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation'}
+        className={`rounded-2xl transition-all duration-350 ease-apple 
+          ${expanded ? 'border-accent shadow-elevation border-2' : 'border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2'}
           overflow-hidden`}
         style={{ minHeight: expanded ? 'auto' : '100%' }}
       >
@@ -170,11 +185,25 @@ const QuoteCard = ({ quote, delay = 0 }: QuoteCardProps) => {
             onClick={toggleExpanded}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ 
+                opacity: 0, 
+                scale: 0.95,
+                borderRadius: "1rem",
+                border: "2px solid transparent",
+              }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                borderRadius: "1rem",
+                border: "2px solid hsl(var(--accent))",
+              }}
+              exit={{ 
+                opacity: 0, 
+                scale: 0.95,
+                borderRadius: "1rem",
+              }}
               transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl shadow-elevation border border-accent max-w-3xl w-full max-h-[90vh] overflow-hidden z-[100]"
+              className="bg-white rounded-2xl shadow-elevation max-w-3xl w-full max-h-[90vh] overflow-hidden z-[100]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Expanded Card Header with close button */}

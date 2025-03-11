@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
 import QuoteCard from '../components/QuoteCard';
@@ -6,13 +7,18 @@ import { Heart } from 'lucide-react';
 
 const Favorites = () => {
   const { favorites } = useFavorites();
+  const [anyExpanded, setAnyExpanded] = useState(false);
+  
+  const handleExpand = (isExpanded: boolean) => {
+    setAnyExpanded(isExpanded);
+  };
   
   return (
     <div className="min-h-screen pt-24 pb-20 page-padding">
       <div className="page-max-width">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center mb-10"
         >
@@ -27,7 +33,7 @@ const Favorites = () => {
         </motion.div>
 
         {favorites.length === 0 ? (
-          <div className="bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border">
+          <div className={`bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border ${anyExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
             <Heart size={40} className="mx-auto mb-4 text-muted-foreground/50" />
             <h2 className="text-xl font-medium mb-2">No favorites yet</h2>
             <p className="text-muted-foreground max-w-md mx-auto">
@@ -37,7 +43,13 @@ const Favorites = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
             {favorites.map((quote, index) => (
-              <QuoteCard key={quote.id} quote={quote} delay={index} />
+              <QuoteCard 
+                key={quote.id} 
+                quote={quote} 
+                delay={index} 
+                isAnyExpanded={anyExpanded}
+                onExpand={handleExpand}
+              />
             ))}
           </div>
         )}
