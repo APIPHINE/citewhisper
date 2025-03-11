@@ -94,7 +94,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
         ease: [0.25, 0.1, 0.25, 1],
         delay: delay * 0.08 
       }}
-      className={`group relative z-10 ${isAnyExpanded && !expanded ? 'pointer-events-none' : ''}`}
+      className={`group relative z-10 ${isAnyExpanded && !expanded ? 'pointer-events-none opacity-0' : ''}`}
       style={{ minHeight: '280px' }} // Ensure minimum height for all cards
     >
       {/* Main Card */}

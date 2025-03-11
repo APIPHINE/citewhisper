@@ -20,7 +20,7 @@ const Favorites = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="text-center mb-10"
+          className={`text-center mb-10 ${anyExpanded ? 'pointer-events-none' : ''}`}
         >
           <div className="inline-flex items-center justify-center mb-3 bg-secondary/80 text-foreground px-3 py-1.5 rounded-full text-sm">
             <Heart size={14} className="mr-1.5" />
