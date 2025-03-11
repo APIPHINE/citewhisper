@@ -78,11 +78,15 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     }
   };
 
+  // Show the card if it's expanded, or if no cards are expanded
+  // This separates expanded card handling from other cards
+  const shouldShowCard = expanded || !isAnyExpanded;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ 
-        opacity: isAnyExpanded && !expanded ? 0 : 1, 
+        opacity: shouldShowCard ? 1 : 0, 
         y: 0,
         transition: { 
           duration: 0.5, 
@@ -94,7 +98,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
         ease: [0.25, 0.1, 0.25, 1],
         delay: delay * 0.08 
       }}
-      className={`group relative z-10 ${isAnyExpanded && !expanded ? 'pointer-events-none opacity-0' : ''}`}
+      className={`group relative z-10 ${shouldShowCard ? '' : 'pointer-events-none opacity-0'}`}
       style={{ height: 'fit-content' }} // Allow height to match content
     >
       {/* Main Card */}
