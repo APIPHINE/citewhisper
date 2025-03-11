@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from 'react';
-import { Heart, Copy, Check, ChevronDown, ChevronUp, ExternalLink, X } from 'lucide-react';
+import { useState } from 'react';
+import { Heart, Copy, Check, ChevronDown, ExternalLink, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '../context/FavoritesContext';
@@ -69,35 +69,26 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     if (onExpand) {
       onExpand(newExpandedState);
     }
-    
-    // Prevent body scrolling when expanded
-    if (newExpandedState) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
   };
 
-  return (
-    <>
-      {/* Regular card - show when not expanded and no other cards are expanded */}
+  // Render the main card (only when not expanded)
+  const renderMainCard = () => {
+    if (expanded) return null;
+    
+    return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
-          opacity: isAnyExpanded ? 0 : 1,
-          y: 0,
-          transition: { 
-            duration: 0.5, 
-            ease: [0.25, 0.1, 0.25, 1],
-          }
+          opacity: 1,
+          y: 0 
         }}
         transition={{ 
           duration: 0.5, 
           ease: [0.25, 0.1, 0.25, 1],
           delay: delay * 0.08 
         }}
-        className={`group relative ${isAnyExpanded ? 'pointer-events-none opacity-0' : ''}`}
-        style={{ height: 'fit-content' }} // Allow height to match content
+        className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
+        style={{ height: 'fit-content' }} 
       >
         <div 
           className="rounded-2xl transition-all duration-350 ease-apple 
@@ -170,8 +161,15 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
           </div>
         </div>
       </motion.div>
+    );
+  };
+
+  return (
+    <>
+      {/* Main card */}
+      {renderMainCard()}
       
-      {/* Expanded Overlay - completely separate from regular card rendering */}
+      {/* Expanded Overlay - Completely separate component */}
       <AnimatePresence>
         {expanded && (
           <motion.div

@@ -20,7 +20,7 @@ const Favorites = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className={`text-center mb-10 ${anyExpanded ? 'pointer-events-none' : ''}`}
+          className={anyExpanded ? 'hidden' : 'text-center mb-10'}
         >
           <div className="inline-flex items-center justify-center mb-3 bg-secondary/80 text-foreground px-3 py-1.5 rounded-full text-sm">
             <Heart size={14} className="mr-1.5" />
@@ -33,7 +33,7 @@ const Favorites = () => {
         </motion.div>
 
         {favorites.length === 0 ? (
-          <div className={`bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border ${anyExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+          <div className={anyExpanded ? 'hidden' : 'bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border'}>
             <Heart size={40} className="mx-auto mb-4 text-muted-foreground/50" />
             <h2 className="text-xl font-medium mb-2">No favorites yet</h2>
             <p className="text-muted-foreground max-w-md mx-auto">
