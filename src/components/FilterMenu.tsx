@@ -1,23 +1,20 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Filter } from 'lucide-react';
-import { useSearch, FilterOption } from '@/context/SearchContext';
+import { useSearch } from '@/context/SearchContext';
 import { Badge } from '@/components/ui/badge';
 import AuthorFilter from './filter/AuthorFilter';
 import TopicFilter from './filter/TopicFilter';
 import ThemeFilter from './filter/ThemeFilter';
 import DateRangeFilter from './filter/DateRangeFilter';
 import KeywordFilter from './filter/KeywordFilter';
-import { dateStringToYear } from '@/utils/dateUtils';
 
 const FilterMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { 
     filters, 
-    updateFilter, 
-    clearFilters, 
-    availableFilters 
+    clearFilters 
   } = useSearch();
   
   // Close menu when clicking outside
@@ -44,45 +41,6 @@ const FilterMenu = () => {
     filters.theme.length + 
     filters.keyword.length + 
     (filters.date.start || filters.date.end ? 1 : 0);
-  
-  // Toggle selection for multi-select filters
-  const toggleFilter = (filterType: FilterOption, value: string) => {
-    const currentValues = filters[filterType] as string[];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value];
-    
-    updateFilter(filterType, newValues);
-  };
-  
-  // Handle date range slider
-  const MIN_YEAR = -2000;
-  const MAX_YEAR = 2025;
-  
-  // Initial slider values
-  const initialStart = filters.date.start ? dateStringToYear(filters.date.start) : MIN_YEAR;
-  const initialEnd = filters.date.end ? dateStringToYear(filters.date.end) : MAX_YEAR;
-  
-  // Handle date range changes
-  const handleDateRangeChange = (range: [number, number]) => {
-    const [start, end] = range;
-    
-    // Convert slider value (year number) to date string
-    const sliderValueToDate = (value: number): string => {
-      // For BCE dates
-      if (value <= 0) {
-        return `${Math.abs(value)}-01-01 BCE`;
-      }
-      // For CE dates
-      return `${value}-01-01`;
-    };
-    
-    // Update filter with new date range
-    updateFilter('date', {
-      start: sliderValueToDate(start),
-      end: sliderValueToDate(end)
-    });
-  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -120,34 +78,11 @@ const FilterMenu = () => {
           </div>
           
           <div className="p-4 max-h-[60vh] overflow-y-auto">
-            <AuthorFilter 
-              authors={availableFilters.authors}
-              selectedAuthors={filters.author}
-              toggleFilter={toggleFilter}
-            />
-            
-            <TopicFilter 
-              topics={availableFilters.topics}
-              selectedTopics={filters.topic}
-              toggleFilter={toggleFilter}
-            />
-            
-            <ThemeFilter 
-              themes={availableFilters.themes}
-              selectedThemes={filters.theme}
-              toggleFilter={toggleFilter}
-            />
-            
-            <DateRangeFilter 
-              initialStart={initialStart}
-              initialEnd={initialEnd}
-              onRangeChange={handleDateRangeChange}
-            />
-            
-            <KeywordFilter 
-              keywords={filters.keyword}
-              updateFilter={updateFilter}
-            />
+            <AuthorFilter />
+            <TopicFilter />
+            <ThemeFilter />
+            <DateRangeFilter />
+            <KeywordFilter />
           </div>
         </div>
       )}
