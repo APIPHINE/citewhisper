@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Heart, Copy, Check, ChevronDown, ExternalLink, X } from 'lucide-react';
+import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '../context/FavoritesContext';
@@ -164,6 +164,17 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     );
   };
 
+  // Section box component for expanded view
+  const SectionBox = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
+    <div className="mb-6 border border-border rounded-lg overflow-hidden">
+      <div className="bg-secondary/30 px-4 py-3 flex items-center border-b border-border/80">
+        <div className="mr-2 text-muted-foreground">{icon}</div>
+        <h3 className="font-medium">{title}</h3>
+      </div>
+      <div className="p-4 bg-white">{children}</div>
+    </div>
+  );
+
   return (
     <>
       {/* Main card */}
@@ -227,56 +238,227 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                   </p>
                 </div>
                 
-                {/* Original language section */}
-                {quote.originalLanguage && (
-                  <div className="mb-6 p-4 bg-secondary/30 rounded-lg">
-                    <h3 className="font-medium mb-2">Original Quote ({quote.originalLanguage})</h3>
-                    <p className="italic">{quote.originalText || quote.text}</p>
-                  </div>
-                )}
-                
-                {/* Source section */}
-                <div className="mb-6">
-                  <h3 className="font-medium mb-2">Source</h3>
-                  <p className="text-muted-foreground">{quote.source || "Unknown source"}</p>
-                  {quote.sourceUrl && (
-                    <a 
-                      href={quote.sourceUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center text-accent hover:underline"
-                    >
-                      View original source <ExternalLink size={14} className="ml-1" />
-                    </a>
-                  )}
-                </div>
-                
-                {/* Context section */}
-                <div className="mb-6">
-                  <h3 className="font-medium mb-2">Quote Context</h3>
-                  <p className="text-muted-foreground">{quote.context || "No additional context available."}</p>
-                </div>
-                
-                {/* Historical/Social Context */}
-                <div className="mb-6">
-                  <h3 className="font-medium mb-2">Historical Context</h3>
-                  <p className="text-muted-foreground">{quote.historicalContext || "No historical context available."}</p>
-                </div>
-                
-                {/* Tags section */}
-                <div className="mb-6">
-                  <h3 className="font-medium mb-2">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {quote.topics.map((topic) => (
-                      <Badge key={topic} variant="secondary" className="bg-secondary/80">
-                        {topic}
+                {/* Source Section */}
+                <SectionBox title="Source Information" icon={<BookOpen size={18} />}>
+                  <div className="space-y-3">
+                    {/* Original language */}
+                    {quote.originalLanguage && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-1">Original Language: {quote.originalLanguage}</h4>
+                        {quote.originalText && <p className="italic text-muted-foreground">{quote.originalText}</p>}
+                      </div>
+                    )}
+                    
+                    {/* Source details */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Source</h4>
+                      <p className="text-muted-foreground">{quote.source || "Unknown source"}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Publication date: {quote.sourcePublicationDate || "Unknown"}</p>
+                      
+                      {quote.sourceUrl && (
+                        <a 
+                          href={quote.sourceUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center text-accent hover:underline text-sm"
+                        >
+                          View original source <ExternalLink size={14} className="ml-1" />
+                        </a>
+                      )}
+                    </div>
+                    
+                    {/* Manuscript reference */}
+                    {quote.originalManuscriptReference && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-1">Original Manuscript</h4>
+                        <p className="text-muted-foreground text-sm">{quote.originalManuscriptReference}</p>
+                      </div>
+                    )}
+                    
+                    {/* Attribution status */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Attribution</h4>
+                      <Badge variant={quote.attributionStatus === "Confirmed" ? "outline" : "secondary"} className="bg-secondary/80">
+                        {quote.attributionStatus || "Unknown"}
                       </Badge>
-                    ))}
-                    <Badge variant="outline" className="border-accent/30 text-accent">
-                      {quote.theme}
-                    </Badge>
+                      {quote.translator && (
+                        <p className="text-xs text-muted-foreground mt-2">Translator: {quote.translator}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </SectionBox>
+                
+                {/* Context Section */}
+                <SectionBox title="Historical Context" icon={<FileText size={18} />}>
+                  <div className="space-y-4">
+                    {/* Quote Context */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Quote Context</h4>
+                      <p className="text-muted-foreground">{quote.context || "No additional context available."}</p>
+                    </div>
+                    
+                    {/* Historical Context */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Historical Significance</h4>
+                      <p className="text-muted-foreground">{quote.historicalContext || "No historical context available."}</p>
+                    </div>
+                    
+                    {/* Impact */}
+                    {quote.impact && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-1">Impact</h4>
+                        <p className="text-muted-foreground">{quote.impact}</p>
+                      </div>
+                    )}
+                  </div>
+                </SectionBox>
+                
+                {/* Verification Section */}
+                <SectionBox title="Source Verification" icon={<Fingerprint size={18} />}>
+                  <div className="space-y-4">
+                    {/* OCR Information */}
+                    {quote.ocrExtractedText && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-1">OCR Extraction</h4>
+                        <p className="text-muted-foreground text-sm">{quote.ocrExtractedText}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Confidence Score: {quote.ocrConfidenceScore ? `${(quote.ocrConfidenceScore * 100).toFixed(1)}%` : "Unknown"}</p>
+                      </div>
+                    )}
+                    
+                    {/* Citation Chain */}
+                    {quote.citationChain && quote.citationChain.length > 0 && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-1">Citation Chain</h4>
+                        <div className="space-y-2">
+                          {quote.citationChain.map((citation, index) => (
+                            <div key={index} className="text-sm">
+                              <Badge variant="outline" className="mr-2">{citation.type}</Badge>
+                              <span className="text-muted-foreground">{citation.source}, {citation.date}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* IIIF & Screenshot */}
+                    {quote.iiifImageUrl && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-1">Digital Archives</h4>
+                        <p className="text-xs text-muted-foreground">IIIF Manifest Available</p>
+                        <p className="text-xs text-muted-foreground">Image Coordinates: {JSON.stringify(quote.imageCoordinates)}</p>
+                      </div>
+                    )}
+                  </div>
+                </SectionBox>
+                
+                {/* Related Content Section */}
+                <SectionBox title="Related Content" icon={<GitBranch size={18} />}>
+                  {/* Alternative Versions */}
+                  {quote.variations && quote.variations.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-medium text-sm mb-1">Alternative Versions</h4>
+                      <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                        {quote.variations.map((variation, index) => (
+                          <li key={index}>{variation}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Cross-Referenced Quotes */}
+                  {quote.crossReferencedQuotes && quote.crossReferencedQuotes.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Related Quotes</h4>
+                      <div className="space-y-2">
+                        {quote.crossReferencedQuotes.map((relatedQuote, index) => (
+                          <div key={index} className="text-sm border-l-2 border-accent/30 pl-3 py-1">
+                            <p className="italic">"{relatedQuote.text}"</p>
+                            <p className="text-xs text-muted-foreground">— {relatedQuote.author}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </SectionBox>
+                
+                {/* Tags Section */}
+                <SectionBox title="Tags & Categories" icon={<Tags size={18} />}>
+                  <div className="space-y-3">
+                    {/* Topics */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Topics</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {quote.topics.map((topic) => (
+                          <Badge key={topic} variant="secondary" className="bg-secondary/80">
+                            {topic}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Theme */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Theme</h4>
+                      <Badge variant="outline" className="border-accent/30 text-accent">
+                        {quote.theme}
+                      </Badge>
+                    </div>
+                    
+                    {/* Keywords */}
+                    {quote.keywords && quote.keywords.length > 0 && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-2">Keywords</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {quote.keywords.map((keyword, index) => (
+                            <Badge key={index} variant="secondary" className="bg-secondary/50">
+                              {keyword}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </SectionBox>
+                
+                {/* Citation Section */}
+                <SectionBox title="Citation Formats" icon={<Award size={18} />}>
+                  <div className="space-y-3">
+                    {/* APA */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">APA</h4>
+                      <p className="text-sm text-muted-foreground">{quote.citationAPA}</p>
+                    </div>
+                    
+                    {/* MLA */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">MLA</h4>
+                      <p className="text-sm text-muted-foreground">{quote.citationMLA}</p>
+                    </div>
+                    
+                    {/* Chicago */}
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Chicago</h4>
+                      <p className="text-sm text-muted-foreground">{quote.citationChicago}</p>
+                    </div>
+                  </div>
+                </SectionBox>
+                
+                {/* Export Section */}
+                {quote.exportFormats && Object.values(quote.exportFormats).some(val => val) && (
+                  <SectionBox title="Export Options" icon={<FileDown size={18} />}>
+                    <div className="flex flex-wrap gap-2">
+                      {quote.exportFormats.json && (
+                        <Badge variant="outline" className="cursor-pointer hover:bg-secondary/30">JSON</Badge>
+                      )}
+                      {quote.exportFormats.csv && (
+                        <Badge variant="outline" className="cursor-pointer hover:bg-secondary/30">CSV</Badge>
+                      )}
+                      {quote.exportFormats.cff && (
+                        <Badge variant="outline" className="cursor-pointer hover:bg-secondary/30">CFF</Badge>
+                      )}
+                    </div>
+                  </SectionBox>
+                )}
                 
                 {/* Actions */}
                 <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-border">

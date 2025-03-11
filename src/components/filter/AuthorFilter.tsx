@@ -1,31 +1,34 @@
 
+import React from 'react';
 import FilterChip from './FilterChip';
 import FilterSection from './FilterSection';
-import { FilterOption } from '@/context/SearchContext';
+import { useSearch } from '../../context/SearchContext';
 
-interface AuthorFilterProps {
-  authors: string[];
-  selectedAuthors: string[];
-  toggleFilter: (filterType: FilterOption, value: string) => void;
-}
-
-const AuthorFilter = ({ 
-  authors, 
-  selectedAuthors, 
-  toggleFilter 
-}: AuthorFilterProps) => (
-  <FilterSection title="Author">
-    <div className="grid grid-cols-2 gap-2">
-      {authors.map((author) => (
-        <FilterChip
-          key={author}
-          label={author}
-          selected={selectedAuthors.includes(author)}
-          onClick={() => toggleFilter('author', author)}
-        />
-      ))}
-    </div>
-  </FilterSection>
-);
+const AuthorFilter = () => {
+  const { filters, updateFilter, availableFilters } = useSearch();
+  
+  const toggleAuthor = (author: string) => {
+    const newAuthors = filters.author.includes(author)
+      ? filters.author.filter(a => a !== author)
+      : [...filters.author, author];
+    
+    updateFilter('author', newAuthors);
+  };
+  
+  return (
+    <FilterSection title="Authors">
+      <div className="flex flex-wrap gap-2">
+        {availableFilters.authors.map((author) => (
+          <FilterChip
+            key={author}
+            label={author}
+            selected={filters.author.includes(author)}
+            onClick={() => toggleAuthor(author)}
+          />
+        ))}
+      </div>
+    </FilterSection>
+  );
+};
 
 export default AuthorFilter;

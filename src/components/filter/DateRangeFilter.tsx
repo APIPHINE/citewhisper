@@ -1,59 +1,69 @@
 
-import { useState, useEffect } from 'react';
-import FilterSection from './FilterSection';
+import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { formatDateYear } from '@/utils/dateUtils';
+import FilterSection from './FilterSection';
+import { useSearch } from '../../context/SearchContext';
 
-interface DateRangeFilterProps {
-  initialStart: number;
-  initialEnd: number;
-  onRangeChange: (range: [number, number]) => void;
-}
+// Date range constants
+const MIN_YEAR = -2000; // 2000 BCE
+const MAX_YEAR = 2025;  // 2025 CE
+const RANGE = MAX_YEAR - MIN_YEAR;
 
-const DateRangeFilter = ({ 
-  initialStart, 
-  initialEnd, 
-  onRangeChange 
-}: DateRangeFilterProps) => {
-  const MIN_YEAR = -2000;
-  const MAX_YEAR = 2025;
+const DateRangeFilter = () => {
+  const { filters, updateFilter } = useSearch();
   
-  const [dateRange, setDateRange] = useState<[number, number]>([
-    initialStart, 
-    initialEnd
-  ]);
+  // Convert filter dates to slider values
+  const startYear = filters.date.start 
+    ? new Date(filters.date.start).getFullYear() 
+    : MIN_YEAR;
+    
+  const endYear = filters.date.end 
+    ? new Date(filters.date.end).getFullYear() 
+    : MAX_YEAR;
+  
+  // Convert years to normalized values for slider (0-100)
+  const normalizedStart = ((startYear - MIN_YEAR) / RANGE) * 100;
+  const normalizedEnd = ((endYear - MIN_YEAR) / RANGE) * 100;
   
   // Handle slider change
   const handleSliderChange = (values: number[]) => {
-    const [start, end] = values as [number, number];
-    setDateRange([start, end]);
-    onRangeChange([start, end]);
+    if (values.length === 2) {
+      // Convert normalized values back to years
+      const newStartYear = Math.round((values[0] / 100) * RANGE + MIN_YEAR);
+      const newEndYear = Math.round((values[1] / 100) * RANGE + MIN_YEAR);
+      
+      // Convert years to date strings
+      const startDate = newStartYear < 0 
+        ? `${Math.abs(newStartYear)}-01-01 BCE` 
+        : `${newStartYear}-01-01`;
+        
+      const endDate = newEndYear < 0 
+        ? `${Math.abs(newEndYear)}-12-31 BCE` 
+        : `${newEndYear}-12-31`;
+      
+      updateFilter('date', { start: startDate, end: endDate });
+    }
   };
-
-  // Update local state if props change
-  useEffect(() => {
-    setDateRange([initialStart, initialEnd]);
-  }, [initialStart, initialEnd]);
+  
+  // Format year for display
+  const formatYear = (year: number) => {
+    return year < 0 ? `${Math.abs(year)} BCE` : `${year} CE`;
+  };
 
   return (
     <FilterSection title="Date Range">
-      <div className="px-2 pt-6 pb-2">
+      <div className="px-1 pt-6 pb-2">
         <Slider
-          defaultValue={[MIN_YEAR, MAX_YEAR]}
-          value={dateRange}
-          min={MIN_YEAR}
-          max={MAX_YEAR}
-          step={1}
+          defaultValue={[normalizedStart, normalizedEnd]}
+          max={100}
+          step={0.1}
           onValueChange={handleSliderChange}
           className="mb-6"
         />
-        <div className="flex justify-between text-sm text-muted-foreground mt-2">
-          <div>
-            <span className="font-medium text-foreground">{formatDateYear(dateRange[0])}</span>
-          </div>
-          <div>
-            <span className="font-medium text-foreground">{formatDateYear(dateRange[1])}</span>
-          </div>
+        
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{formatYear(startYear)}</span>
+          <span>{formatYear(endYear)}</span>
         </div>
       </div>
     </FilterSection>

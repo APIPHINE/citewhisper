@@ -11,6 +11,45 @@ export interface Quote {
   originalText?: string;
   context?: string;
   historicalContext?: string;
+  
+  // IIIF & Screenshot Metadata
+  iiifImageUrl?: string;
+  iiifManifestUrl?: string;
+  imageCoordinates?: { x: number; y: number; width: number; height: number };
+  screenshotUrl?: string;
+  
+  // OCR Extraction
+  ocrExtractedText?: string;
+  ocrConfidenceScore?: number;
+  
+  // Source & Attribution Verification
+  sourcePublicationDate?: string;
+  originalManuscriptReference?: string;
+  translator?: string;
+  attributionStatus?: string;
+  
+  // Citation Chain (Source Provenance)
+  citationChain?: Array<{ source: string; date: string; type: string }>;
+  
+  // Alternative Versions & Cross-References
+  variations?: string[];
+  crossReferencedQuotes?: Array<{ id: string; text: string; author: string }>;
+  
+  // Keywords, Tags, and Impact
+  keywords?: string[];
+  impact?: string;
+  
+  // Citation Formats for Export
+  citationAPA?: string;
+  citationMLA?: string;
+  citationChicago?: string;
+  
+  // Export & API Integration
+  exportFormats?: {
+    json?: boolean;
+    csv?: boolean;
+    cff?: boolean;
+  };
 }
 
 export const quotes: Quote[] = [
@@ -265,3 +304,50 @@ export const quotes: Quote[] = [
     historicalContext: "Presented as design thinking methodologies were becoming mainstream, offering a counterpoint to formulaic approaches."
   }
 ];
+
+// Update the existing quotes with placeholder values for the new fields
+quotes.forEach(quote => {
+  // Add IIIF & Screenshot Metadata
+  quote.iiifImageUrl = "PLACEHOLDER_iiifImageUrl";
+  quote.iiifManifestUrl = "PLACEHOLDER_iiifManifestUrl";
+  quote.imageCoordinates = { x: 0, y: 0, width: 0, height: 0 };
+  quote.screenshotUrl = "PLACEHOLDER_screenshotUrl";
+  
+  // Add OCR Extraction
+  quote.ocrExtractedText = "PLACEHOLDER_ocrExtractedText";
+  quote.ocrConfidenceScore = 0.95;
+  
+  // Add Source & Attribution Verification
+  quote.sourcePublicationDate = quote.date;
+  quote.originalManuscriptReference = "PLACEHOLDER_originalManuscriptReference";
+  quote.translator = quote.originalLanguage !== "English" ? "PLACEHOLDER_translator" : undefined;
+  quote.attributionStatus = "Confirmed";
+  
+  // Add Citation Chain
+  quote.citationChain = [
+    { source: "PLACEHOLDER_primarySource", date: quote.date, type: "Primary Source" },
+    { source: "PLACEHOLDER_secondarySource", date: quote.date, type: "Secondary Source" }
+  ];
+  
+  // Add Alternative Versions & Cross-References
+  quote.variations = ["PLACEHOLDER_quoteVariations"];
+  quote.crossReferencedQuotes = [
+    { id: "PLACEHOLDER_crossRefId", text: "PLACEHOLDER_crossRefText", author: "PLACEHOLDER_crossRefAuthor" }
+  ];
+  
+  // Add Keywords, Tags, and Impact
+  quote.keywords = [...quote.topics];
+  quote.impact = "PLACEHOLDER_impactAnalysis";
+  
+  // Add Citation Formats
+  quote.citationAPA = `${quote.author} (${new Date(quote.date).getFullYear()}). ${quote.text}`;
+  quote.citationMLA = `${quote.author}. "${quote.text}." ${quote.source || "Unknown source"}, ${new Date(quote.date).getFullYear()}.`;
+  quote.citationChicago = `${quote.author}, "${quote.text}," ${quote.source || "Unknown source"}, ${new Date(quote.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
+  
+  // Add Export Formats
+  quote.exportFormats = {
+    json: true,
+    csv: true,
+    cff: true
+  };
+});
