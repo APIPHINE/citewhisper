@@ -95,14 +95,13 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
         delay: delay * 0.08 
       }}
       className={`group relative z-10 ${isAnyExpanded && !expanded ? 'pointer-events-none opacity-0' : ''}`}
-      style={{ minHeight: '280px' }} // Ensure minimum height for all cards
+      style={{ height: 'fit-content' }} // Allow height to match content
     >
       {/* Main Card */}
       <div 
         className={`rounded-2xl transition-all duration-350 ease-apple 
           ${expanded ? 'border-accent shadow-elevation border-2' : 'border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2'}
-          overflow-hidden`}
-        style={{ minHeight: expanded ? 'auto' : '100%' }}
+          overflow-hidden h-full`}
       >
         {!expanded && (
           <>
@@ -181,7 +180,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6 md:p-8"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8"
             onClick={toggleExpanded}
           >
             <motion.div
