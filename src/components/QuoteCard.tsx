@@ -174,7 +174,7 @@ const QuoteCard = ({ quote, delay = 0 }: QuoteCardProps) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl shadow-elevation border border-accent max-w-3xl w-full max-h-[90vh] overflow-hidden"
+              className="bg-white rounded-2xl shadow-elevation border border-accent max-w-3xl w-full max-h-[90vh] overflow-hidden z-[100]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Expanded Card Header with close button */}
