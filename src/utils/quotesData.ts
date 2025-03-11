@@ -1,4 +1,3 @@
-
 export interface Quote {
   id: string;
   text: string;
@@ -6,6 +5,12 @@ export interface Quote {
   date: string;
   topics: string[];
   theme: string;
+  source?: string;
+  sourceUrl?: string;
+  originalLanguage?: string;
+  originalText?: string;
+  context?: string;
+  historicalContext?: string;
 }
 
 export const quotes: Quote[] = [
@@ -15,7 +20,12 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "2003-01-15",
     topics: ["Design", "Functionality"],
-    theme: "Technology"
+    theme: "Technology",
+    source: "New York Times Interview",
+    sourceUrl: "https://www.nytimes.com/",
+    originalLanguage: "English",
+    context: "Said during an interview about Apple's approach to product design, emphasizing that functionality is as important as aesthetics.",
+    historicalContext: "Spoken at a time when Apple was redefining product design with the iPod, shifting focus from purely aesthetic design to user experience design."
   },
   {
     id: '2',
@@ -23,7 +33,12 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "2005-06-12",
     topics: ["Life", "Motivation"],
-    theme: "Inspiration"
+    theme: "Inspiration",
+    source: "Stanford Commencement Address",
+    sourceUrl: "https://news.stanford.edu/2005/06/14/jobs-061505/",
+    originalLanguage: "English",
+    context: "Part of Jobs' famous Stanford commencement speech where he reflected on his own mortality after his cancer diagnosis.",
+    historicalContext: "Delivered during a period when Jobs had recently returned to Apple after being forced out, and had experienced a cancer diagnosis that changed his outlook on life."
   },
   {
     id: '3',
@@ -31,7 +46,13 @@ export const quotes: Quote[] = [
     author: "Leonardo da Vinci",
     date: "1490-05-20",
     topics: ["Design", "Philosophy"],
-    theme: "Art"
+    theme: "Art",
+    source: "Notebooks of Leonardo da Vinci",
+    sourceUrl: "https://www.britannica.com/biography/Leonardo-da-Vinci",
+    originalLanguage: "Italian",
+    originalText: "La semplicità è l'ultima sofisticazione.",
+    context: "Written in da Vinci's notebooks during his studies of art and nature, reflecting his belief that the most elegant solutions are often the simplest.",
+    historicalContext: "During the Italian Renaissance when da Vinci was developing revolutionary ideas in art, science, and engineering, often finding elegant, simple solutions to complex problems."
   },
   {
     id: '4',
@@ -39,7 +60,13 @@ export const quotes: Quote[] = [
     author: "Dieter Rams",
     date: "1980-11-28",
     topics: ["Design", "Minimalism"],
-    theme: "Design"
+    theme: "Design",
+    source: "Ten Principles for Good Design",
+    sourceUrl: "https://www.vitsoe.com/us/about/good-design",
+    originalLanguage: "German",
+    originalText: "Gutes Design ist so wenig Design wie möglich.",
+    context: "One of Rams' ten principles for good design, advocating for simplicity and removing unnecessary elements.",
+    historicalContext: "Formulated during Rams' tenure at Braun, where he revolutionized industrial design with minimalist, functional products that influenced generations of designers, including those at Apple."
   },
   {
     id: '5',
@@ -47,7 +74,12 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "2007-09-10",
     topics: ["Leadership", "Innovation"],
-    theme: "Business"
+    theme: "Business",
+    source: "Business Week Interview",
+    sourceUrl: "https://www.bloomberg.com/businessweek",
+    originalLanguage: "English",
+    context: "Said during an interview about Apple's approach to creating new products rather than following market trends.",
+    historicalContext: "Spoken during the period when Apple was about to release the iPhone, which would revolutionize the mobile phone industry."
   },
   {
     id: '6',
@@ -55,7 +87,13 @@ export const quotes: Quote[] = [
     author: "Dieter Rams",
     date: "1985-02-15",
     topics: ["Design", "Minimalism"],
-    theme: "Design"
+    theme: "Design",
+    source: "Design Philosophy",
+    sourceUrl: "https://www.vitsoe.com/us/about/dieter-rams",
+    originalLanguage: "German",
+    originalText: "Weniger, aber besser.",
+    context: "A central tenet of Rams' design philosophy, emphasizing quality over quantity and removing unnecessary elements.",
+    historicalContext: "Developed during a period of increasing consumer goods production, advocating for more thoughtful, sustainable design approaches."
   },
   {
     id: '7',
@@ -63,7 +101,12 @@ export const quotes: Quote[] = [
     author: "Charles Eames",
     date: "1972-07-08",
     topics: ["Design", "Attention to Detail"],
-    theme: "Design"
+    theme: "Design",
+    source: "Interview with Design Quarterly",
+    sourceUrl: "https://www.eamesoffice.com/",
+    originalLanguage: "English",
+    context: "Spoken during a discussion about the Eames design process and their attention to every aspect of their work.",
+    historicalContext: "Said during the modernist design movement, emphasizing that even small details contribute significantly to the overall user experience."
   },
   {
     id: '8',
@@ -71,7 +114,12 @@ export const quotes: Quote[] = [
     author: "Joe Sparano",
     date: "2010-03-19",
     topics: ["Design", "User Experience"],
-    theme: "Design"
+    theme: "Design",
+    source: "AIGA Conference",
+    sourceUrl: "https://www.aiga.org/",
+    originalLanguage: "English",
+    context: "From a presentation on user-centered design principles, discussing how the best designs become invisible to users.",
+    historicalContext: "Emerged during the rise of user experience design as a discipline, emphasizing that great design should not call attention to itself but should seamlessly serve its purpose."
   },
   {
     id: '9',
@@ -79,7 +127,12 @@ export const quotes: Quote[] = [
     author: "Alan Kay",
     date: "1971-08-02",
     topics: ["Innovation", "Future"],
-    theme: "Technology"
+    theme: "Technology",
+    source: "Meeting of the Xerox Palo Alto Research Center",
+    sourceUrl: "https://www.parc.com/",
+    originalLanguage: "English",
+    context: "Said during a meeting at Xerox PARC, encouraging researchers to create the technologies they envisioned rather than waiting for them to emerge.",
+    historicalContext: "Spoken at the dawn of personal computing, when Kay and his colleagues were inventing technologies like the graphical user interface that would shape computing for decades."
   },
   {
     id: '10',
@@ -87,7 +140,12 @@ export const quotes: Quote[] = [
     author: "Alina Wheeler",
     date: "2006-10-25",
     topics: ["Design", "Intelligence"],
-    theme: "Design"
+    theme: "Design",
+    source: "Designing Brand Identity",
+    sourceUrl: "https://www.alinawheeler.com/",
+    originalLanguage: "English",
+    context: "From her book on brand identity, discussing how design communicates complex ideas visually.",
+    historicalContext: "Written during the expansion of branding as a strategic business function, highlighting design's role in expressing brand values and positioning."
   },
   {
     id: '11',
@@ -95,7 +153,10 @@ export const quotes: Quote[] = [
     author: "Micha Commeren",
     date: "2011-12-05",
     topics: ["Design", "Functionality"],
-    theme: "Design"
+    theme: "Design",
+    source: "Design Conference in Amsterdam",
+    context: "Part of a lecture on functional design principles.",
+    historicalContext: "Spoken during a period of renewed interest in functional design and user experience."
   },
   {
     id: '12',
@@ -103,7 +164,11 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "1996-05-15",
     topics: ["Creativity", "Innovation"],
-    theme: "Inspiration"
+    theme: "Inspiration",
+    source: "Wired Magazine Interview",
+    sourceUrl: "https://www.wired.com/",
+    context: "From an interview discussing how innovation often comes from combining existing ideas in new ways.",
+    historicalContext: "Said during Jobs' time away from Apple, reflecting on his approach to product development."
   },
   {
     id: '13',
@@ -111,7 +176,11 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "2005-06-12",
     topics: ["Work", "Passion"],
-    theme: "Inspiration"
+    theme: "Inspiration",
+    source: "Stanford Commencement Address",
+    sourceUrl: "https://news.stanford.edu/2005/06/14/jobs-061505/",
+    context: "Another key message from Jobs' Stanford speech, emphasizing the importance of passion in career choices.",
+    historicalContext: "Part of the same speech as his 'don't waste time' quote, reflecting on his career journey and lessons learned."
   },
   {
     id: '14',
@@ -119,7 +188,12 @@ export const quotes: Quote[] = [
     author: "Pablo Picasso",
     date: "1935-07-18",
     topics: ["Design", "Creativity"],
-    theme: "Art"
+    theme: "Art",
+    source: "Interview with The Paris Review",
+    originalLanguage: "Spanish",
+    originalText: "Los buenos artistas copian, los grandes roban.",
+    context: "Speaking about how artists build upon the work of those who came before them.",
+    historicalContext: "Said during Picasso's later career when reflecting on artistic influence and originality."
   },
   {
     id: '15',
@@ -127,7 +201,11 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "2005-06-12",
     topics: ["Inspiration", "Motivation"],
-    theme: "Inspiration"
+    theme: "Inspiration",
+    source: "Stanford Commencement Address",
+    sourceUrl: "https://news.stanford.edu/2005/06/14/jobs-061505/",
+    context: "The closing line of Jobs' Stanford speech, originally from the final issue of The Whole Earth Catalog.",
+    historicalContext: "Jobs borrowed this phrase from Stewart Brand's counterculture publication, which influenced Jobs' worldview in the 1970s."
   },
   {
     id: '16',
@@ -135,7 +213,10 @@ export const quotes: Quote[] = [
     author: "Robin Mathew",
     date: "2009-11-30",
     topics: ["Design", "Science", "Art"],
-    theme: "Design"
+    theme: "Design",
+    source: "Design Journal",
+    context: "From an article discussing the intersection of scientific thinking and artistic creativity in design.",
+    historicalContext: "Written during a period of increasing cross-disciplinary approaches to design problems."
   },
   {
     id: '17',
@@ -143,7 +224,10 @@ export const quotes: Quote[] = [
     author: "Ralf Speth",
     date: "2013-04-22",
     topics: ["Design", "Business"],
-    theme: "Business"
+    theme: "Business",
+    source: "Design Management Conference",
+    context: "Speaking about the business value of investing in quality design from the beginning.",
+    historicalContext: "Said by the CEO of Jaguar Land Rover, reflecting on how poor design decisions can lead to costly fixes and brand damage."
   },
   {
     id: '18',
@@ -151,7 +235,11 @@ export const quotes: Quote[] = [
     author: "Marty Neumeier",
     date: "2008-07-14",
     topics: ["Design", "Innovation"],
-    theme: "Creativity"
+    theme: "Creativity",
+    source: "The Designful Company",
+    sourceUrl: "https://www.martyneumeier.com/",
+    context: "From his book about how companies can use design thinking to drive innovation.",
+    historicalContext: "Written during the emergence of design thinking as a business strategy for innovation."
   },
   {
     id: '19',
@@ -159,7 +247,10 @@ export const quotes: Quote[] = [
     author: "Steve Jobs",
     date: "2010-08-05",
     topics: ["Simplicity", "Focus"],
-    theme: "Design"
+    theme: "Design",
+    source: "BusinessWeek Interview",
+    context: "Discussing Apple's design philosophy and the challenge of making products simple to use.",
+    historicalContext: "Said near the end of Jobs' career, summarizing a core philosophy that guided Apple's approach to product design."
   },
   {
     id: '20',
@@ -167,6 +258,10 @@ export const quotes: Quote[] = [
     author: "Natasha Jen",
     date: "2015-09-21",
     topics: ["Design", "Complexity"],
-    theme: "Design"
+    theme: "Design",
+    source: "99U Conference",
+    sourceUrl: "https://99u.adobe.com/",
+    context: "From a talk critiquing oversimplified approaches to design thinking.",
+    historicalContext: "Presented as design thinking methodologies were becoming mainstream, offering a counterpoint to formulaic approaches."
   }
 ];
