@@ -71,113 +71,107 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     }
     
     // Prevent body scrolling when expanded
-    if (!expanded) {
+    if (newExpandedState) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
   };
 
-  // Show the card if it's expanded, or if no cards are expanded
-  // This separates expanded card handling from other cards
-  const shouldShowCard = expanded || !isAnyExpanded;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ 
-        opacity: shouldShowCard ? 1 : 0, 
-        y: 0,
-        transition: { 
+    <>
+      {/* Regular card - show only if not expanded and no other cards are expanded */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ 
+          opacity: !expanded && !isAnyExpanded ? 1 : 0,
+          y: 0,
+          transition: { 
+            duration: 0.5, 
+            ease: [0.25, 0.1, 0.25, 1],
+          }
+        }}
+        transition={{ 
           duration: 0.5, 
           ease: [0.25, 0.1, 0.25, 1],
-        }
-      }}
-      transition={{ 
-        duration: 0.5, 
-        ease: [0.25, 0.1, 0.25, 1],
-        delay: delay * 0.08 
-      }}
-      className={`group relative z-10 ${shouldShowCard ? '' : 'pointer-events-none opacity-0'}`}
-      style={{ height: 'fit-content' }} // Allow height to match content
-    >
-      {/* Main Card */}
-      <div 
-        className={`rounded-2xl transition-all duration-350 ease-apple 
-          ${expanded ? 'border-accent shadow-elevation border-2' : 'border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2'}
-          overflow-hidden h-full`}
+          delay: delay * 0.08 
+        }}
+        className={`group relative ${!expanded && !isAnyExpanded ? '' : 'pointer-events-none opacity-0 absolute'}`}
+        style={{ height: 'fit-content' }} // Allow height to match content
       >
-        {!expanded && (
-          <>
-            {/* Quote Text */}
-            <p className="text-balance text-lg leading-relaxed mb-4 relative">
-              <span className="absolute -left-1 -top-3 text-4xl text-accent font-serif opacity-30">"</span>
-              {quote.text}
-              <span className="absolute -bottom-6 -right-1 text-4xl text-accent font-serif opacity-30">"</span>
-            </p>
-            
-            {/* Quote Meta */}
-            <div className="mt-6 flex items-start justify-between">
-              <div>
-                <p className="font-medium text-foreground">{quote.author}</p>
-                <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
-                
-                {/* Source - New Addition */}
-                {quote.source && (
-                  <p className="text-sm text-muted-foreground mt-1 italic">
-                    Source: {quote.source}
-                  </p>
-                )}
-                
-                {/* Topics & Theme */}
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {quote.topics.map((topic) => (
-                    <Badge key={topic} variant="secondary" className="bg-secondary/80">
-                      {topic}
-                    </Badge>
-                  ))}
-                  <Badge variant="outline" className="border-accent/30 text-accent">
-                    {quote.theme}
-                  </Badge>
-                </div>
-              </div>
+        <div 
+          className="rounded-2xl transition-all duration-350 ease-apple 
+            border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2
+            overflow-hidden h-full"
+        >
+          {/* Quote Text */}
+          <p className="text-balance text-lg leading-relaxed mb-4 relative">
+            <span className="absolute -left-1 -top-3 text-4xl text-accent font-serif opacity-30">"</span>
+            {quote.text}
+            <span className="absolute -bottom-6 -right-1 text-4xl text-accent font-serif opacity-30">"</span>
+          </p>
+          
+          {/* Quote Meta */}
+          <div className="mt-6 flex items-start justify-between">
+            <div>
+              <p className="font-medium text-foreground">{quote.author}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
               
-              {/* Actions */}
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={toggleFavorite}
-                  className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                  aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <Heart 
-                    size={20} 
-                    className={favorite ? "fill-accent text-accent" : "text-foreground"} 
-                  />
-                </button>
-                
-                <button
-                  onClick={handleCopy}
-                  className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                  aria-label="Copy to clipboard"
-                >
-                  {copied ? <Check size={20} className="text-accent" /> : <Copy size={20} />}
-                </button>
-                
-                {/* Expand button */}
-                <button
-                  onClick={toggleExpanded}
-                  className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                  aria-label="Expand quote details"
-                >
-                  <ChevronDown size={20} />
-                </button>
+              {/* Source - New Addition */}
+              {quote.source && (
+                <p className="text-sm text-muted-foreground mt-1 italic">
+                  Source: {quote.source}
+                </p>
+              )}
+              
+              {/* Topics & Theme */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {quote.topics.map((topic) => (
+                  <Badge key={topic} variant="secondary" className="bg-secondary/80">
+                    {topic}
+                  </Badge>
+                ))}
+                <Badge variant="outline" className="border-accent/30 text-accent">
+                  {quote.theme}
+                </Badge>
               </div>
             </div>
-          </>
-        )}
-      </div>
+            
+            {/* Actions */}
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={toggleFavorite}
+                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart 
+                  size={20} 
+                  className={favorite ? "fill-accent text-accent" : "text-foreground"} 
+                />
+              </button>
+              
+              <button
+                onClick={handleCopy}
+                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                aria-label="Copy to clipboard"
+              >
+                {copied ? <Check size={20} className="text-accent" /> : <Copy size={20} />}
+              </button>
+              
+              {/* Expand button */}
+              <button
+                onClick={toggleExpanded}
+                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                aria-label="Expand quote details"
+              >
+                <ChevronDown size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
       
-      {/* Expanded Overlay */}
+      {/* Expanded Overlay - completely separate from regular card rendering */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -312,7 +306,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </>
   );
 };
 
