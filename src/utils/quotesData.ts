@@ -1,3 +1,4 @@
+
 export interface Quote {
   id: string;
   text: string;
@@ -11,6 +12,7 @@ export interface Quote {
   originalText?: string;
   context?: string;
   historicalContext?: string;
+  avatar?: string; // New field for author avatar image
   
   // IIIF & Screenshot Metadata
   iiifImageUrl?: string;
@@ -63,6 +65,7 @@ export const quotes: Quote[] = [
     source: "New York Times Interview",
     sourceUrl: "https://www.nytimes.com/",
     originalLanguage: "English",
+    avatar: "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png", // Steve Jobs emoji
     context: "Said during an interview about Apple's approach to product design, emphasizing that functionality is as important as aesthetics.",
     historicalContext: "Spoken at a time when Apple was redefining product design with the iPod, shifting focus from purely aesthetic design to user experience design."
   },
@@ -76,6 +79,7 @@ export const quotes: Quote[] = [
     source: "Stanford Commencement Address",
     sourceUrl: "https://news.stanford.edu/2005/06/14/jobs-061505/",
     originalLanguage: "English",
+    avatar: "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png", // Steve Jobs emoji
     context: "Part of Jobs' famous Stanford commencement speech where he reflected on his own mortality after his cancer diagnosis.",
     historicalContext: "Delivered during a period when Jobs had recently returned to Apple after being forced out, and had experienced a cancer diagnosis that changed his outlook on life."
   },
@@ -104,6 +108,7 @@ export const quotes: Quote[] = [
     sourceUrl: "https://www.vitsoe.com/us/about/good-design",
     originalLanguage: "German",
     originalText: "Gutes Design ist so wenig Design wie möglich.",
+    avatar: "/lovable-uploads/d09783d1-38f2-49c7-ba86-a1e3ef8d4597.png", // Dieter Rams emoji
     context: "One of Rams' ten principles for good design, advocating for simplicity and removing unnecessary elements.",
     historicalContext: "Formulated during Rams' tenure at Braun, where he revolutionized industrial design with minimalist, functional products that influenced generations of designers, including those at Apple."
   },
@@ -117,6 +122,7 @@ export const quotes: Quote[] = [
     source: "Business Week Interview",
     sourceUrl: "https://www.bloomberg.com/businessweek",
     originalLanguage: "English",
+    avatar: "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png", // Steve Jobs emoji
     context: "Said during an interview about Apple's approach to creating new products rather than following market trends.",
     historicalContext: "Spoken during the period when Apple was about to release the iPhone, which would revolutionize the mobile phone industry."
   },
@@ -131,6 +137,7 @@ export const quotes: Quote[] = [
     sourceUrl: "https://www.vitsoe.com/us/about/dieter-rams",
     originalLanguage: "German",
     originalText: "Weniger, aber besser.",
+    avatar: "/lovable-uploads/d09783d1-38f2-49c7-ba86-a1e3ef8d4597.png", // Dieter Rams emoji
     context: "A central tenet of Rams' design philosophy, emphasizing quality over quantity and removing unnecessary elements.",
     historicalContext: "Developed during a period of increasing consumer goods production, advocating for more thoughtful, sustainable design approaches."
   },
@@ -307,47 +314,57 @@ export const quotes: Quote[] = [
 
 // Update the existing quotes with placeholder values for the new fields
 quotes.forEach(quote => {
-  // Add IIIF & Screenshot Metadata
-  quote.iiifImageUrl = "PLACEHOLDER_iiifImageUrl";
-  quote.iiifManifestUrl = "PLACEHOLDER_iiifManifestUrl";
-  quote.imageCoordinates = { x: 0, y: 0, width: 0, height: 0 };
-  quote.screenshotUrl = "PLACEHOLDER_screenshotUrl";
+  if (!quote.avatar) {
+    // Only add default avatar if one isn't already set
+    if (quote.author.includes("Steve Jobs")) {
+      quote.avatar = "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png";
+    } else if (quote.author.includes("Dieter Rams")) {
+      quote.avatar = "/lovable-uploads/d09783d1-38f2-49c7-ba86-a1e3ef8d4597.png";
+    }
+  }
   
-  // Add OCR Extraction
-  quote.ocrExtractedText = "PLACEHOLDER_ocrExtractedText";
-  quote.ocrConfidenceScore = 0.95;
+  // Add IIIF & Screenshot Metadata if not already set
+  quote.iiifImageUrl = quote.iiifImageUrl || "PLACEHOLDER_iiifImageUrl";
+  quote.iiifManifestUrl = quote.iiifManifestUrl || "PLACEHOLDER_iiifManifestUrl";
+  quote.imageCoordinates = quote.imageCoordinates || { x: 0, y: 0, width: 0, height: 0 };
+  quote.screenshotUrl = quote.screenshotUrl || "PLACEHOLDER_screenshotUrl";
   
-  // Add Source & Attribution Verification
-  quote.sourcePublicationDate = quote.date;
-  quote.originalManuscriptReference = "PLACEHOLDER_originalManuscriptReference";
-  quote.translator = quote.originalLanguage !== "English" ? "PLACEHOLDER_translator" : undefined;
-  quote.attributionStatus = "Confirmed";
+  // Add OCR Extraction if not already set
+  quote.ocrExtractedText = quote.ocrExtractedText || "PLACEHOLDER_ocrExtractedText";
+  quote.ocrConfidenceScore = quote.ocrConfidenceScore || 0.95;
   
-  // Add Citation Chain
-  quote.citationChain = [
+  // Add Source & Attribution Verification if not already set
+  quote.sourcePublicationDate = quote.sourcePublicationDate || quote.date;
+  quote.originalManuscriptReference = quote.originalManuscriptReference || "PLACEHOLDER_originalManuscriptReference";
+  quote.translator = quote.translator || (quote.originalLanguage !== "English" ? "PLACEHOLDER_translator" : undefined);
+  quote.attributionStatus = quote.attributionStatus || "Confirmed";
+  
+  // Add Citation Chain if not already set
+  quote.citationChain = quote.citationChain || [
     { source: "PLACEHOLDER_primarySource", date: quote.date, type: "Primary Source" },
     { source: "PLACEHOLDER_secondarySource", date: quote.date, type: "Secondary Source" }
   ];
   
-  // Add Alternative Versions & Cross-References
-  quote.variations = ["PLACEHOLDER_quoteVariations"];
-  quote.crossReferencedQuotes = [
+  // Add Alternative Versions & Cross-References if not already set
+  quote.variations = quote.variations || ["PLACEHOLDER_quoteVariations"];
+  quote.crossReferencedQuotes = quote.crossReferencedQuotes || [
     { id: "PLACEHOLDER_crossRefId", text: "PLACEHOLDER_crossRefText", author: "PLACEHOLDER_crossRefAuthor" }
   ];
   
-  // Add Keywords, Tags, and Impact
-  quote.keywords = [...quote.topics];
-  quote.impact = "PLACEHOLDER_impactAnalysis";
+  // Add Keywords, Tags, and Impact if not already set
+  quote.keywords = quote.keywords || [...quote.topics];
+  quote.impact = quote.impact || "PLACEHOLDER_impactAnalysis";
   
-  // Add Citation Formats
-  quote.citationAPA = `${quote.author} (${new Date(quote.date).getFullYear()}). ${quote.text}`;
-  quote.citationMLA = `${quote.author}. "${quote.text}." ${quote.source || "Unknown source"}, ${new Date(quote.date).getFullYear()}.`;
-  quote.citationChicago = `${quote.author}, "${quote.text}," ${quote.source || "Unknown source"}, ${new Date(quote.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
+  // Add Citation Formats if not already set
+  quote.citationAPA = quote.citationAPA || `${quote.author} (${new Date(quote.date).getFullYear()}). ${quote.text}`;
+  quote.citationMLA = quote.citationMLA || `${quote.author}. "${quote.text}." ${quote.source || "Unknown source"}, ${new Date(quote.date).getFullYear()}.`;
+  quote.citationChicago = quote.citationChicago || `${quote.author}, "${quote.text}," ${quote.source || "Unknown source"}, ${new Date(quote.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
   
-  // Add Export Formats
-  quote.exportFormats = {
+  // Add Export Formats if not already set
+  quote.exportFormats = quote.exportFormats || {
     json: true,
     csv: true,
     cff: true
   };
 });
+

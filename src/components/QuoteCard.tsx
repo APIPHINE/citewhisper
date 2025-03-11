@@ -1,11 +1,12 @@
 
 import { useState } from 'react';
-import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown } from 'lucide-react';
+import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown, Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '../context/FavoritesContext';
 import { Quote } from '../utils/quotesData';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface QuoteCardProps {
   quote: Quote;
@@ -71,6 +72,15 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     }
   };
 
+  // Get initials for avatar fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase();
+  };
+
   // Render the main card (only when not expanded)
   const renderMainCard = () => {
     if (expanded) return null;
@@ -93,8 +103,18 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
         <div 
           className="rounded-2xl transition-all duration-350 ease-apple 
             border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2
-            overflow-hidden h-full"
+            overflow-hidden h-full relative"
         >
+          {/* Author Avatar (new addition) */}
+          {quote.avatar && (
+            <div className="absolute top-2 right-2 z-10">
+              <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+                <AvatarImage src={quote.avatar} alt={quote.author} />
+                <AvatarFallback>{getInitials(quote.author)}</AvatarFallback>
+              </Avatar>
+            </div>
+          )}
+          
           {/* Quote Text */}
           <p className="text-balance text-lg leading-relaxed mb-4 relative">
             <span className="absolute -left-1 -top-3 text-4xl text-accent font-serif opacity-30">"</span>
@@ -214,9 +234,18 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
             >
               {/* Expanded Card Header with close button */}
               <div className="flex justify-between items-start border-b border-border p-6">
-                <div>
-                  <h2 className="text-2xl font-bold">{quote.author}</h2>
-                  <p className="text-muted-foreground">{formatDate(quote.date)}</p>
+                <div className="flex items-center gap-4">
+                  {/* Add avatar to expanded view header */}
+                  {quote.avatar && (
+                    <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+                      <AvatarImage src={quote.avatar} alt={quote.author} />
+                      <AvatarFallback>{getInitials(quote.author)}</AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div>
+                    <h2 className="text-2xl font-bold">{quote.author}</h2>
+                    <p className="text-muted-foreground">{formatDate(quote.date)}</p>
+                  </div>
                 </div>
                 
                 <button 
