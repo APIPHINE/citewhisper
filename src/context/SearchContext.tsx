@@ -1,5 +1,7 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Quote, quotes as initialQuotes } from '../utils/quotesData';
+import { dateStringToYear } from '../utils/dateUtils';
 
 export type SortOption = 'author' | 'date' | 'relevance' | 'theme' | 'topic';
 export type FilterOption = 'author' | 'topic' | 'keyword' | 'date' | 'theme';
@@ -101,10 +103,16 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     if (filters.date.start || filters.date.end) {
       result = result.filter(quote => {
+        // Get the quote year (from the date)
         const quoteDate = new Date(quote.date);
-        const startValid = !filters.date.start || quoteDate >= new Date(filters.date.start);
-        const endValid = !filters.date.end || quoteDate <= new Date(filters.date.end);
-        return startValid && endValid;
+        const quoteYear = quoteDate.getFullYear();
+        
+        // Get start and end years from filters
+        const startYear = filters.date.start ? dateStringToYear(filters.date.start) : -2000; // Default to 2000 BCE
+        const endYear = filters.date.end ? dateStringToYear(filters.date.end) : 2025; // Default to 2025 CE
+        
+        // Check if quote year is within range
+        return quoteYear >= startYear && quoteYear <= endYear;
       });
     }
 

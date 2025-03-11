@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Filter, Check, X } from 'lucide-react';
 import { useSearch, FilterOption } from '../context/SearchContext';
 import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { formatDateYear } from '../utils/dateUtils';
 
 const FilterMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -58,9 +60,44 @@ const FilterMenu = () => {
     }
   };
   
-  // Handle date filter
-  const handleDateChange = (field: 'start' | 'end', value: string) => {
-    updateFilter('date', { ...filters.date, [field]: value });
+  // Handle date range slider
+  // Min value is 2000 BCE (-2000), max value is 2025 CE (2025)
+  const MIN_YEAR = -2000;
+  const MAX_YEAR = 2025;
+  const RANGE = MAX_YEAR - MIN_YEAR;
+  
+  // Convert date string to slider value (year number)
+  const dateToSliderValue = (dateStr: string): number => {
+    if (!dateStr) return MIN_YEAR;
+    const date = new Date(dateStr);
+    return date.getFullYear();
+  };
+  
+  // Convert slider value (year number) to date string
+  const sliderValueToDate = (value: number): string => {
+    // For BCE dates
+    if (value <= 0) {
+      return `${Math.abs(value)}-01-01 BCE`;
+    }
+    // For CE dates
+    return `${value}-01-01`;
+  };
+  
+  // Initial slider values
+  const initialStart = filters.date.start ? dateToSliderValue(filters.date.start) : MIN_YEAR;
+  const initialEnd = filters.date.end ? dateToSliderValue(filters.date.end) : MAX_YEAR;
+  const [dateRange, setDateRange] = useState<[number, number]>([initialStart, initialEnd]);
+  
+  // Handle slider change
+  const handleSliderChange = (values: number[]) => {
+    const [start, end] = values as [number, number];
+    setDateRange([start, end]);
+    
+    // Update filter with new date range
+    updateFilter('date', {
+      start: sliderValueToDate(start),
+      end: sliderValueToDate(end)
+    });
   };
 
   return (
@@ -141,26 +178,25 @@ const FilterMenu = () => {
               </div>
             </FilterSection>
             
-            {/* Filter by Date Range */}
+            {/* Filter by Date Range - Slider */}
             <FilterSection title="Date Range">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-1">From</label>
-                  <input
-                    type="date"
-                    value={filters.date.start}
-                    onChange={(e) => handleDateChange('start', e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-1">To</label>
-                  <input
-                    type="date"
-                    value={filters.date.end}
-                    onChange={(e) => handleDateChange('end', e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                  />
+              <div className="px-2 pt-6 pb-2">
+                <Slider
+                  defaultValue={[MIN_YEAR, MAX_YEAR]}
+                  value={dateRange}
+                  min={MIN_YEAR}
+                  max={MAX_YEAR}
+                  step={1}
+                  onValueChange={handleSliderChange}
+                  className="mb-6"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                  <div>
+                    <span className="font-medium text-foreground">{formatDateYear(dateRange[0])}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-foreground">{formatDateYear(dateRange[1])}</span>
+                  </div>
                 </div>
               </div>
             </FilterSection>
