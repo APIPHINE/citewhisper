@@ -80,11 +80,11 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
 
   return (
     <>
-      {/* Regular card - show only if not expanded and no other cards are expanded */}
+      {/* Regular card - show when not expanded and no other cards are expanded */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
-          opacity: !expanded && !isAnyExpanded ? 1 : 0,
+          opacity: isAnyExpanded ? 0 : 1,
           y: 0,
           transition: { 
             duration: 0.5, 
@@ -96,7 +96,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
           ease: [0.25, 0.1, 0.25, 1],
           delay: delay * 0.08 
         }}
-        className={`group relative ${!expanded && !isAnyExpanded ? '' : 'pointer-events-none opacity-0 absolute'}`}
+        className={`group relative ${isAnyExpanded ? 'pointer-events-none opacity-0' : ''}`}
         style={{ height: 'fit-content' }} // Allow height to match content
       >
         <div 
