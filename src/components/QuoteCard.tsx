@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown, Link, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,7 +7,9 @@ import { useFavorites } from '../context/FavoritesContext';
 import { Quote } from '../utils/quotesData';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface QuoteCardProps {
   quote: Quote;
@@ -15,6 +18,11 @@ interface QuoteCardProps {
   onExpand?: (expanded: boolean) => void;
 }
 
+// Embed style types
+type EmbedStyle = 'minimal' | 'standard' | 'elegant';
+type EmbedColor = 'light' | 'dark' | 'accent';
+type EmbedSize = 'small' | 'medium' | 'large';
+
 const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteCardProps) => {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { toast } = useToast();
@@ -22,6 +30,11 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
   const [expanded, setExpanded] = useState(false);
   const [showEmbedCode, setShowEmbedCode] = useState(false);
   const favorite = isFavorite(quote.id);
+  
+  // Embed customization options
+  const [embedStyle, setEmbedStyle] = useState<EmbedStyle>('standard');
+  const [embedColor, setEmbedColor] = useState<EmbedColor>('light');
+  const [embedSize, setEmbedSize] = useState<EmbedSize>('medium');
   
   // Format date
   const formatDate = (dateString: string) => {
@@ -89,9 +102,15 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     toggleExpanded();
   };
   
-  // Generate embed code for the quote
+  // Generate embed code for the quote with custom options
   const generateEmbedCode = () => {
-    return `<iframe src="https://yourapp.com/embed/quote/${quote.id}" width="100%" height="200" frameborder="0"></iframe>`;
+    return `<iframe 
+  src="https://yourapp.com/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
+  width="${embedSize === 'small' ? '300' : embedSize === 'medium' ? '450' : '600'}" 
+  height="${embedSize === 'small' ? '150' : embedSize === 'medium' ? '200' : '250'}" 
+  frameborder="0"
+  title="Quote by ${quote.author}"
+></iframe>`;
   };
   
   // Copy embed code to clipboard
@@ -102,15 +121,6 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
       description: "The embed code has been copied to your clipboard.",
     });
   };
-
-    // Get initials for avatar fallback
-    const getInitials = (name: string) => {
-      return name
-        .split(' ')
-        .map(part => part[0])
-        .join('')
-        .toUpperCase();
-    };
 
   // Render the main card (only when not expanded)
   const renderMainCard = () => {
@@ -137,7 +147,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
             overflow-hidden h-full relative"
         >
           {/* Share Count Badge */}
-          {quote.shareCount > 0 && (
+          {quote.shareCount && quote.shareCount > 0 && (
             <div 
               onClick={() => toggleExpanded(true)}
               className="absolute top-2 right-2 z-10 cursor-pointer"
@@ -229,6 +239,61 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     </div>
   );
 
+  // Render embed preview based on selected options
+  const renderEmbedPreview = () => {
+    let previewClasses = "p-4 border rounded-lg mt-4 mb-6 relative";
+    let textSize = "text-base";
+    let padding = "p-4";
+    
+    // Apply style variations
+    if (embedStyle === 'minimal') {
+      previewClasses += " border-dashed";
+      padding = "p-3";
+    } else if (embedStyle === 'elegant') {
+      previewClasses += " shadow-md";
+      padding = "p-5";
+    }
+    
+    // Apply color variations
+    if (embedColor === 'dark') {
+      previewClasses += " bg-slate-800 text-white";
+    } else if (embedColor === 'accent') {
+      previewClasses += " bg-accent/10 border-accent/30";
+    } else {
+      previewClasses += " bg-white";
+    }
+    
+    // Apply size variations
+    if (embedSize === 'small') {
+      textSize = "text-sm";
+    } else if (embedSize === 'large') {
+      textSize = "text-lg";
+    }
+    
+    return (
+      <div className={previewClasses}>
+        <div className={`${padding}`}>
+          <p className={`${textSize} italic relative mb-2`}>
+            <span className={`absolute -left-1 -top-2 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
+            {quote.text}
+            <span className={`absolute -bottom-4 -right-1 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
+          </p>
+          <div className="mt-4 flex justify-between items-center">
+            <div>
+              <p className="font-medium">{quote.author}</p>
+              {embedStyle !== 'minimal' && (
+                <p className="text-sm opacity-70">{formatDate(quote.date)}</p>
+              )}
+            </div>
+            {embedStyle === 'elegant' && (
+              <div className="text-xs opacity-50">via Quote Archive</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       {/* Main card */}
@@ -295,9 +360,73 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                 {/* Embed Code Section (shown when share button is clicked) */}
                 {showEmbedCode && (
                   <div className="mb-8 p-4 bg-secondary/30 rounded-lg border border-border">
-                    <h3 className="font-medium mb-2 flex items-center">
+                    <h3 className="font-medium mb-4 flex items-center">
                       <Link size={16} className="mr-2" /> Embed this quote on your website
                     </h3>
+                    
+                    {/* Embed Customization Options */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      {/* Style Option */}
+                      <div>
+                        <Label htmlFor="embed-style" className="mb-2 block">Style</Label>
+                        <Select value={embedStyle} onValueChange={(value) => setEmbedStyle(value as EmbedStyle)}>
+                          <SelectTrigger id="embed-style">
+                            <SelectValue placeholder="Select style" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="minimal">Minimal</SelectItem>
+                            <SelectItem value="standard">Standard</SelectItem>
+                            <SelectItem value="elegant">Elegant</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* Color Theme */}
+                      <div>
+                        <Label className="mb-2 block">Color</Label>
+                        <RadioGroup 
+                          value={embedColor} 
+                          onValueChange={(value) => setEmbedColor(value as EmbedColor)}
+                          className="flex space-x-4"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="light" id="light" />
+                            <Label htmlFor="light">Light</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="dark" id="dark" />
+                            <Label htmlFor="dark">Dark</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="accent" id="accent" />
+                            <Label htmlFor="accent">Accent</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                      
+                      {/* Size Option */}
+                      <div>
+                        <Label htmlFor="embed-size" className="mb-2 block">Size</Label>
+                        <Select value={embedSize} onValueChange={(value) => setEmbedSize(value as EmbedSize)}>
+                          <SelectTrigger id="embed-size">
+                            <SelectValue placeholder="Select size" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="small">Small</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="large">Large</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    {/* Preview */}
+                    <div>
+                      <Label className="mb-2 block">Preview</Label>
+                      {renderEmbedPreview()}
+                    </div>
+                    
+                    {/* Generated Embed Code */}
                     <div className="bg-white border border-border p-3 rounded-md text-sm font-mono mb-3 overflow-x-auto">
                       {generateEmbedCode()}
                     </div>
@@ -539,7 +668,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                   </SectionBox>
                 )}
                 
-                {/* New "Cited By" Section */}
+                {/* "Cited By" Section */}
                 <SectionBox 
                   title={`Cited By (${quote.citedBy?.length || 0})`} 
                   icon={<Link size={18} />}
