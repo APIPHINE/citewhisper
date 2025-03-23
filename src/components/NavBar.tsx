@@ -1,113 +1,99 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, Search, Menu, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
+import { useMobile } from '../hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+
+const routePaths = [
+  { name: 'Home', path: '/' },
+  { name: 'Quotes', path: '/quotes' },
+  { name: 'Favorites', path: '/favorites' }
+];
 
 const NavBar = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isMobile } = useMobile();
   const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // Handle scroll event to change navbar appearance
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    setMounted(true);
   }, []);
-  
-  // Close mobile menu when changing routes
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-350 ease-apple ${
-        scrolled 
-          ? 'glass backdrop-blur-md border-b border-border/40 py-3' 
-          : 'bg-transparent'
-      }`}
+    <motion.nav
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+      className="fixed top-0 left-0 w-full bg-background/90 backdrop-blur-md z-50 border-b border-border"
     >
-      <div className="page-padding page-max-width">
-        <nav className="flex items-center justify-between">
+      <div className="page-padding py-4">
+        <div className="page-max-width flex items-center justify-between">
           {/* Logo */}
-          <Link 
-            to="/" 
-            className="group flex items-center font-medium text-lg transition-opacity duration-250 hover:opacity-80"
-          >
-            <span className="text-accent mr-1 font-bold text-2xl">"</span>
-            <span className="text-xl tracking-tight">CiteQuotes</span>
+          <Link to="/" className="text-xl font-semibold">
+            CiteQuotes
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
-            <NavLink to="/" active={location.pathname === '/'}>
-              <Search size={18} className="mr-1.5" />
-              Explore
-            </NavLink>
-            <NavLink to="/favorites" active={location.pathname === '/favorites'}>
-              <Heart size={18} className="mr-1.5" />
-              Favorites
-            </NavLink>
-          </div>
-
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden button-effect p-1.5 rounded-full hover:bg-secondary"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </nav>
+          {isMobile && (
+            <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          )}
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-elevation border border-border/30 overflow-hidden animate-fade-in">
-            <div className="py-3 flex flex-col">
-              <MobileNavLink to="/" active={location.pathname === '/'}>
-                <Search size={18} className="mr-2" />
-                Explore
-              </MobileNavLink>
-              <MobileNavLink to="/favorites" active={location.pathname === '/favorites'}>
-                <Heart size={18} className="mr-2" />
-                Favorites
-              </MobileNavLink>
-            </div>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-6">
+            {routePaths.map((route) => (
+              <Link
+                key={route.path}
+                to={route.path}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  location.pathname === route.path ? 'text-primary' : 'text-foreground'
+                }`}
+              >
+                {route.name}
+              </Link>
+            ))}
           </div>
-        )}
+        </div>
       </div>
-    </header>
+
+      {/* Mobile Menu */}
+      {isMobile && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: isMobileMenuOpen ? 1 : 0, height: isMobileMenuOpen ? 'auto' : 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="overflow-hidden"
+        >
+          <div className="page-padding py-4 flex flex-col gap-4">
+            {routePaths.map((route) => (
+              <Link
+                key={route.path}
+                to={route.path}
+                className={`text-lg font-medium transition-colors hover:text-primary ${
+                  location.pathname === route.path ? 'text-primary' : 'text-foreground'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {route.name}
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </motion.nav>
   );
 };
-
-const NavLink = ({ to, active, children }: { to: string; active: boolean; children: React.ReactNode }) => (
-  <Link
-    to={to}
-    className={`button-effect flex items-center px-4 py-2 rounded-full transition-all duration-250 ease-apple ${
-      active 
-        ? 'bg-primary text-primary-foreground font-medium' 
-        : 'hover:bg-secondary'
-    }`}
-  >
-    {children}
-  </Link>
-);
-
-const MobileNavLink = ({ to, active, children }: { to: string; active: boolean; children: React.ReactNode }) => (
-  <Link
-    to={to}
-    className={`flex items-center px-5 py-3 transition-colors ${
-      active 
-        ? 'bg-secondary/80 font-medium' 
-        : 'hover:bg-secondary/50'
-    }`}
-  >
-    {children}
-  </Link>
-);
 
 export default NavBar;
