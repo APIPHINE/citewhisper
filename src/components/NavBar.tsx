@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import { useMobile } from '../hooks/use-mobile';
+import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 
 const routePaths = [
@@ -13,7 +14,7 @@ const routePaths = [
 
 const NavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
 
