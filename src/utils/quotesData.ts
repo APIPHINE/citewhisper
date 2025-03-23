@@ -1,4 +1,4 @@
-import { Authors } from "./authors";
+import { authors } from "./authors";
 
 export type Citation = {
   type: string;
@@ -55,6 +55,7 @@ export interface Quote {
   imageCoordinates?: any;
   shareCount?: number;
   citedBy?: EmbedFormat[];
+  evidenceImage?: string;
 }
 
 export const quotes: Quote[] = [
@@ -66,7 +67,7 @@ export const quotes: Quote[] = [
     topics: ["Design", "Functionality", "User Experience"],
     theme: "Design Philosophy",
     source: "The New York Times Interview",
-    sourceUrl: "https://www.nytimes.com/2003/11/30/magazine/the-guts-of-a-new-machine.html",
+    sourceUrl: "https://web.archive.org/web/20170601140021/http://www.nytimes.com/2003/11/30/magazine/the-guts-of-a-new-machine.html",
     sourcePublicationDate: "2003-11-30",
     context: "Jobs was discussing the design philosophy behind Apple's products, emphasizing that good design goes beyond aesthetics.",
     historicalContext: "This quote came during the period when Apple was revolutionizing product design with the iPod, shortly before the iPhone would change the technology landscape forever.",
@@ -96,7 +97,9 @@ export const quotes: Quote[] = [
         siteName: "Interaction Design Foundation",
         embedDate: "2021-08-22"
       }
-    ]
+    ],
+    evidenceImage: "/lovable-uploads/88d0b22b-76de-4abd-87c3-70f960a4d252.png",
+    ocrExtractedText: "\"Most people make the mistake of thinking design is what it looks like,\" says Steve Jobs, Apple's C.E.O. \"People think it's this veneer -- that the designers are handed this box and told, 'Make it look good!' That's not what we think design is. It's not just what it looks like and feels like. Design is how it works.\""
   },
   {
     id: "2",

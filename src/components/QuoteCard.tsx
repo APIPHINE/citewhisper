@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown, Link, Share2 } from 'lucide-react';
+import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown, Link, Share2, Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '../context/FavoritesContext';
@@ -449,6 +448,35 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                 {/* Source Section */}
                 <SectionBox title="Source Information" icon={<BookOpen size={18} />}>
                   <div className="space-y-3">
+                    {/* Evidence Image */}
+                    {quote.evidenceImage && (
+                      <div className="mb-4">
+                        <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
+                        <div className="border border-border rounded-md overflow-hidden">
+                          <img 
+                            src={quote.evidenceImage} 
+                            alt={`Evidence for quote by ${quote.author}`} 
+                            className="w-full h-auto"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* OCR extracted text - show right after evidence image */}
+                    {quote.ocrExtractedText && (
+                      <div className="mb-4">
+                        <h4 className="font-medium text-sm mb-1">Extracted Text</h4>
+                        <div className="bg-secondary/20 p-3 rounded-md italic text-sm">
+                          {quote.ocrExtractedText}
+                        </div>
+                        {quote.ocrConfidenceScore && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Confidence Score: {(quote.ocrConfidenceScore * 100).toFixed(1)}%
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
                     {/* Original language */}
                     {quote.originalLanguage && (
                       <div>
