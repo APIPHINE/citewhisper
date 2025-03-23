@@ -1,4 +1,3 @@
-
 export interface Quote {
   id: string;
   text: string;
@@ -12,7 +11,14 @@ export interface Quote {
   originalText?: string;
   context?: string;
   historicalContext?: string;
-  avatar?: string; // New field for author avatar image
+  
+  // Share and citation tracking
+  shareCount?: number;
+  citedBy?: Array<{
+    siteName: string;
+    siteUrl: string;
+    embedDate: string;
+  }>;
   
   // IIIF & Screenshot Metadata
   iiifImageUrl?: string;
@@ -65,7 +71,6 @@ export const quotes: Quote[] = [
     source: "New York Times Interview",
     sourceUrl: "https://www.nytimes.com/",
     originalLanguage: "English",
-    avatar: "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png", // Steve Jobs emoji
     context: "Said during an interview about Apple's approach to product design, emphasizing that functionality is as important as aesthetics.",
     historicalContext: "Spoken at a time when Apple was redefining product design with the iPod, shifting focus from purely aesthetic design to user experience design."
   },
@@ -79,7 +84,6 @@ export const quotes: Quote[] = [
     source: "Stanford Commencement Address",
     sourceUrl: "https://news.stanford.edu/2005/06/14/jobs-061505/",
     originalLanguage: "English",
-    avatar: "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png", // Steve Jobs emoji
     context: "Part of Jobs' famous Stanford commencement speech where he reflected on his own mortality after his cancer diagnosis.",
     historicalContext: "Delivered during a period when Jobs had recently returned to Apple after being forced out, and had experienced a cancer diagnosis that changed his outlook on life."
   },
@@ -108,7 +112,6 @@ export const quotes: Quote[] = [
     sourceUrl: "https://www.vitsoe.com/us/about/good-design",
     originalLanguage: "German",
     originalText: "Gutes Design ist so wenig Design wie möglich.",
-    avatar: "/lovable-uploads/d09783d1-38f2-49c7-ba86-a1e3ef8d4597.png", // Dieter Rams emoji
     context: "One of Rams' ten principles for good design, advocating for simplicity and removing unnecessary elements.",
     historicalContext: "Formulated during Rams' tenure at Braun, where he revolutionized industrial design with minimalist, functional products that influenced generations of designers, including those at Apple."
   },
@@ -122,7 +125,6 @@ export const quotes: Quote[] = [
     source: "Business Week Interview",
     sourceUrl: "https://www.bloomberg.com/businessweek",
     originalLanguage: "English",
-    avatar: "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png", // Steve Jobs emoji
     context: "Said during an interview about Apple's approach to creating new products rather than following market trends.",
     historicalContext: "Spoken during the period when Apple was about to release the iPhone, which would revolutionize the mobile phone industry."
   },
@@ -137,7 +139,6 @@ export const quotes: Quote[] = [
     sourceUrl: "https://www.vitsoe.com/us/about/dieter-rams",
     originalLanguage: "German",
     originalText: "Weniger, aber besser.",
-    avatar: "/lovable-uploads/d09783d1-38f2-49c7-ba86-a1e3ef8d4597.png", // Dieter Rams emoji
     context: "A central tenet of Rams' design philosophy, emphasizing quality over quantity and removing unnecessary elements.",
     historicalContext: "Developed during a period of increasing consumer goods production, advocating for more thoughtful, sustainable design approaches."
   },
@@ -314,15 +315,25 @@ export const quotes: Quote[] = [
 
 // Update the existing quotes with placeholder values for the new fields
 quotes.forEach(quote => {
-  if (!quote.avatar) {
-    // Only add default avatar if one isn't already set
-    if (quote.author.includes("Steve Jobs")) {
-      quote.avatar = "/lovable-uploads/0f058567-cbf5-4089-a2e1-fb060e883ddd.png";
-    } else if (quote.author.includes("Dieter Rams")) {
-      quote.avatar = "/lovable-uploads/d09783d1-38f2-49c7-ba86-a1e3ef8d4597.png";
+  // Initialize share count and citedBy array
+  quote.shareCount = quote.shareCount || Math.floor(Math.random() * 15); // Random share count for demo
+  quote.citedBy = quote.citedBy || [
+    {
+      siteName: "Design Inspiration Blog",
+      siteUrl: "https://designinspiration.example.com",
+      embedDate: new Date(Date.now() - Math.random() * 10000000000).toISOString() // Random date within last ~4 months
+    },
+    {
+      siteName: "Creative Minds Magazine",
+      siteUrl: "https://creativeminds.example.com",
+      embedDate: new Date(Date.now() - Math.random() * 10000000000).toISOString()
     }
-  }
+  ];
   
+  // Remove avatar field (no longer needed)
+  delete quote.avatar;
+  
+  // Keep all other existing field initializations
   // Add IIIF & Screenshot Metadata if not already set
   quote.iiifImageUrl = quote.iiifImageUrl || "PLACEHOLDER_iiifImageUrl";
   quote.iiifManifestUrl = quote.iiifManifestUrl || "PLACEHOLDER_iiifManifestUrl";
@@ -367,4 +378,3 @@ quotes.forEach(quote => {
     cff: true
   };
 });
-

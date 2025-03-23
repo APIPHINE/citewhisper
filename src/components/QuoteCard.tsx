@@ -1,11 +1,11 @@
-
 import { useState } from 'react';
-import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown, Image } from 'lucide-react';
+import { Heart, Copy, Check, ChevronDown, ExternalLink, X, BookOpen, FileText, Fingerprint, GitBranch, Tags, Award, FileDown, Link, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '../context/FavoritesContext';
 import { Quote } from '../utils/quotesData';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface QuoteCardProps {
@@ -20,6 +20,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [showEmbedCode, setShowEmbedCode] = useState(false);
   const favorite = isFavorite(quote.id);
   
   // Format date
@@ -62,7 +63,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
   };
 
   // Toggle expanded status
-  const toggleExpanded = () => {
+  const toggleExpanded = (scrollToCitedBy = false) => {
     const newExpandedState = !expanded;
     setExpanded(newExpandedState);
     
@@ -70,16 +71,46 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     if (onExpand) {
       onExpand(newExpandedState);
     }
+    
+    // If requested, scroll to the cited-by section after expansion
+    if (newExpandedState && scrollToCitedBy) {
+      setTimeout(() => {
+        const citedBySection = document.getElementById(`cited-by-section-${quote.id}`);
+        if (citedBySection) {
+          citedBySection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+    }
+  };
+  
+  // Handle share button click
+  const handleShare = () => {
+    setShowEmbedCode(true);
+    toggleExpanded();
+  };
+  
+  // Generate embed code for the quote
+  const generateEmbedCode = () => {
+    return `<iframe src="https://yourapp.com/embed/quote/${quote.id}" width="100%" height="200" frameborder="0"></iframe>`;
+  };
+  
+  // Copy embed code to clipboard
+  const copyEmbedCode = () => {
+    navigator.clipboard.writeText(generateEmbedCode());
+    toast({
+      title: "Embed code copied",
+      description: "The embed code has been copied to your clipboard.",
+    });
   };
 
-  // Get initials for avatar fallback
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase();
-  };
+    // Get initials for avatar fallback
+    const getInitials = (name: string) => {
+      return name
+        .split(' ')
+        .map(part => part[0])
+        .join('')
+        .toUpperCase();
+    };
 
   // Render the main card (only when not expanded)
   const renderMainCard = () => {
@@ -105,13 +136,15 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
             border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2
             overflow-hidden h-full relative"
         >
-          {/* Author Avatar (new addition) */}
-          {quote.avatar && (
-            <div className="absolute top-2 right-2 z-10">
-              <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
-                <AvatarImage src={quote.avatar} alt={quote.author} />
-                <AvatarFallback>{getInitials(quote.author)}</AvatarFallback>
-              </Avatar>
+          {/* Share Count Badge */}
+          {quote.shareCount > 0 && (
+            <div 
+              onClick={() => toggleExpanded(true)}
+              className="absolute top-2 right-2 z-10 cursor-pointer"
+            >
+              <div className="flex items-center justify-center h-8 w-8 bg-accent/10 text-accent rounded-full text-xs font-medium hover:bg-accent/20 transition-colors">
+                {quote.shareCount}
+              </div>
             </div>
           )}
           
@@ -161,17 +194,18 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                 />
               </button>
               
+              {/* Share button (replacing copy button) */}
               <button
-                onClick={handleCopy}
+                onClick={handleShare}
                 className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                aria-label="Copy to clipboard"
+                aria-label="Share this quote"
               >
-                {copied ? <Check size={20} className="text-accent" /> : <Copy size={20} />}
+                <Share2 size={20} />
               </button>
               
               {/* Expand button */}
               <button
-                onClick={toggleExpanded}
+                onClick={() => toggleExpanded()}
                 className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
                 aria-label="Expand quote details"
               >
@@ -185,8 +219,8 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
   };
 
   // Section box component for expanded view
-  const SectionBox = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
-    <div className="mb-6 border border-border rounded-lg overflow-hidden">
+  const SectionBox = ({ title, icon, children, id }: { title: string; icon: React.ReactNode; children: React.ReactNode; id?: string }) => (
+    <div className="mb-6 border border-border rounded-lg overflow-hidden" id={id}>
       <div className="bg-secondary/30 px-4 py-3 flex items-center border-b border-border/80">
         <div className="mr-2 text-muted-foreground">{icon}</div>
         <h3 className="font-medium">{title}</h3>
@@ -200,7 +234,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
       {/* Main card */}
       {renderMainCard()}
       
-      {/* Expanded Overlay - Completely separate component */}
+      {/* Expanded Overlay */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -208,7 +242,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8"
-            onClick={toggleExpanded}
+            onClick={() => toggleExpanded()}
           >
             <motion.div
               initial={{ 
@@ -232,24 +266,15 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
               className="bg-white rounded-2xl shadow-elevation max-w-3xl w-full max-h-[90vh] overflow-hidden z-[100]"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Expanded Card Header with close button */}
+              {/* Expanded Card Header */}
               <div className="flex justify-between items-start border-b border-border p-6">
-                <div className="flex items-center gap-4">
-                  {/* Add avatar to expanded view header */}
-                  {quote.avatar && (
-                    <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
-                      <AvatarImage src={quote.avatar} alt={quote.author} />
-                      <AvatarFallback>{getInitials(quote.author)}</AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div>
-                    <h2 className="text-2xl font-bold">{quote.author}</h2>
-                    <p className="text-muted-foreground">{formatDate(quote.date)}</p>
-                  </div>
+                <div>
+                  <h2 className="text-2xl font-bold">{quote.author}</h2>
+                  <p className="text-muted-foreground">{formatDate(quote.date)}</p>
                 </div>
                 
                 <button 
-                  onClick={toggleExpanded}
+                  onClick={() => toggleExpanded()}
                   className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
                   aria-label="Close expanded view"
                 >
@@ -266,6 +291,31 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                     <span className="absolute -bottom-6 -right-1 text-4xl text-accent font-serif opacity-30">"</span>
                   </p>
                 </div>
+                
+                {/* Embed Code Section (shown when share button is clicked) */}
+                {showEmbedCode && (
+                  <div className="mb-8 p-4 bg-secondary/30 rounded-lg border border-border">
+                    <h3 className="font-medium mb-2 flex items-center">
+                      <Link size={16} className="mr-2" /> Embed this quote on your website
+                    </h3>
+                    <div className="bg-white border border-border p-3 rounded-md text-sm font-mono mb-3 overflow-x-auto">
+                      {generateEmbedCode()}
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs text-muted-foreground">
+                        By embedding this quote, your site will be listed in the "Cited By" section.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={copyEmbedCode}
+                        className="ml-4"
+                      >
+                        Copy Code
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Source Section */}
                 <SectionBox title="Source Information" icon={<BookOpen size={18} />}>
@@ -489,6 +539,41 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                   </SectionBox>
                 )}
                 
+                {/* New "Cited By" Section */}
+                <SectionBox 
+                  title={`Cited By (${quote.citedBy?.length || 0})`} 
+                  icon={<Link size={18} />}
+                  id={`cited-by-section-${quote.id}`}
+                >
+                  {quote.citedBy && quote.citedBy.length > 0 ? (
+                    <div className="space-y-4">
+                      {quote.citedBy.map((citation, index) => (
+                        <div key={index} className="flex justify-between items-start p-3 border border-border/50 rounded-lg hover:bg-secondary/10 transition-colors">
+                          <div>
+                            <p className="font-medium">{citation.siteName}</p>
+                            <p className="text-xs text-muted-foreground">Embedded on: {formatDate(citation.embedDate)}</p>
+                          </div>
+                          <a 
+                            href={citation.siteUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-accent hover:underline flex items-center text-sm"
+                          >
+                            Visit <ExternalLink size={14} className="ml-1" />
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">This quote hasn't been embedded on any websites yet.</p>
+                      <p className="text-sm mt-2">
+                        Share it using the embed code to see sites that cite this quote.
+                      </p>
+                    </div>
+                  )}
+                </SectionBox>
+                
                 {/* Actions */}
                 <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
                   <button
@@ -503,11 +588,11 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
                   </button>
                   
                   <button
-                    onClick={handleCopy}
+                    onClick={copyEmbedCode}
                     className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                    aria-label="Copy to clipboard"
+                    aria-label="Copy embed code"
                   >
-                    {copied ? <Check size={20} className="text-accent" /> : <Copy size={20} />}
+                    <Share2 size={20} />
                   </button>
                 </div>
               </div>
