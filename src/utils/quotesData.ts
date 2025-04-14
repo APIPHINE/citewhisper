@@ -296,6 +296,63 @@ export const quotes: Quote[] = [
     citationChicago: "Mamo, Lorinda. Interview in \"Storytelling in Design.\" Creative Bloq, August 17, 2012.",
     attributionStatus: "Confirmed",
     shareCount: 176
+  },
+  {
+    id: "quote_001_gabo",
+    text: "The best news is not always the one given first, but often the one best told.",
+    author: "Gabriel García Márquez",
+    date: "1996-01-01",
+    topics: ["Journalism", "Media", "Ethics"],
+    theme: "Quality over speed in journalism",
+    source: "El mejor oficio del mundo",
+    sourceUrl: "https://fundaciongabo.org/es/fundacion/noticias/el-mejor-oficio-del-mundo-por-gabriel-garcia-marquez",
+    sourcePublicationDate: "1996-01-01",
+    originalLanguage: "Spanish",
+    originalText: "La mejor noticia no es siempre la que se da primero, sino muchas veces la que se da mejor.",
+    context: "Gabriel García Márquez reflects on the craft of journalism, emphasizing narrative quality over urgency.",
+    historicalContext: "Published in a speech for the Colombian Foundation for New Journalism (now Fundación Gabo), urging reporters to honor storytelling.",
+    keywords: ["news", "ethics", "truth", "reporting", "storytelling"],
+    citationAPA: "García Márquez, G. (1996). El mejor oficio del mundo. Fundación Gabo.",
+    citationMLA: "García Márquez, Gabriel. El mejor oficio del mundo. Fundación Gabo, 1996.",
+    citationChicago: "García Márquez, Gabriel. 1996. El mejor oficio del mundo. Fundación Gabo.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 2145,
+    citedBy: [
+      {
+        siteUrl: "https://www.bbc.com/mundo/noticias-47235598",
+        siteName: "BBC Mundo",
+        embedDate: "2022-05-15"
+      }
+    ]
+  },
+  {
+    id: "quote_002_larra",
+    text: "To write in Madrid is to cry, to seek a voice and not find it.",
+    author: "Mariano José de Larra",
+    date: "1836-11-02",
+    topics: ["Censorship", "Writing", "Press"],
+    theme: "Repression and frustration in journalism",
+    source: "El Día de Difuntos de 1836",
+    sourceUrl: "https://www.cervantesvirtual.com/obra-visor/el-dia-de-difuntos-de-1836--0/html/ff08e46c-82b1-11df-acc7-002185ce6064_2.html",
+    sourcePublicationDate: "1836-11-02",
+    originalLanguage: "Spanish",
+    originalText: "Escribir en Madrid es llorar, es buscar voz sin encontrarla.",
+    context: "Larra expresses despair at the political and cultural repression of his time, reflecting on the futility of honest journalism.",
+    historicalContext: "Written during a time of press censorship and political tension in 19th-century Spain.",
+    keywords: ["Madrid", "censorship", "expression", "journalism", "Spain"],
+    citationAPA: "Larra, M. J. de. (1836). El Día de Difuntos de 1836. Biblioteca Virtual Miguel de Cervantes.",
+    citationMLA: "Larra, Mariano José de. El Día de Difuntos de 1836. 1836.",
+    citationChicago: "Larra, Mariano José de. 1836. El Día de Difuntos de 1836. Biblioteca Virtual Miguel de Cervantes.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 1321
   }
 ];
 
