@@ -9,6 +9,7 @@ import { SearchProvider } from "./context/SearchContext";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Favorites from "./pages/Favorites";
+import AddQuote from "./pages/AddQuote";
 import NotFound from "./pages/NotFound";
 import NavBar from "./components/NavBar";
 
@@ -26,6 +27,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/quotes" element={<Index />} />
+              <Route path="/add-quote" element={<AddQuote />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

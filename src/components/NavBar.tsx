@@ -2,13 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, PlusCircle } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 
 const routePaths = [
   { name: 'Home', path: '/' },
   { name: 'Quotes', path: '/quotes' },
+  { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Favorites', path: '/favorites' }
 ];
 
