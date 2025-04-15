@@ -1,11 +1,11 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, FileJson, Import } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 import type { Quote } from '../utils/quotesData';
 
 const AddQuote = () => {
@@ -17,7 +17,7 @@ const AddQuote = () => {
     },
     shareCount: 0
   });
-
+  const [jsonInput, setJsonInput] = useState('');
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -32,6 +32,38 @@ const AddQuote = () => {
         ...prev,
         [name]: value
       }));
+    }
+  };
+
+  const handleJsonImport = () => {
+    try {
+      const parsedJson = JSON.parse(jsonInput);
+      
+      // Validate required fields
+      if (!parsedJson.text || !parsedJson.author) {
+        throw new Error("Quote text and author are required");
+      }
+
+      setFormData({
+        ...parsedJson,
+        exportFormats: parsedJson.exportFormats || {
+          json: true,
+          csv: true,
+          cff: true
+        },
+        shareCount: parsedJson.shareCount || 0
+      });
+
+      toast({
+        title: "JSON Imported",
+        description: "Form fields have been populated from JSON data.",
+      });
+    } catch (error) {
+      toast({
+        title: "Invalid JSON",
+        description: error instanceof Error ? error.message : "Please check your JSON format",
+        variant: "destructive"
+      });
     }
   };
 
@@ -102,10 +134,33 @@ const AddQuote = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Header section */}
           <div className="inline-flex items-center justify-center mb-4 bg-secondary/80 text-foreground px-4 py-2 rounded-full text-sm">
             <PlusCircle size={16} className="mr-2" /> Add New Quote
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Contribute a Quote</h1>
+          
+          {/* JSON Import Section */}
+          <div className="mb-8 p-6 border rounded-lg bg-card">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <FileJson className="mr-2" /> Import from JSON
+            </h2>
+            <div className="space-y-4">
+              <Textarea 
+                value={jsonInput}
+                onChange={(e) => setJsonInput(e.target.value)}
+                placeholder="Paste your JSON here..."
+                className="min-h-[200px] font-mono text-sm"
+              />
+              <Button onClick={handleJsonImport} className="w-full">
+                <Import className="mr-2" /> Import JSON and Fill Form
+              </Button>
+            </div>
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Manual Entry Form */}
           <p className="text-muted-foreground mb-8 max-w-xl">
             Help expand our collection of verified quotes. Please provide as much information as possible.
           </p>
