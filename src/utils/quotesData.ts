@@ -1,3 +1,4 @@
+
 import { authors } from "./authors";
 
 export type Citation = {
@@ -566,5 +567,40 @@ export const quotes: Quote[] = [
     source: "TED Talk: Facebook's Role in Brexit and the Threat to Democracy",
     sourceUrl: "https://www.ted.com/talks/carole_cadwalladr_facebook_s_role_in_brexit_and_the_threat_to_democracy",
     sourcePublicationDate: "2019-04-15",
-    originalLanguage: "English",
     context: "Cadwalladr exposed Cambridge Analytica's interference in UK elections and its implications for journalism.",
+    historicalContext: "Post-Brexit, digital disinformation and democratic erosion dominated public discourse.",
+    keywords: ["democracy", "Cambridge Analytica", "journalism", "digital truth"],
+    citationAPA: "Cadwalladr, C. (2019, April 15). *TED Talk*.",
+    citationMLA: "Cadwalladr, Carole. 'TED Talk.' 15 Apr. 2019.",
+    citationChicago: "Cadwalladr, Carole. 2019. 'TED Talk.' April 15.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 7
+  },
+  {
+    id: "quote_001_orwell_verified",
+    text: "If liberty means anything at all, it means the right to tell people what they do not want to hear.",
+    author: "George Orwell",
+    date: "1945-08-01",
+    topics: ["Liberty", "Censorship", "Truth", "Press"],
+    theme: "Freedom of speech as a democratic foundation",
+    source: "Unpublished Preface to Animal Farm (Freedom of the Press)",
+    sourceUrl: "https://www.orwellfoundation.com/the-orwell-foundation/orwell/essays-and-other-works/the-freedom-of-the-press/",
+    sourcePublicationDate: "1945-08-01",
+    context: "Orwell wrote this as a preface to Animal Farm, criticizing British publishers' fear of political backlash.",
+    historicalContext: "Post-WWII Britain, facing pressures of political conformity and anti-communist paranoia.",
+    keywords: ["freedom", "liberty", "press", "truth", "Orwell"],
+    citationAPA: "Orwell, G. (1945). *The Freedom of the Press*. In unpublished preface to Animal Farm.",
+    citationMLA: "Orwell, George. 'The Freedom of the Press.' Unpublished preface to *Animal Farm*, 1945.",
+    citationChicago: "Orwell, George. 1945. 'The Freedom of the Press.' Unpublished preface to *Animal Farm*.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 6
+  }
+];
