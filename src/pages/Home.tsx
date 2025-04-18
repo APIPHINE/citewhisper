@@ -1,4 +1,3 @@
-
 import { ArrowRight, BookOpen, Search, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -88,7 +87,7 @@ const Home = () => {
                   and builds a foundation for meaningful discourse.
                 </p>
                 <a 
-                  href="https://www.plagiarism.org/article/why-should-i-cite-sources" 
+                  href="https://www.poynter.org/reporting-editing/2021/why-citing-sources-is-important-in-journalism/"
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-accent hover:underline"
@@ -106,7 +105,7 @@ const Home = () => {
                   an open mind to new possibilities and interpretations.
                 </p>
                 <a 
-                  href="https://www.scientificamerican.com/article/the-delicate-balance/"
+                  href="https://www.spj.org/ethics-papers-balance.asp"
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-accent hover:underline"
