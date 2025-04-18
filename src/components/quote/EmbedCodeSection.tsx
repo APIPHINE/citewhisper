@@ -1,4 +1,3 @@
-
 import { Link, Share2 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -97,6 +96,7 @@ export function EmbedCodeSection({
                 <p className={`${textSize} mb-3`}>{quote.text}</p>
                 <div className="text-sm">
                   <p className="font-medium">{quote.author}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
                   <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
                 </div>
               </div>
@@ -113,10 +113,11 @@ export function EmbedCodeSection({
                 <Logo />
               </div>
               <div className="p-4">
-                <p className={`${textSize} mb-3`}>{quote.text}</p>
-                <div className="text-sm">
+                <p className={`${textSize} mb-4`}>{quote.text}</p>
+                <div className="text-sm space-y-1">
                   <p className="font-medium">{quote.author}</p>
-                  <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
+                  <p className="text-muted-foreground">{formatDate(quote.date)}</p>
+                  <p className="opacity-70">Source: {quote.source || "Unknown"}</p>
                 </div>
               </div>
             </div>
@@ -125,17 +126,16 @@ export function EmbedCodeSection({
         default: // standard
           return (
             <div className="p-4">
-              <p className={`${textSize} relative mb-3`}>
+              <p className={`${textSize} relative mb-4`}>
                 <span className={`absolute -left-1 -top-2 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
                 {quote.text}
                 <span className={`absolute -bottom-4 -right-1 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
               </p>
-              <div className="mt-4 flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{quote.author}</p>
-                  <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
-                </div>
-                <div className="text-xs opacity-50">via CiteQuotes</div>
+              <div className="mt-6 space-y-1">
+                <p className="font-medium">{quote.author}</p>
+                <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
+                <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
+                <div className="text-xs opacity-50 mt-2">via CiteQuotes</div>
               </div>
             </div>
           );

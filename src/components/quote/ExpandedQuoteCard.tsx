@@ -35,13 +35,10 @@ export function ExpandedQuoteCard({
 }: ExpandedQuoteCardProps) {
   const { formatDate } = useFormatDate();
   const [showEmbedSection, setShowEmbedSection] = useState(showEmbedCode);
-  
-  // Embed customization options
   const [embedStyle, setEmbedStyle] = useState<EmbedStyle>('standard');
   const [embedColor, setEmbedColor] = useState<EmbedColor>('light');
   const [embedSize, setEmbedSize] = useState<EmbedSize>('medium');
   
-  // Handle share button click to toggle embed code visibility
   const handleShareClick = () => {
     setShowEmbedSection(!showEmbedSection);
   };
@@ -102,6 +99,9 @@ export function ExpandedQuoteCard({
               {quote.text}
               <span className="absolute -bottom-6 -right-1 text-4xl text-accent font-serif opacity-30">"</span>
             </p>
+            <div className="mt-8 text-sm text-muted-foreground">
+              <p>Source: {quote.source}</p>
+            </div>
           </div>
           
           {/* Share/Embed Button */}
@@ -115,7 +115,7 @@ export function ExpandedQuoteCard({
             </button>
           </div>
           
-          {/* Embed Code Section (shown when share button is clicked) */}
+          {/* Embed Code Section */}
           {showEmbedSection && (
             <EmbedCodeSection
               quote={quote}
