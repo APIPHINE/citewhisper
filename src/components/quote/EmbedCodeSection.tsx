@@ -75,17 +75,6 @@ export function EmbedCodeSection({
     } else if (embedSize === 'large') {
       textSize = "text-lg";
     }
-
-    // Logo component
-    const Logo = () => (
-      <div className="flex items-center justify-center">
-        <img 
-          src="/lovable-uploads/3f43633e-47a4-4c7f-a48a-00063e5f23ca.png" 
-          alt="CiteQuotes Logo" 
-          className="h-8 w-auto"
-        />
-      </div>
-    );
     
     const renderQuoteContent = () => {
       switch(embedStyle) {
@@ -100,18 +89,12 @@ export function EmbedCodeSection({
                   <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
                 </div>
               </div>
-              <div className="w-32 bg-accent/10 flex flex-col items-center justify-center p-4 border-l">
-                <Logo />
-              </div>
             </div>
           );
         
         case 'vertical':
           return (
             <div className="flex flex-col">
-              <div className="bg-accent/10 p-4 flex justify-center items-center border-b">
-                <Logo />
-              </div>
               <div className="p-4">
                 <p className={`${textSize} mb-4`}>{quote.text}</p>
                 <div className="text-sm space-y-1">
