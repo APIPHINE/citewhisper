@@ -54,8 +54,7 @@ export function EmbedCodeSection({
       description: "The embed code has been copied to your clipboard.",
     });
   };
-
-  // Render embed preview based on selected options
+  
   const renderEmbedPreview = () => {
     let previewClasses = "border rounded-lg mt-4 mb-6 relative overflow-hidden";
     let textSize = "text-base";
@@ -77,17 +76,21 @@ export function EmbedCodeSection({
     }
     
     const renderQuoteContent = () => {
+      const metaInfo = (
+        <div className="text-sm space-y-1">
+          <p className="font-medium">{quote.author}</p>
+          <p className="text-muted-foreground">{formatDate(quote.date)}</p>
+          <p className="opacity-70">Source: {quote.source || "Unknown"}</p>
+        </div>
+      );
+
       switch(embedStyle) {
         case 'horizontal':
           return (
             <div className="flex items-stretch">
               <div className="flex-1 p-4">
                 <p className={`${textSize} mb-3`}>{quote.text}</p>
-                <div className="text-sm">
-                  <p className="font-medium">{quote.author}</p>
-                  <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
-                  <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
-                </div>
+                {metaInfo}
               </div>
             </div>
           );
@@ -97,11 +100,7 @@ export function EmbedCodeSection({
             <div className="flex flex-col">
               <div className="p-4">
                 <p className={`${textSize} mb-4`}>{quote.text}</p>
-                <div className="text-sm space-y-1">
-                  <p className="font-medium">{quote.author}</p>
-                  <p className="text-muted-foreground">{formatDate(quote.date)}</p>
-                  <p className="opacity-70">Source: {quote.source || "Unknown"}</p>
-                </div>
+                {metaInfo}
               </div>
             </div>
           );
@@ -114,11 +113,8 @@ export function EmbedCodeSection({
                 {quote.text}
                 <span className={`absolute -bottom-4 -right-1 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
               </p>
-              <div className="mt-6 space-y-1">
-                <p className="font-medium">{quote.author}</p>
-                <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
-                <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
-                <div className="text-xs opacity-50 mt-2">via CiteQuotes</div>
+              <div className="mt-6">
+                {metaInfo}
               </div>
             </div>
           );
