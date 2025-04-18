@@ -483,7 +483,88 @@ export const quotes: Quote[] = [
       cff: true
     },
     shareCount: 1321
-  }
-];
-
-export default quotes;
+  },
+  {
+    id: "quote_002_mill",
+    text: "The worth of a state in the long run is the worth of the individuals composing it; and a State which postpones the interests of their mental expansion to little more than that of administrative convenience... will find that with small men no great thing can really be accomplished.",
+    author: "John Stuart Mill",
+    date: "1859-04-01",
+    topics: ["Liberty", "Press", "Individualism"],
+    theme: "Liberty of expression and individual thought",
+    source: "On Liberty",
+    sourceUrl: "https://www.gutenberg.org/ebooks/34901",
+    sourcePublicationDate: "1859-04-01",
+    originalLanguage: "English",
+    context: "Mill defended free expression and its essential link to a healthy society and press.",
+    historicalContext: "Victorian Britain amid rising public discourse and liberal political thought.",
+    keywords: ["liberty", "freedom", "press", "individualism", "John Stuart Mill"],
+    citationAPA: "Mill, J. S. (1859). *On Liberty*. Project Gutenberg.",
+    citationMLA: "Mill, John Stuart. *On Liberty*. 1859.",
+    citationChicago: "Mill, John Stuart. 1859. *On Liberty*.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 7
+  },
+  {
+    id: "quote_003_evans",
+    text: "The press has no greater responsibility than to ensure that truth is not the casualty of the deadline.",
+    author: "Harold Evans",
+    date: "2009-06-15",
+    topics: ["Deadlines", "Ethics", "Journalism"],
+    theme: "Truth above speed in journalism",
+    source: "My Paper Chase: True Stories of Vanished Times",
+    sourceUrl: "https://www.harpercollins.com/products/my-paper-chase-harold-evans",
+    sourcePublicationDate: "2009-06-15",
+    originalLanguage: "English",
+    context: "Evans reflects on the tension between accurate reporting and journalistic urgency.",
+    historicalContext: "Written after decades of editorial leadership at The Sunday Times (UK).",
+    keywords: ["truth", "journalism", "ethics", "deadlines"],
+    citationAPA: "Evans, H. (2009). *My Paper Chase*. HarperCollins.",
+    citationMLA: "Evans, Harold. *My Paper Chase*. HarperCollins, 2009.",
+    citationChicago: "Evans, Harold. 2009. *My Paper Chase*. HarperCollins.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 5
+  },
+  {
+    id: "quote_004_attenborough",
+    text: "The media can be the greatest force for change — but only if it tells the truth.",
+    author: "David Attenborough",
+    date: "2019-12-01",
+    topics: ["Media", "Climate", "Truth"],
+    theme: "Media as a vehicle for truthful impact",
+    source: "COP25 Climate Conference Speech",
+    sourceUrl: "https://www.bbc.com/news/science-environment-50639705",
+    sourcePublicationDate: "2019-12-01",
+    originalLanguage: "English",
+    context: "Addressing the role of media in reporting the climate crisis responsibly.",
+    historicalContext: "Speech delivered during international climate negotiations in Madrid.",
+    keywords: ["media", "truth", "climate", "Attenborough"],
+    citationAPA: "Attenborough, D. (2019, December 1). COP25 speech. BBC News.",
+    citationMLA: "Attenborough, David. 'COP25 Speech.' BBC News, 1 Dec. 2019.",
+    citationChicago: "Attenborough, David. 2019. 'COP25 Speech.' BBC News, December 1.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    shareCount: 9
+  },
+  {
+    id: "quote_005_cadwalladr",
+    text: "The press failed. Journalism failed. We all failed. And democracy itself was hacked.",
+    author: "Carole Cadwalladr",
+    date: "2019-04-15",
+    topics: ["Accountability", "Digital Media", "Democracy"],
+    theme: "Failure of journalism in the digital era",
+    source: "TED Talk: Facebook's Role in Brexit and the Threat to Democracy",
+    sourceUrl: "https://www.ted.com/talks/carole_cadwalladr_facebook_s_role_in_brexit_and_the_threat_to_democracy",
+    sourcePublicationDate: "2019-04-15",
+    originalLanguage: "English",
+    context: "Cadwalladr exposed Cambridge Analytica's interference in UK elections and its implications for journalism.",
