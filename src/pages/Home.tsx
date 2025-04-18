@@ -8,6 +8,20 @@ const Home = () => {
   return (
     <div className="min-h-screen pt-24 pb-20 page-padding">
       <div className="page-max-width">
+        {/* Logo Section */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-center mb-8"
+        >
+          <img 
+            src="/og-image.png" 
+            alt="CiteQuotes Logo" 
+            className="w-48 h-48 object-contain" 
+          />
+        </motion.div>
+
         {/* Hero Section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
