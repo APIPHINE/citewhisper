@@ -86,14 +86,12 @@ const Home = () => {
                   Explore how proper attribution strengthens arguments, honors intellectual property, 
                   and builds a foundation for meaningful discourse.
                 </p>
-                <a 
-                  href="https://www.poynter.org/reporting-editing/2021/why-citing-sources-is-important-in-journalism/"
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <Link 
+                  to="/blog/why-sourcing-matters"
                   className="inline-flex items-center text-accent hover:underline"
                 >
                   Read article <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </CardContent>
             </Card>
             <Card className="overflow-hidden hover:shadow-md transition-shadow group">
@@ -104,14 +102,12 @@ const Home = () => {
                   Learn about the delicate balance between evidence-based reasoning and maintaining 
                   an open mind to new possibilities and interpretations.
                 </p>
-                <a 
-                  href="https://www.spj.org/ethics-papers-balance.asp"
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <Link 
+                  to="/blog/evidence-and-open-mindedness"
                   className="inline-flex items-center text-accent hover:underline"
                 >
                   Read article <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </CardContent>
             </Card>
           </div>
