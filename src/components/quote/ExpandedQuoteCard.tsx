@@ -34,11 +34,17 @@ export function ExpandedQuoteCard({
   copyEmbedCode
 }: ExpandedQuoteCardProps) {
   const { formatDate } = useFormatDate();
+  const [showEmbedSection, setShowEmbedSection] = useState(showEmbedCode);
   
   // Embed customization options
   const [embedStyle, setEmbedStyle] = useState<EmbedStyle>('standard');
   const [embedColor, setEmbedColor] = useState<EmbedColor>('light');
   const [embedSize, setEmbedSize] = useState<EmbedSize>('medium');
+  
+  // Handle share button click to toggle embed code visibility
+  const handleShareClick = () => {
+    setShowEmbedSection(!showEmbedSection);
+  };
   
   if (!expanded) return null;
   
@@ -98,8 +104,19 @@ export function ExpandedQuoteCard({
             </p>
           </div>
           
+          {/* Share/Embed Button */}
+          <div className="mb-4">
+            <button
+              onClick={handleShareClick}
+              className="flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+            >
+              <Share2 size={16} />
+              {showEmbedSection ? "Hide embed options" : "Embed this quote on your website"}
+            </button>
+          </div>
+          
           {/* Embed Code Section (shown when share button is clicked) */}
-          {showEmbedCode && (
+          {showEmbedSection && (
             <EmbedCodeSection
               quote={quote}
               embedStyle={embedStyle}
@@ -146,14 +163,6 @@ export function ExpandedQuoteCard({
                 size={20} 
                 className={favorite ? "fill-accent text-accent" : "text-foreground"} 
               />
-            </button>
-            
-            <button
-              onClick={copyEmbedCode}
-              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-              aria-label="Copy embed code"
-            >
-              <Share2 size={20} />
             </button>
           </div>
         </div>

@@ -56,6 +56,11 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     const newExpandedState = !expanded;
     setExpanded(newExpandedState);
     
+    // Reset embed code visibility when closing the expanded view
+    if (!newExpandedState) {
+      setShowEmbedCode(false);
+    }
+    
     // Notify parent component about expansion state
     if (onExpand) {
       onExpand(newExpandedState);
@@ -72,27 +77,10 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
     }
   };
   
-  // Handle share button click
+  // Handle share button click (from main card)
   const handleShare = () => {
     setShowEmbedCode(true);
     toggleExpanded();
-  };
-  
-  // Copy embed code to clipboard
-  const copyEmbedCode = () => {
-    const embedCode = `<iframe 
-  src="https://yourapp.com/embed/quote/${quote.id}" 
-  width="450" 
-  height="200" 
-  frameborder="0"
-  title="Quote by ${quote.author}"
-></iframe>`;
-    
-    navigator.clipboard.writeText(embedCode);
-    toast({
-      title: "Embed code copied",
-      description: "The embed code has been copied to your clipboard.",
-    });
   };
 
   return (
@@ -118,7 +106,21 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
           favorite={favorite}
           toggleFavorite={toggleFavorite}
           showEmbedCode={showEmbedCode}
-          copyEmbedCode={copyEmbedCode}
+          copyEmbedCode={() => {
+            navigator.clipboard.writeText(`<iframe 
+  src="https://citequotes.com/embed/quote/${quote.id}?style=standard&color=light&size=medium" 
+  width="450" 
+  height="240" 
+  frameborder="0"
+  title="Quote by ${quote.author}"
+></iframe>
+<a href="https://citequotes.com/quotes/${quote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View on CiteQuotes</a>`);
+            
+            toast({
+              title: "Embed code copied",
+              description: "The embed code has been copied to your clipboard.",
+            });
+          }}
         />
       </AnimatePresence>
     </>
