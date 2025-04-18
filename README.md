@@ -1,8 +1,18 @@
+
 # Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/3c0ccb73-bd0a-4a1a-8a38-b43612b72ad4
+
+## About This Project
+
+This is a quotes collection application focused on journalism and media-related quotes. It features:
+
+- A curated collection of historical and contemporary quotes about journalism, media, and truth
+- Detailed source attribution and citation formats
+- Export capabilities in multiple formats
+- Interactive UI for exploring and sharing quotes
 
 ## How can I edit this code?
 
@@ -50,20 +60,20 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Technologies Used
 
-This project is built with .
+This project is built with modern web technologies:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Vite - Fast, modern frontend build tool
+- TypeScript - For type-safe JavaScript development
+- React - UI library for building interactive interfaces
+- shadcn/ui - High-quality, customizable UI components
+- Tailwind CSS - Utility-first CSS framework
 
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/3c0ccb73-bd0a-4a1a-8a38-b43612b72ad4) and click on Share -> Publish.
 
-## I want to use a custom domain - is that possible?
+## Custom Domain Support
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
