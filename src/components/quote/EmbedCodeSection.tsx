@@ -34,12 +34,20 @@ export function EmbedCodeSection({
   const { formatDate } = useFormatDate();
   const { toast } = useToast();
 
-  // Generate embed code with source link
+  // Generate embed code with source link and updated dimensions for vertical style
   const generateEmbedCode = () => {
+    const width = embedStyle === 'vertical' 
+      ? '400' // 1/3 width for vertical style
+      : embedSize === 'small' ? '300' : embedSize === 'medium' ? '450' : '600';
+    
+    const height = embedStyle === 'vertical'
+      ? '640' // 9:16 ratio for vertical style
+      : embedSize === 'small' ? '180' : embedSize === 'medium' ? '240' : '300';
+
     return `<iframe 
   src="https://citequotes.com/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
-  width="${embedSize === 'small' ? '300' : embedSize === 'medium' ? '450' : '600'}" 
-  height="${embedSize === 'small' ? '180' : embedSize === 'medium' ? '240' : '300'}" 
+  width="${width}" 
+  height="${height}" 
   frameborder="0"
   title="Quote by ${quote.author}"
 ></iframe>
@@ -66,6 +74,11 @@ export function EmbedCodeSection({
       previewClasses += " bg-accent/10 border-accent/30";
     } else {
       previewClasses += " bg-white";
+    }
+    
+    // Adjust preview container for vertical style
+    if (embedStyle === 'vertical') {
+      previewClasses += " w-[400px] aspect-[9/16]"; // 1/3 width and 9:16 ratio
     }
     
     // Apply size variations
@@ -140,10 +153,10 @@ export function EmbedCodeSection({
         <div>
           <Label htmlFor="embed-style" className="mb-2 block">Style</Label>
           <Select value={embedStyle} onValueChange={(value) => setEmbedStyle(value as EmbedStyle)}>
-            <SelectTrigger id="embed-style">
+            <SelectTrigger id="embed-style" className="bg-popover">
               <SelectValue placeholder="Select style" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover border-border">
               <SelectItem value="standard">Standard</SelectItem>
               <SelectItem value="horizontal">Horizontal Card</SelectItem>
               <SelectItem value="vertical">Vertical Card</SelectItem>
