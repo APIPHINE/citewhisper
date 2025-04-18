@@ -1,3 +1,4 @@
+
 import { ArrowRight, BookOpen, Search, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -16,9 +17,9 @@ const Home = () => {
           className="flex justify-center mb-8"
         >
           <img 
-            src="/og-image.png" 
+            src="/lovable-uploads/9b16d3c2-e088-4a30-af80-c9a31c6b2046.png" 
             alt="CiteQuotes Logo" 
-            className="w-48 h-48 object-contain" 
+            className="w-96 h-96 object-contain" 
           />
         </motion.div>
 
