@@ -1,4 +1,3 @@
-
 import { Link, Share2 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -9,7 +8,7 @@ import { useFormatDate } from '../../hooks/use-format-date';
 import { useToast } from '@/hooks/use-toast';
 
 // Embed style types
-export type EmbedStyle = 'minimal' | 'standard' | 'elegant' | 'modern' | 'classic';
+export type EmbedStyle = 'standard' | 'horizontal' | 'vertical';
 export type EmbedColor = 'light' | 'dark' | 'accent';
 export type EmbedSize = 'small' | 'medium' | 'large';
 
@@ -40,7 +39,7 @@ export function EmbedCodeSection({
     return `<iframe 
   src="https://citequotes.com/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
   width="${embedSize === 'small' ? '300' : embedSize === 'medium' ? '450' : '600'}" 
-  height="${embedSize === 'small' ? '150' : embedSize === 'medium' ? '200' : '250'}" 
+  height="${embedSize === 'small' ? '180' : embedSize === 'medium' ? '240' : '300'}" 
   frameborder="0"
   title="Quote by ${quote.author}"
 ></iframe>
@@ -58,36 +57,8 @@ export function EmbedCodeSection({
 
   // Render embed preview based on selected options
   const renderEmbedPreview = () => {
-    let previewClasses = "p-4 border rounded-lg mt-4 mb-6 relative";
+    let previewClasses = "border rounded-lg mt-4 mb-6 relative overflow-hidden";
     let textSize = "text-base";
-    let padding = "p-4";
-    let quoteSymbolsStyle = "";
-    
-    // Apply style variations
-    switch(embedStyle) {
-      case 'minimal':
-        previewClasses += " border-dashed";
-        padding = "p-3";
-        break;
-      case 'elegant':
-        previewClasses += " shadow-md";
-        padding = "p-5";
-        quoteSymbolsStyle = "text-accent italic";
-        break;
-      case 'modern':
-        previewClasses += " shadow-lg border-l-4 border-l-accent";
-        padding = "p-6";
-        quoteSymbolsStyle = "text-accent/50";
-        break;
-      case 'classic':
-        previewClasses += " bg-secondary/20 border-2";
-        padding = "p-5";
-        quoteSymbolsStyle = "font-serif text-foreground/30";
-        break;
-      default:
-        previewClasses += " shadow-sm";
-        quoteSymbolsStyle = embedColor === 'dark' ? 'text-white/30' : 'text-accent/30';
-    }
     
     // Apply color variations
     if (embedColor === 'dark') {
@@ -104,27 +75,75 @@ export function EmbedCodeSection({
     } else if (embedSize === 'large') {
       textSize = "text-lg";
     }
+
+    // Logo component
+    const Logo = () => (
+      <div className="flex items-center justify-center">
+        <img 
+          src="/lovable-uploads/3f43633e-47a4-4c7f-a48a-00063e5f23ca.png" 
+          alt="CiteQuotes Logo" 
+          className="h-8 w-auto"
+        />
+      </div>
+    );
     
+    const renderQuoteContent = () => {
+      switch(embedStyle) {
+        case 'horizontal':
+          return (
+            <div className="flex items-stretch">
+              <div className="flex-1 p-4">
+                <p className={`${textSize} mb-3`}>{quote.text}</p>
+                <div className="text-sm">
+                  <p className="font-medium">{quote.author}</p>
+                  <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
+                </div>
+              </div>
+              <div className="w-32 bg-accent/10 flex flex-col items-center justify-center p-4 border-l">
+                <Logo />
+              </div>
+            </div>
+          );
+        
+        case 'vertical':
+          return (
+            <div className="flex flex-col">
+              <div className="bg-accent/10 p-4 flex justify-center items-center border-b">
+                <Logo />
+              </div>
+              <div className="p-4">
+                <p className={`${textSize} mb-3`}>{quote.text}</p>
+                <div className="text-sm">
+                  <p className="font-medium">{quote.author}</p>
+                  <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
+                </div>
+              </div>
+            </div>
+          );
+        
+        default: // standard
+          return (
+            <div className="p-4">
+              <p className={`${textSize} relative mb-3`}>
+                <span className={`absolute -left-1 -top-2 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
+                {quote.text}
+                <span className={`absolute -bottom-4 -right-1 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
+              </p>
+              <div className="mt-4 flex justify-between items-center">
+                <div>
+                  <p className="font-medium">{quote.author}</p>
+                  <p className="text-sm opacity-70">Source: {quote.source || "Unknown"}</p>
+                </div>
+                <div className="text-xs opacity-50">via CiteQuotes</div>
+              </div>
+            </div>
+          );
+      }
+    };
+
     return (
       <div className={previewClasses}>
-        <div className={`${padding}`}>
-          <p className={`${textSize} relative mb-2`}>
-            <span className={`absolute -left-1 -top-2 text-3xl ${quoteSymbolsStyle} font-serif`}>"</span>
-            {quote.text}
-            <span className={`absolute -bottom-4 -right-1 text-3xl ${quoteSymbolsStyle} font-serif`}>"</span>
-          </p>
-          <div className="mt-4 flex justify-between items-center">
-            <div>
-              <p className="font-medium">{quote.author}</p>
-              {embedStyle !== 'minimal' && (
-                <p className="text-sm opacity-70">{formatDate(quote.date)}</p>
-              )}
-            </div>
-            {embedStyle !== 'minimal' && (
-              <div className="text-xs opacity-50">via CiteQuotes</div>
-            )}
-          </div>
-        </div>
+        {renderQuoteContent()}
       </div>
     );
   };
@@ -145,11 +164,9 @@ export function EmbedCodeSection({
               <SelectValue placeholder="Select style" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="minimal">Minimal</SelectItem>
               <SelectItem value="standard">Standard</SelectItem>
-              <SelectItem value="elegant">Elegant</SelectItem>
-              <SelectItem value="modern">Modern</SelectItem>
-              <SelectItem value="classic">Classic</SelectItem>
+              <SelectItem value="horizontal">Horizontal Card</SelectItem>
+              <SelectItem value="vertical">Vertical Card</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -220,4 +237,3 @@ export function EmbedCodeSection({
     </div>
   );
 }
-
