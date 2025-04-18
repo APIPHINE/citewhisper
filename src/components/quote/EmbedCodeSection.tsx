@@ -9,7 +9,7 @@ import { useFormatDate } from '../../hooks/use-format-date';
 import { useToast } from '@/hooks/use-toast';
 
 // Embed style types
-export type EmbedStyle = 'minimal' | 'standard' | 'elegant';
+export type EmbedStyle = 'minimal' | 'standard' | 'elegant' | 'modern' | 'classic';
 export type EmbedColor = 'light' | 'dark' | 'accent';
 export type EmbedSize = 'small' | 'medium' | 'large';
 
@@ -35,15 +35,16 @@ export function EmbedCodeSection({
   const { formatDate } = useFormatDate();
   const { toast } = useToast();
 
-  // Generate embed code for the quote with custom options
+  // Generate embed code with source link
   const generateEmbedCode = () => {
     return `<iframe 
-  src="https://yourapp.com/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
+  src="https://citequotes.com/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
   width="${embedSize === 'small' ? '300' : embedSize === 'medium' ? '450' : '600'}" 
   height="${embedSize === 'small' ? '150' : embedSize === 'medium' ? '200' : '250'}" 
   frameborder="0"
   title="Quote by ${quote.author}"
-></iframe>`;
+></iframe>
+<a href="https://citequotes.com/quotes/${quote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View on CiteQuotes</a>`;
   };
   
   // Copy embed code to clipboard
@@ -60,14 +61,32 @@ export function EmbedCodeSection({
     let previewClasses = "p-4 border rounded-lg mt-4 mb-6 relative";
     let textSize = "text-base";
     let padding = "p-4";
+    let quoteSymbolsStyle = "";
     
     // Apply style variations
-    if (embedStyle === 'minimal') {
-      previewClasses += " border-dashed";
-      padding = "p-3";
-    } else if (embedStyle === 'elegant') {
-      previewClasses += " shadow-md";
-      padding = "p-5";
+    switch(embedStyle) {
+      case 'minimal':
+        previewClasses += " border-dashed";
+        padding = "p-3";
+        break;
+      case 'elegant':
+        previewClasses += " shadow-md";
+        padding = "p-5";
+        quoteSymbolsStyle = "text-accent italic";
+        break;
+      case 'modern':
+        previewClasses += " shadow-lg border-l-4 border-l-accent";
+        padding = "p-6";
+        quoteSymbolsStyle = "text-accent/50";
+        break;
+      case 'classic':
+        previewClasses += " bg-secondary/20 border-2";
+        padding = "p-5";
+        quoteSymbolsStyle = "font-serif text-foreground/30";
+        break;
+      default:
+        previewClasses += " shadow-sm";
+        quoteSymbolsStyle = embedColor === 'dark' ? 'text-white/30' : 'text-accent/30';
     }
     
     // Apply color variations
@@ -89,10 +108,10 @@ export function EmbedCodeSection({
     return (
       <div className={previewClasses}>
         <div className={`${padding}`}>
-          <p className={`${textSize} italic relative mb-2`}>
-            <span className={`absolute -left-1 -top-2 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
+          <p className={`${textSize} relative mb-2`}>
+            <span className={`absolute -left-1 -top-2 text-3xl ${quoteSymbolsStyle} font-serif`}>"</span>
             {quote.text}
-            <span className={`absolute -bottom-4 -right-1 text-3xl ${embedColor === 'dark' ? 'text-white/30' : 'text-accent/30'} font-serif`}>"</span>
+            <span className={`absolute -bottom-4 -right-1 text-3xl ${quoteSymbolsStyle} font-serif`}>"</span>
           </p>
           <div className="mt-4 flex justify-between items-center">
             <div>
@@ -101,8 +120,8 @@ export function EmbedCodeSection({
                 <p className="text-sm opacity-70">{formatDate(quote.date)}</p>
               )}
             </div>
-            {embedStyle === 'elegant' && (
-              <div className="text-xs opacity-50">via Quote Archive</div>
+            {embedStyle !== 'minimal' && (
+              <div className="text-xs opacity-50">via CiteQuotes</div>
             )}
           </div>
         </div>
@@ -129,6 +148,8 @@ export function EmbedCodeSection({
               <SelectItem value="minimal">Minimal</SelectItem>
               <SelectItem value="standard">Standard</SelectItem>
               <SelectItem value="elegant">Elegant</SelectItem>
+              <SelectItem value="modern">Modern</SelectItem>
+              <SelectItem value="classic">Classic</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -182,6 +203,7 @@ export function EmbedCodeSection({
       <div className="bg-white border border-border p-3 rounded-md text-sm font-mono mb-3 overflow-x-auto">
         {generateEmbedCode()}
       </div>
+      
       <div className="flex justify-between items-center">
         <p className="text-xs text-muted-foreground">
           By embedding this quote, your site will be listed in the "Cited By" section.
@@ -198,3 +220,4 @@ export function EmbedCodeSection({
     </div>
   );
 }
+
