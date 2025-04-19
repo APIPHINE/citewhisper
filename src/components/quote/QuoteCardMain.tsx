@@ -1,9 +1,11 @@
 
-import { Heart, Share2, ChevronDown, Circle, Check } from 'lucide-react';
+import { Heart, Share2, ChevronDown, Circle, Check, Languages } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { useFormatDate } from '../../hooks/use-format-date';
+import { useState } from 'react';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface QuoteCardMainProps {
   quote: Quote;
@@ -31,11 +33,15 @@ export function QuoteCardMain({
   favoriteCount
 }: QuoteCardMainProps) {
   const { formatDate } = useFormatDate();
+  const [currentLanguage, setCurrentLanguage] = useState<"en" | "fr">("en");
   
   if (expanded) return null;
 
-  // Check if quote is verified (has evidenceImage)
   const isVerified = Boolean(quote.evidenceImage);
+  const hasTranslation = Boolean(quote.translations?.fr);
+  
+  const displayText = currentLanguage === "en" ? quote.text : quote.translations?.fr?.text || quote.text;
+  const displaySource = currentLanguage === "en" ? quote.source : quote.translations?.fr?.source || quote.source;
   
   return (
     <motion.div
@@ -52,8 +58,14 @@ export function QuoteCardMain({
       className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
       style={{ height: 'fit-content' }} 
     >
-      {/* Verification Status Indicator */}
-      <div className="absolute top-4 right-4 z-10">
+      {/* Verification Status and Language Switcher */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        {hasTranslation && (
+          <LanguageSwitcher
+            currentLanguage={currentLanguage}
+            onLanguageChange={setCurrentLanguage}
+          />
+        )}
         {isVerified ? (
           <div className="relative">
             <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
@@ -64,14 +76,10 @@ export function QuoteCardMain({
         )}
       </div>
 
-      <div 
-        className="rounded-2xl transition-all duration-350 ease-apple 
-          border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2
-          overflow-hidden h-full relative"
-      >
+      <div className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative">
         {/* Quote Text */}
         <p className="text-balance text-lg leading-relaxed mb-4">
-          "{quote.text}"
+          "{displayText}"
         </p>
         
         {/* Quote Meta */}
@@ -81,9 +89,9 @@ export function QuoteCardMain({
             <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
             
             {/* Source - New Addition */}
-            {quote.source && (
+            {displaySource && (
               <p className="text-sm text-muted-foreground mt-1 italic">
-                Source: {quote.source}
+                Source: {displaySource}
               </p>
             )}
             
