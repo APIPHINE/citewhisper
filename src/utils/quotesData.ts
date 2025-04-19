@@ -54,6 +54,30 @@ export const quotes: Quote[] = [
     topics: ["business", "success"],
     theme: "passion",
     source: "Stanford Commencement Address",
+    evidenceImage: "/lovable-uploads/88d0b22b-76de-4abd-87c3-70f960a4d252.png",
+    sourceUrl: "https://news.stanford.edu/2005/06/14/jobs-061505/",
+    sourcePublicationDate: "2005-06-14",
+    context: "Jobs delivered this line during his Stanford commencement address, encouraging graduates to find work they're passionate about.",
+    historicalContext: "At the time of this speech, Jobs had recently recovered from his first cancer diagnosis and was reflecting on mortality and meaningful work.",
+    attributionStatus: "Confirmed",
+    impact: "This quote has become one of Jobs' most cited sayings, inspiring countless entrepreneurs and professionals to pursue careers aligned with their passions.",
+    citationAPA: "Jobs, S. (2005, June 12). Stanford University Commencement Address.",
+    citationMLA: "Jobs, Steve. \"Stanford University Commencement Address.\" Stanford University, 12 June 2005.",
+    citationChicago: "Jobs, Steve. \"Stanford University Commencement Address.\" Speech, Stanford, CA, June 12, 2005.",
+    ocrExtractedText: "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
+    ocrConfidenceScore: 0.98,
+    citedBy: [
+      {
+        siteName: "Forbes",
+        siteUrl: "https://www.forbes.com/sites/forbesleadershipforum/2013/05/13/steve-jobs-best-quotes-for-entrepreneurs/",
+        embedDate: "2013-05-13"
+      },
+      {
+        siteName: "Harvard Business Review",
+        siteUrl: "https://hbr.org/2011/10/steve-jobss-ultimate-lesson-fo",
+        embedDate: "2011-10-07"
+      }
+    ]
   },
   {
     id: "2",
@@ -192,7 +216,7 @@ export const quotes: Quote[] = [
     topics: ["wisdom", "philosophy"],
     theme: "humility",
   },
-   {
+  {
     id: "19",
     text: "I have always depended on the kindness of strangers.",
     author: "Tennessee Williams",
@@ -307,5 +331,78 @@ export const quotes: Quote[] = [
     date: "2015-01-01",
     topics: ["humor", "space"],
     theme: "ambition",
+  },
+  {
+    id: "33",
+    text: "Without freedom of the press, there can be no representative government.",
+    author: "Thomas Jefferson",
+    date: "1823-11-07",
+    topics: ["freedom", "government"],
+    theme: "democracy",
+    source: "Letter to Lafayette",
+    evidenceImage: "/lovable-uploads/9fe7c698-558b-4981-a5fa-73e7bb8ea87f.png",
+    sourceUrl: "https://founders.archives.gov/documents/Jefferson/98-01-02-3843",
+    attributionStatus: "Confirmed",
+    citationAPA: "Jefferson, T. (1823, November 7). Letter to Lafayette.",
+    citationMLA: "Jefferson, Thomas. \"Letter to Lafayette.\" 7 Nov. 1823.",
+    citationChicago: "Jefferson, Thomas. Letter to Lafayette, November 7, 1823.",
+    ocrExtractedText: "Without freedom of the press, there can be no representative government, nor any other permanent free government.",
+    ocrConfidenceScore: 0.96,
+    historicalContext: "Jefferson wrote this in the context of the emerging democratic republics in Latin America, where he emphasized the critical importance of press freedom for democratic governance.",
+    impact: "This quote became a foundational principle for American press freedom and has been cited in numerous Supreme Court cases on First Amendment rights."
+  },
+  {
+    id: "34",
+    text: "La vie n'est pas ce qu'on a vécu, mais ce dont on se souvient et comment on s'en souvient.",
+    author: "Gabriel García Márquez",
+    date: "2002-07-05",
+    topics: ["memory", "life"],
+    theme: "perspective",
+    source: "Vivre pour la raconter",
+    originalLanguage: "Spanish",
+    originalText: "La vida no es la que uno vivió, sino la que uno recuerda y cómo la recuerda para contarla.",
+    translator: "Claude Couffon",
+    attributionStatus: "Confirmed",
+    translations: {
+      fr: {
+        text: "La vie n'est pas ce qu'on a vécu, mais ce dont on se souvient et comment on s'en souvient.",
+        source: "Vivre pour la raconter"
+      }
+    }
+  },
+  {
+    id: "35",
+    text: "An unjust law is itself a species of violence. Arrest for its breach is more so.",
+    author: "Mahatma Gandhi",
+    date: "1930-03-02",
+    topics: ["justice", "civil disobedience"],
+    theme: "resistance",
+    source: "Young India",
+    evidenceImage: "/lovable-uploads/7f15ed9e-c194-44df-a54d-54f0d2bfef77.png",
+    sourceUrl: "https://www.mkgandhi.org/youngindi/index.htm",
+    sourcePublicationDate: "1930-03-02",
+    attributionStatus: "Confirmed",
+    citationAPA: "Gandhi, M. (1930, March 2). Young India.",
+    citationMLA: "Gandhi, Mahatma. \"Young India.\" 2 Mar. 1930.",
+    citationChicago: "Gandhi, Mahatma. Young India, March 2, 1930.",
+    historicalContext: "Gandhi wrote this during the Salt Satyagraha (Salt March), a nonviolent protest against British salt monopoly and taxation in colonial India.",
+    impact: "This quote became a cornerstone of nonviolent civil disobedience movements worldwide, including the American Civil Rights Movement led by Martin Luther King Jr."
+  },
+  {
+    id: "36",
+    text: "Il n'y a qu'un problème philosophique vraiment sérieux: c'est le suicide.",
+    author: "Albert Camus",
+    date: "1942-01-01",
+    topics: ["philosophy", "existentialism"],
+    theme: "absurdism",
+    source: "Le Mythe de Sisyphe",
+    originalLanguage: "French",
+    attributionStatus: "Confirmed",
+    translations: {
+      fr: {
+        text: "Il n'y a qu'un problème philosophique vraiment sérieux: c'est le suicide.",
+        source: "Le Mythe de Sisyphe"
+      }
+    }
   }
 ]
