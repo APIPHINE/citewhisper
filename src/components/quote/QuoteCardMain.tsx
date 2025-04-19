@@ -1,3 +1,4 @@
+
 import { Heart, Share2, ChevronDown, Circle, Check, Languages } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -39,9 +40,11 @@ export function QuoteCardMain({
   const isVerified = Boolean(quote.evidenceImage);
   const hasTranslation = Boolean(quote.translations?.fr);
   
-  const displayText = currentLanguage === "en" ? quote.text : quote.translations?.fr?.text || quote.text;
-  const displaySource = currentLanguage === "en" ? quote.source : quote.translations?.fr?.source || quote.source;
-  
+  // Always use English text as default, switch to translation when selected
+  const displayText = currentLanguage === "en" ? quote.text : (quote.translations?.fr?.text || quote.text);
+  const displaySource = currentLanguage === "en" ? quote.source : (quote.translations?.fr?.source || quote.source);
+  const displayAuthor = quote.author; // Author name typically stays the same
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -83,7 +86,7 @@ export function QuoteCardMain({
         {/* Quote Meta */}
         <div className="mt-6 flex items-start justify-between">
           <div>
-            <p className="font-medium text-foreground">{quote.author}</p>
+            <p className="font-medium text-foreground">{displayAuthor}</p>
             <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
             
             {/* Topics & Theme */}
