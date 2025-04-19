@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
 import QuoteCard from '../components/QuoteCard';
 import { Heart } from 'lucide-react';
+import { FavoriteQuotesCarousel } from '../components/quote/favorites/FavoriteQuotesCarousel';
 
 const Favorites = () => {
   const { favorites } = useFavorites();
@@ -31,6 +32,9 @@ const Favorites = () => {
             Your personally curated collection of favorite quotes that inspire and resonate with you.
           </p>
         </motion.div>
+
+        {/* Favorites Carousel */}
+        {favorites.length > 0 && <FavoriteQuotesCarousel quotes={favorites} />}
 
         {favorites.length === 0 ? (
           <div className={anyExpanded ? 'hidden' : 'bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border'}>
