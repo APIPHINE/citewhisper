@@ -1,6 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { Languages } from "lucide-react";
 
 interface LanguageSwitcherProps {
   currentLanguage: "en" | "fr";
@@ -9,14 +8,12 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ currentLanguage, onLanguageChange }: LanguageSwitcherProps) {
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      className="absolute top-4 right-4 gap-1.5"
+    <button
       onClick={() => onLanguageChange(currentLanguage === "en" ? "fr" : "en")}
+      className="w-8 h-8 rounded-full bg-secondary/50 hover:bg-secondary flex items-center justify-center text-xs font-medium transition-colors"
+      aria-label={`Switch to ${currentLanguage === "en" ? "French" : "English"}`}
     >
-      <Languages size={16} />
       {currentLanguage === "en" ? "FR" : "ENG"}
-    </Button>
+    </button>
   );
 }

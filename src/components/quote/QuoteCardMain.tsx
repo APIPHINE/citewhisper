@@ -1,4 +1,3 @@
-
 import { Heart, Share2, ChevronDown, Circle, Check, Languages } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -59,7 +58,7 @@ export function QuoteCardMain({
       style={{ height: 'fit-content' }} 
     >
       {/* Verification Status */}
-      <div className="absolute top-4 right-4 z-10">
+      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
         {isVerified ? (
           <div className="relative">
             <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
@@ -67,6 +66,14 @@ export function QuoteCardMain({
           </div>
         ) : (
           <Circle size={24} className="text-[#ea384c] fill-[#ea384c]" />
+        )}
+
+        {/* Language Switcher positioned right below verification circle */}
+        {hasTranslation && (
+          <LanguageSwitcher
+            currentLanguage={currentLanguage}
+            onLanguageChange={setCurrentLanguage}
+          />
         )}
       </div>
 
@@ -106,12 +113,7 @@ export function QuoteCardMain({
           
           {/* Actions */}
           <div className="flex flex-col gap-2">
-            {hasTranslation && (
-              <LanguageSwitcher
-                currentLanguage={currentLanguage}
-                onLanguageChange={setCurrentLanguage}
-              />
-            )}
+            
             
             <div className="flex items-center gap-2">
               <button
