@@ -19,7 +19,7 @@ const Home = () => {
           <img 
             src="/lovable-uploads/4bbe1b42-32de-49b9-b5a2-e8cb69d01488.png" 
             alt="CiteQuotes Logo" 
-            className="w-[512px] h-[512px] object-contain" 
+            className="w-[128px] h-[128px] object-contain" 
           />
         </motion.div>
 
