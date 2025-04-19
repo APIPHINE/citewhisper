@@ -353,22 +353,46 @@ export const quotes: Quote[] = [
   },
   {
     id: "34",
-    text: "La vie n'est pas ce qu'on a vécu, mais ce dont on se souvient et comment on s'en souvient.",
+    text: "Life is not what one lived, but what one remembers and how one remembers it in order to tell it.",
     author: "Gabriel García Márquez",
-    date: "2002-07-05",
-    topics: ["memory", "life"],
-    theme: "perspective",
-    source: "Vivre pour la raconter",
-    originalLanguage: "Spanish",
+    date: "2002-10-01",
+    topics: ["memory", "autobiography", "narrative identity"],
+    theme: "Memory and the Construction of Identity",
+    source: "Living to Tell the Tale",
+    sourceUrl: "https://www.penguinrandomhouse.com/books/52876/living-to-tell-the-tale-by-gabriel-garcia-marquez-translated-by-edith-grossman/",
+    sourcePublicationDate: "2003-11-04",
+    originalLanguage: "es",
     originalText: "La vida no es la que uno vivió, sino la que uno recuerda y cómo la recuerda para contarla.",
-    translator: "Claude Couffon",
-    attributionStatus: "Confirmed",
-    translations: {
-      fr: {
-        text: "La vie n'est pas ce qu'on a vécu, mais ce dont on se souvient et comment on s'en souvient.",
-        source: "Vivre pour la raconter"
+    originalSource: {
+      title: "Vivir para contarla",
+      publisher: "Editorial Sudamericana",
+      publicationDate: "2002-10-01",
+      location: "Buenos Aires, Argentina",
+      isbn: "9789500722794",
+      sourceUrl: "https://www.casadellibro.com/libro-vivir-para-contarla/9789500722794/928043"
+    },
+    context: "This is the opening line of García Márquez's memoir, setting the stage for a reflection on memory's role in shaping a personal narrative. It introduces the idea that experience is secondary to the act of remembering and retelling.",
+    historicalContext: "Originally published in October 2002 by Editorial Sudamericana in Spanish. The English translation by Edith Grossman was published in November 2003 by Alfred A. Knopf. The book chronicles the author's early life in Colombia and his development as a writer, blending journalism, memory, and fiction. It reflects the literary ethos of post-Boom Latin American narrative.",
+    keywords: ["memory", "autobiography", "Latin American literature", "Gabriel García Márquez", "storytelling", "personal identity"],
+    citationAPA: "García Márquez, G. (2003). Living to Tell the Tale (E. Grossman, Trans.). Alfred A. Knopf. (Original work published 2002)",
+    citationMLA: "García Márquez, Gabriel. Living to Tell the Tale. Translated by Edith Grossman, Alfred A. Knopf, 2003.",
+    citationChicago: "García Márquez, Gabriel. Living to Tell the Tale. Translated by Edith Grossman. New York: Alfred A. Knopf, 2003.",
+    exportFormats: {
+      json: true,
+      csv: true,
+      cff: true
+    },
+    translations: [
+      {
+        language: "fr",
+        text: "La vie n'est pas celle que l'on a vécue, mais celle dont on se souvient, et comment on s'en souvient pour la raconter.",
+        source: "Vivre pour la raconter",
+        translator: "Annie Morvan",
+        publication: "Éditions Grasset",
+        publicationDate: "2003-10-08",
+        sourceUrl: "https://www.grasset.fr/livre/vivre-pour-la-raconter-9782246636519"
       }
-    }
+    ]
   },
   {
     id: "35",
