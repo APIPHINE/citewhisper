@@ -17,9 +17,9 @@ const Home = () => {
           className="flex justify-center mb-8"
         >
           <img 
-            src="/lovable-uploads/9b16d3c2-e088-4a30-af80-c9a31c6b2046.png" 
+            src="/lovable-uploads/4bbe1b42-32de-49b9-b5a2-e8cb69d01488.png" 
             alt="CiteQuotes Logo" 
-            className="w-96 h-96 object-contain" 
+            className="w-[512px] h-[512px] object-contain" 
           />
         </motion.div>
 
