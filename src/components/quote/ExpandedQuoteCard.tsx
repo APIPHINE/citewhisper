@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Share2, X } from 'lucide-react';
+import { Heart, Share2, X, Circle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Quote } from '../../utils/quotesData';
 import { useFormatDate } from '../../hooks/use-format-date';
@@ -47,6 +47,9 @@ export function ExpandedQuoteCard({
   };
   
   if (!expanded) return null;
+
+  // Check if quote is verified (has screenshot)
+  const isVerified = Boolean(quote.sourceScreenshot);
   
   return (
     <motion.div
@@ -78,6 +81,18 @@ export function ExpandedQuoteCard({
         className="bg-white rounded-2xl shadow-elevation max-w-3xl w-full max-h-[90vh] overflow-hidden z-[100]"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Verification Status Indicator */}
+        <div className="absolute top-4 right-12 z-10">
+          {isVerified ? (
+            <div className="relative">
+              <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
+              <Check size={16} className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            </div>
+          ) : (
+            <Circle size={24} className="text-[#ea384c] fill-[#ea384c]" />
+          )}
+        </div>
+
         {/* Expanded Card Header */}
         <div className="flex justify-between items-start border-b border-border p-6">
           <div>

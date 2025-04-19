@@ -1,4 +1,5 @@
-import { Heart, Share2, ChevronDown } from 'lucide-react';
+
+import { Heart, Share2, ChevronDown, Circle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
@@ -32,6 +33,9 @@ export function QuoteCardMain({
   const { formatDate } = useFormatDate();
   
   if (expanded) return null;
+
+  // Check if quote is verified (has screenshot)
+  const isVerified = Boolean(quote.sourceScreenshot);
   
   return (
     <motion.div
@@ -48,6 +52,18 @@ export function QuoteCardMain({
       className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
       style={{ height: 'fit-content' }} 
     >
+      {/* Verification Status Indicator */}
+      <div className="absolute top-4 right-4 z-10">
+        {isVerified ? (
+          <div className="relative">
+            <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
+            <Check size={16} className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          </div>
+        ) : (
+          <Circle size={24} className="text-[#ea384c] fill-[#ea384c]" />
+        )}
+      </div>
+
       <div 
         className="rounded-2xl transition-all duration-350 ease-apple 
           border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2
