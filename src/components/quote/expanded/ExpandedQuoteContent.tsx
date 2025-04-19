@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Quote } from '../../../utils/quotesData';
 import { ShareEmbedButton } from './ShareEmbedButton';
@@ -5,7 +6,6 @@ import { QuoteMainContent } from './QuoteMainContent';
 import { EmbedCodeSection } from '../EmbedCodeSection';
 import { SourceSection } from '../SourceSection';
 import { ContextSection } from '../ContextSection';
-import { VerificationSection } from '../VerificationSection';
 import { RelatedContentSection } from '../RelatedContentSection';
 import { TagsSection } from '../TagsSection';
 import { CitationSection } from '../CitationSection';
@@ -42,16 +42,13 @@ export function ExpandedQuoteContent({
   
   return (
     <div className="overflow-y-auto p-6 max-h-[calc(90vh-80px)]">
-      {/* Quote Text */}
       <QuoteMainContent quote={quote} />
       
-      {/* Share/Embed Button */}
       <ShareEmbedButton 
         handleShareClick={handleShareClick} 
         showEmbedSection={showEmbedSection} 
       />
       
-      {/* Embed Code Section */}
       {showEmbedSection && (
         <EmbedCodeSection
           quote={quote}
@@ -64,31 +61,14 @@ export function ExpandedQuoteContent({
         />
       )}
       
-      {/* Source Section */}
       <SourceSection quote={quote} />
-      
-      {/* Context Section */}
       <ContextSection quote={quote} />
-      
-      {/* Verification Section */}
-      <VerificationSection quote={quote} />
-      
-      {/* Related Content Section */}
       <RelatedContentSection quote={quote} />
-      
-      {/* Tags Section */}
       <TagsSection quote={quote} />
-      
-      {/* Citation Section */}
       <CitationSection quote={quote} />
-      
-      {/* Export Section */}
       <ExportSection quote={quote} />
-      
-      {/* "Cited By" Section */}
       <CitedBySection quote={quote} />
       
-      {/* Actions */}
       <QuoteActions 
         handleShareClick={handleShareClick}
         toggleFavorite={toggleFavorite}
