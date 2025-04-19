@@ -1,5 +1,5 @@
 
-import { Heart, Share2, ChevronDown, Circle, Check, Languages } from 'lucide-react';
+import { Heart, Share2, ChevronDown, Circle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
@@ -38,13 +38,13 @@ export function QuoteCardMain({
   if (expanded) return null;
 
   const isVerified = Boolean(quote.evidenceImage);
-  const hasTranslation = Boolean(quote.translations?.fr);
+  const hasTranslation = Boolean(quote.translations?.fr) && quote.originalLanguage === "French";
   
-  // Always use English text as default, switch to translation when selected
-  const displayText = currentLanguage === "en" ? quote.text : (quote.translations?.fr?.text || quote.text);
-  const displaySource = currentLanguage === "en" ? quote.source : (quote.translations?.fr?.source || quote.source);
-  const displayAuthor = quote.author; // Author name typically stays the same
-
+  // Display logic
+  const displayText = currentLanguage === "en" ? quote.text : quote.translations?.fr?.text || quote.text;
+  const displaySource = currentLanguage === "en" ? quote.source : quote.translations?.fr?.source || quote.source;
+  const displayDate = formatDate(quote.date);
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -79,15 +79,18 @@ export function QuoteCardMain({
             "{displayText}"
           </p>
           <p className="text-sm text-muted-foreground mb-4">
-            Source: {displaySource || "Source unknown"}
+            Source: {displaySource}
+            {quote.translator && currentLanguage === "en" && (
+              <span className="ml-1">(translated by {quote.translator})</span>
+            )}
           </p>
         </div>
         
         {/* Quote Meta */}
         <div className="mt-6 flex items-start justify-between">
           <div>
-            <p className="font-medium text-foreground">{displayAuthor}</p>
-            <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
+            <p className="font-medium text-foreground">{quote.author}</p>
+            <p className="text-sm text-muted-foreground">{displayDate}</p>
             
             {/* Topics & Theme */}
             <div className="mt-3 flex flex-wrap gap-2">

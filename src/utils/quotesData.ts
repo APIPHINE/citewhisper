@@ -1,4 +1,3 @@
-
 export interface Quote {
   id: string,
   text: string,
@@ -342,6 +341,7 @@ export const quotes: Quote[] = [
     source: "Letter to Lafayette",
     evidenceImage: "/lovable-uploads/9fe7c698-558b-4981-a5fa-73e7bb8ea87f.png",
     sourceUrl: "https://founders.archives.gov/documents/Jefferson/98-01-02-3843",
+    sourcePublicationDate: "1823-11-07",
     attributionStatus: "Confirmed",
     citationAPA: "Jefferson, T. (1823, November 7). Letter to Lafayette.",
     citationMLA: "Jefferson, Thomas. \"Letter to Lafayette.\" 7 Nov. 1823.",
@@ -390,13 +390,15 @@ export const quotes: Quote[] = [
   },
   {
     id: "36",
-    text: "Il n'y a qu'un problème philosophique vraiment sérieux: c'est le suicide.",
+    text: "There is but one truly serious philosophical question, and that is suicide.",
     author: "Albert Camus",
-    date: "1942-01-01",
+    date: "1941-12-31",
     topics: ["philosophy", "existentialism"],
     theme: "absurdism",
-    source: "Le Mythe de Sisyphe",
+    source: "The Myth of Sisyphus",
     originalLanguage: "French",
+    originalText: "Il n'y a qu'un problème philosophique vraiment sérieux: c'est le suicide.",
+    translator: "Justin O'Brien",
     attributionStatus: "Confirmed",
     translations: {
       fr: {
