@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Heart, Share2, X, Circle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -48,8 +49,8 @@ export function ExpandedQuoteCard({
   
   if (!expanded) return null;
 
-  // Check if quote is verified (has screenshot)
-  const isVerified = Boolean(quote.sourceScreenshot);
+  // Check if quote is verified (has evidenceImage)
+  const isVerified = Boolean(quote.evidenceImage);
   
   return (
     <motion.div

@@ -34,8 +34,8 @@ export function QuoteCardMain({
   
   if (expanded) return null;
 
-  // Check if quote is verified (has screenshot)
-  const isVerified = Boolean(quote.sourceScreenshot);
+  // Check if quote is verified (has evidenceImage)
+  const isVerified = Boolean(quote.evidenceImage);
   
   return (
     <motion.div

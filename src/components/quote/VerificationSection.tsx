@@ -12,6 +12,20 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
   return (
     <SectionBox title="Source Verification" icon={<Fingerprint size={18} />}>
       <div className="space-y-4">
+        {/* Evidence Image */}
+        {quote.evidenceImage && (
+          <div>
+            <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
+            <div className="border border-border/50 rounded-lg overflow-hidden">
+              <img 
+                src={quote.evidenceImage} 
+                alt="Source verification" 
+                className="w-full object-contain max-h-64"
+              />
+            </div>
+          </div>
+        )}
+        
         {/* OCR Information */}
         {quote.ocrExtractedText && (
           <div>
