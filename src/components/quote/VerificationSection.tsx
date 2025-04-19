@@ -50,21 +50,17 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
           </div>
         )}
         
-        {/* Citation Chain */}
         {quote.citationChain && quote.citationChain.length > 0 && (
-          <div>
-            <div className="space-y-2">
-              {quote.citationChain.map((citation, index) => (
-                <div key={index} className="text-sm">
-                  <Badge variant="outline" className="mr-2">{citation.type}</Badge>
-                  <span className="text-muted-foreground">{citation.source}, {citation.date}</span>
-                </div>
-              ))}
-            </div>
+          <div className="space-y-2">
+            {quote.citationChain.map((citation, index) => (
+              <div key={index} className="text-sm">
+                <Badge variant="outline" className="mr-2">{citation.type}</Badge>
+                <span className="text-muted-foreground">{citation.source}, {citation.date}</span>
+              </div>
+            ))}
           </div>
         )}
         
-        {/* IIIF & Screenshot */}
         {quote.iiifImageUrl && (
           <div>
             <p className="text-xs text-muted-foreground">IIIF Manifest Available</p>
