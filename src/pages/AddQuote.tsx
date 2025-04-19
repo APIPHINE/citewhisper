@@ -149,7 +149,29 @@ const AddQuote = () => {
               <Textarea 
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                placeholder="Paste your JSON here..."
+                placeholder={`{
+  "text": "",
+  "author": "",
+  "date": "YYYY-MM-DD",
+  "topics": ["topic1", "topic2"],
+  "theme": "",
+  "source": "",
+  "sourceUrl": "",
+  "sourcePublicationDate": "YYYY-MM-DD",
+  "originalLanguage": "",
+  "originalText": "",
+  "context": "",
+  "historicalContext": "",
+  "keywords": ["keyword1", "keyword2"],
+  "citationAPA": "",
+  "citationMLA": "",
+  "citationChicago": "",
+  "exportFormats": {
+    "json": true,
+    "csv": true,
+    "cff": true
+  }
+}`}
                 className="min-h-[200px] font-mono text-sm"
               />
               <Button onClick={handleJsonImport} className="w-full">
