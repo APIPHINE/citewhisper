@@ -27,6 +27,7 @@ export function JsonImportSection({ formReset }: JsonImportSectionProps) {
         ...parsedJson,
         topics: Array.isArray(parsedJson.topics) ? parsedJson.topics : [],
         keywords: Array.isArray(parsedJson.keywords) ? parsedJson.keywords : [],
+        translations: Array.isArray(parsedJson.translations) ? parsedJson.translations : [],
       };
 
       formReset(formattedData);
@@ -64,14 +65,33 @@ export function JsonImportSection({ formReset }: JsonImportSectionProps) {
   "sourcePublicationDate": "YYYY-MM-DD",
   "originalLanguage": "",
   "originalText": "",
+  "originalSource": {
+    "title": "",
+    "publisher": "",
+    "publicationDate": "YYYY-MM-DD",
+    "location": "",
+    "isbn": "",
+    "sourceUrl": ""
+  },
   "context": "",
   "historicalContext": "",
   "keywords": ["keyword1", "keyword2"],
   "citationAPA": "",
   "citationMLA": "",
-  "citationChicago": ""
+  "citationChicago": "",
+  "translations": [
+    {
+      "language": "",
+      "text": "",
+      "source": "",
+      "translator": "",
+      "publication": "",
+      "publicationDate": "YYYY-MM-DD",
+      "sourceUrl": ""
+    }
+  ]
 }`}
-          className="min-h-[200px] font-mono text-sm"
+          className="min-h-[300px] font-mono text-sm"
         />
         <Button onClick={handleJsonImport} className="w-full">
           <Import className="mr-2" /> Import JSON and Fill Form
