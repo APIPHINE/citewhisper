@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Heart, Share2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -160,7 +161,7 @@ export function ExpandedQuoteCard({
                 <Share2 size={20} />
               </button>
               <span className="text-sm text-muted-foreground">
-                {quote.shareCount || 0}
+                {quote.shareCount ?? 0}
               </span>
             </div>
           
@@ -176,7 +177,7 @@ export function ExpandedQuoteCard({
                 />
               </button>
               <span className="text-sm text-muted-foreground">
-                {quote.favoriteCount || 0}
+                {quote.shareCount ?? 0}
               </span>
             </div>
           </div>
