@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, PlusCircle } from 'lucide-react';
+import { Menu, X, PlusCircle, ExternalLink } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 
@@ -10,7 +10,13 @@ const routePaths = [
   { name: 'Home', path: '/' },
   { name: 'Quotes', path: '/quotes' },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
-  { name: 'Favorites', path: '/favorites' }
+  { name: 'Favorites', path: '/favorites' },
+  { 
+    name: 'IIIF Integration', 
+    path: 'https://lovable.dev/projects/964cf98a-c636-40bc-afd1-055d6ff3a64d',
+    external: true,
+    icon: ExternalLink 
+  }
 ];
 
 const NavBar = () => {
@@ -56,15 +62,29 @@ const NavBar = () => {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
             {routePaths.map((route) => (
-              <Link
-                key={route.path}
-                to={route.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location.pathname === route.path ? 'text-primary' : 'text-foreground'
-                }`}
-              >
-                {route.name}
-              </Link>
+              route.external ? (
+                <a
+                  key={route.path}
+                  href={route.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1"
+                >
+                  {route.name}
+                  {route.icon && <route.icon size={14} />}
+                </a>
+              ) : (
+                <Link
+                  key={route.path}
+                  to={route.path}
+                  className={`text-sm font-medium transition-colors hover:text-primary flex items-center gap-1 ${
+                    location.pathname === route.path ? 'text-primary' : 'text-foreground'
+                  }`}
+                >
+                  {route.name}
+                  {route.icon && <route.icon size={14} />}
+                </Link>
+              )
             ))}
           </div>
         </div>
@@ -80,16 +100,31 @@ const NavBar = () => {
         >
           <div className="page-padding py-4 flex flex-col gap-4">
             {routePaths.map((route) => (
-              <Link
-                key={route.path}
-                to={route.path}
-                className={`text-lg font-medium transition-colors hover:text-primary ${
-                  location.pathname === route.path ? 'text-primary' : 'text-foreground'
-                }`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {route.name}
-              </Link>
+              route.external ? (
+                <a
+                  key={route.path}
+                  href={route.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-medium transition-colors hover:text-primary flex items-center gap-1"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {route.name}
+                  {route.icon && <route.icon size={14} />}
+                </a>
+              ) : (
+                <Link
+                  key={route.path}
+                  to={route.path}
+                  className={`text-lg font-medium transition-colors hover:text-primary flex items-center gap-1 ${
+                    location.pathname === route.path ? 'text-primary' : 'text-foreground'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {route.name}
+                  {route.icon && <route.icon size={14} />}
+                </Link>
+              )
             ))}
           </div>
         </motion.div>
