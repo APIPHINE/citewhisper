@@ -41,7 +41,16 @@ export interface Quote {
       text: string,
       source?: string
     }
-  }
+  } & {
+    [key: string]: {
+      text: string,
+      source?: string,
+      translator?: string,
+      publication?: string,
+      publicationDate?: string,
+      sourceUrl?: string
+    }
+  }[]
 }
 
 export const quotes: Quote[] = [
@@ -363,14 +372,6 @@ export const quotes: Quote[] = [
     sourcePublicationDate: "2003-11-04",
     originalLanguage: "es",
     originalText: "La vida no es la que uno vivió, sino la que uno recuerda y cómo la recuerda para contarla.",
-    originalSource: {
-      title: "Vivir para contarla",
-      publisher: "Editorial Sudamericana",
-      publicationDate: "2002-10-01",
-      location: "Buenos Aires, Argentina",
-      isbn: "9789500722794",
-      sourceUrl: "https://www.casadellibro.com/libro-vivir-para-contarla/9789500722794/928043"
-    },
     context: "This is the opening line of García Márquez's memoir, setting the stage for a reflection on memory's role in shaping a personal narrative. It introduces the idea that experience is secondary to the act of remembering and retelling.",
     historicalContext: "Originally published in October 2002 by Editorial Sudamericana in Spanish. The English translation by Edith Grossman was published in November 2003 by Alfred A. Knopf. The book chronicles the author's early life in Colombia and his development as a writer, blending journalism, memory, and fiction. It reflects the literary ethos of post-Boom Latin American narrative.",
     keywords: ["memory", "autobiography", "Latin American literature", "Gabriel García Márquez", "storytelling", "personal identity"],

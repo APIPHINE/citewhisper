@@ -9,10 +9,32 @@ interface QuoteMainContentProps {
 
 export function QuoteMainContent({ quote }: QuoteMainContentProps) {
   const [currentLanguage, setCurrentLanguage] = useState<"en" | "fr">("en");
-  const hasTranslation = Boolean(quote.translations?.fr) && quote.originalLanguage === "French";
+  
+  // Check if quote has translations in either format
+  const hasTranslation = Boolean(quote.translations?.fr) || 
+    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
 
-  const displayText = currentLanguage === "en" ? quote.text : quote.translations?.fr?.text || quote.text;
-  const displaySource = currentLanguage === "en" ? quote.source : quote.translations?.fr?.source || quote.source;
+  const getTranslation = () => {
+    // Check array format first
+    if (Array.isArray(quote.translations)) {
+      const translation = quote.translations.find(t => t.language === currentLanguage);
+      if (translation) {
+        return {
+          text: translation.text,
+          source: translation.source
+        };
+      }
+    }
+    // Fallback to old format
+    if (currentLanguage === "fr" && quote.translations?.fr) {
+      return quote.translations.fr;
+    }
+    return null;
+  };
+
+  const translation = getTranslation();
+  const displayText = currentLanguage === "en" ? quote.text : translation?.text || quote.text;
+  const displaySource = currentLanguage === "en" ? quote.source : translation?.source || quote.source;
   
   return (
     <div className="mb-8">
@@ -33,6 +55,13 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
         <p>Source: {displaySource}
           {quote.translator && currentLanguage === "en" && (
             <span className="ml-1">(translated by {quote.translator})</span>
+          )}
+          {Array.isArray(quote.translations) && currentLanguage !== "en" && (
+            quote.translations.find(t => t.language === currentLanguage)?.translator && (
+              <span className="ml-1">
+                (translated by {quote.translations.find(t => t.language === currentLanguage)?.translator})
+              </span>
+            )
           )}
         </p>
       </div>

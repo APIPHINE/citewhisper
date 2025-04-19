@@ -38,13 +38,30 @@ export function QuoteCardMain({
   if (expanded) return null;
 
   const isVerified = Boolean(quote.evidenceImage);
-  const hasTranslation = Boolean(quote.translations?.fr) && quote.originalLanguage === "French";
+  const hasTranslation = Boolean(quote.translations?.fr) || 
+    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
   
-  // Display logic
-  const displayText = currentLanguage === "en" ? quote.text : quote.translations?.fr?.text || quote.text;
-  const displaySource = currentLanguage === "en" ? quote.source : quote.translations?.fr?.source || quote.source;
+  const getTranslation = () => {
+    if (Array.isArray(quote.translations)) {
+      const translation = quote.translations.find(t => t.language === currentLanguage);
+      if (translation) {
+        return {
+          text: translation.text,
+          source: translation.source
+        };
+      }
+    }
+    if (currentLanguage === "fr" && quote.translations?.fr) {
+      return quote.translations.fr;
+    }
+    return null;
+  };
+
+  const translation = getTranslation();
+  const displayText = currentLanguage === "en" ? quote.text : translation?.text || quote.text;
+  const displaySource = currentLanguage === "en" ? quote.source : translation?.source || quote.source;
   const displayDate = formatDate(quote.date);
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
