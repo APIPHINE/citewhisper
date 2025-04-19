@@ -71,9 +71,12 @@ export function QuoteCardMain({
 
       <div className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative">
         {/* Quote Text */}
-        <div className="pr-12"> {/* Maintain padding for verification icon */}
-          <p className="text-lg leading-relaxed mb-4">
+        <div className="pr-12">
+          <p className="text-lg leading-relaxed mb-2">
             "{displayText}"
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Source: {displaySource || "Source unknown"}
           </p>
         </div>
         
@@ -82,13 +85,6 @@ export function QuoteCardMain({
           <div>
             <p className="font-medium text-foreground">{quote.author}</p>
             <p className="text-sm text-muted-foreground">{formatDate(quote.date)}</p>
-            
-            {/* Source - New Addition */}
-            {displaySource && (
-              <p className="text-sm text-muted-foreground mt-1 italic">
-                Source: {displaySource}
-              </p>
-            )}
             
             {/* Topics & Theme */}
             <div className="mt-3 flex flex-wrap gap-2">
@@ -105,7 +101,6 @@ export function QuoteCardMain({
           
           {/* Actions */}
           <div className="flex flex-col gap-2">
-            {/* Language Switcher */}
             {hasTranslation && (
               <LanguageSwitcher
                 currentLanguage={currentLanguage}
