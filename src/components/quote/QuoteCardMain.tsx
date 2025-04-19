@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Heart, Share2, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -29,7 +28,6 @@ export function QuoteCardMain({
 }: QuoteCardMainProps) {
   const { formatDate } = useFormatDate();
   
-  // Early return if expanded
   if (expanded) return null;
   
   return (
@@ -52,18 +50,6 @@ export function QuoteCardMain({
           border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2
           overflow-hidden h-full relative"
       >
-        {/* Share Count Badge */}
-        {quote.shareCount && quote.shareCount > 0 && (
-          <div 
-            onClick={() => toggleExpanded(true)}
-            className="absolute top-2 right-2 z-10 cursor-pointer"
-          >
-            <div className="flex items-center justify-center h-8 w-8 bg-accent/10 text-accent rounded-full text-xs font-medium hover:bg-accent/20 transition-colors">
-              {quote.shareCount}
-            </div>
-          </div>
-        )}
-        
         {/* Quote Text */}
         <p className="text-balance text-lg leading-relaxed mb-4">
           "{quote.text}"
@@ -97,27 +83,35 @@ export function QuoteCardMain({
           
           {/* Actions */}
           <div className="flex flex-col gap-2">
-            <button
-              onClick={toggleFavorite}
-              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-              aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-            >
-              <Heart 
-                size={20} 
-                className={favorite ? "fill-accent text-accent" : "text-foreground"} 
-              />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleFavorite}
+                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart 
+                  size={20} 
+                  className={favorite ? "fill-accent text-accent" : "text-foreground"} 
+                />
+              </button>
+              <span className="text-sm text-muted-foreground">
+                {quote.favoriteCount || 0}
+              </span>
+            </div>
             
-            {/* Share button (replacing copy button) */}
-            <button
-              onClick={handleShare}
-              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-              aria-label="Share this quote"
-            >
-              <Share2 size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleShare}
+                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+                aria-label="Share this quote"
+              >
+                <Share2 size={20} />
+              </button>
+              <span className="text-sm text-muted-foreground">
+                {quote.shareCount || 0}
+              </span>
+            </div>
             
-            {/* Expand button */}
             <button
               onClick={() => toggleExpanded()}
               className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
