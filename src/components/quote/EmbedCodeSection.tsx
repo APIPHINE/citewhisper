@@ -156,7 +156,7 @@ export function EmbedCodeSection({
             <SelectTrigger id="embed-style" className="bg-popover">
               <SelectValue placeholder="Select style" />
             </SelectTrigger>
-            <SelectContent className="bg-popover border-border">
+            <SelectContent className="bg-white border-border shadow-md">
               <SelectItem value="standard">Standard Quote</SelectItem>
               <SelectItem value="horizontal">Horizontal Card</SelectItem>
               <SelectItem value="vertical">Vertical Card</SelectItem>
@@ -197,7 +197,7 @@ export function EmbedCodeSection({
             <SelectTrigger id="embed-size">
               <SelectValue placeholder="Select size" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border-border shadow-md">
               <SelectItem value="small">Small (300px)</SelectItem>
               <SelectItem value="medium">Medium (450px)</SelectItem>
               <SelectItem value="large">Large (600px)</SelectItem>
