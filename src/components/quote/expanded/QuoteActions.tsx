@@ -1,5 +1,6 @@
 
 import { Heart, Share2 } from 'lucide-react';
+import { VisualQuoteDialog } from '../VisualQuoteDialog';
 
 interface QuoteActionsProps {
   handleShareClick: () => void;
@@ -7,6 +8,7 @@ interface QuoteActionsProps {
   favorite: boolean;
   shareCount: number;
   favoriteCount: number;
+  quoteId: string;
 }
 
 export function QuoteActions({ 
@@ -14,10 +16,13 @@ export function QuoteActions({
   toggleFavorite, 
   favorite, 
   shareCount, 
-  favoriteCount 
+  favoriteCount,
+  quoteId
 }: QuoteActionsProps) {
   return (
     <div className="flex justify-end gap-4 mt-6 pt-4 border-t border-border">
+      <VisualQuoteDialog quoteId={quoteId} />
+      
       <div className="flex items-center gap-2">
         <button
           onClick={handleShareClick}

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Quote } from '../../../utils/quotesData';
 import { ShareEmbedButton } from './ShareEmbedButton';
@@ -96,6 +95,7 @@ export function ExpandedQuoteContent({
         favorite={favorite}
         shareCount={shareCount}
         favoriteCount={favoriteCount}
+        quoteId={quote.id}
       />
     </div>
   );
