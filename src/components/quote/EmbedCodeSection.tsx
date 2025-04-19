@@ -8,9 +8,9 @@ import { useFormatDate } from '../../hooks/use-format-date';
 import { useToast } from '@/hooks/use-toast';
 
 // Embed style types
-export type EmbedStyle = 'standard' | 'horizontal' | 'vertical';
+export type EmbedStyle = 'standard' | 'horizontal' | 'vertical' | 'minimal' | 'decorative' | 'classic';
 export type EmbedColor = 'light' | 'dark' | 'accent';
-export type EmbedSize = 'small' | 'medium' | 'large';
+export type EmbedSize = 'small' | 'medium' | 'large' | 'custom' | 'responsive' | 'compact';
 
 interface EmbedCodeSectionProps {
   quote: Quote;
@@ -157,9 +157,12 @@ export function EmbedCodeSection({
               <SelectValue placeholder="Select style" />
             </SelectTrigger>
             <SelectContent className="bg-popover border-border">
-              <SelectItem value="standard">Standard</SelectItem>
+              <SelectItem value="standard">Standard Quote</SelectItem>
               <SelectItem value="horizontal">Horizontal Card</SelectItem>
               <SelectItem value="vertical">Vertical Card</SelectItem>
+              <SelectItem value="minimal">Minimal</SelectItem>
+              <SelectItem value="decorative">Decorative</SelectItem>
+              <SelectItem value="classic">Classic Style</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -195,9 +198,12 @@ export function EmbedCodeSection({
               <SelectValue placeholder="Select size" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="small">Small</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="large">Large</SelectItem>
+              <SelectItem value="small">Small (300px)</SelectItem>
+              <SelectItem value="medium">Medium (450px)</SelectItem>
+              <SelectItem value="large">Large (600px)</SelectItem>
+              <SelectItem value="custom">Custom Size</SelectItem>
+              <SelectItem value="responsive">Responsive</SelectItem>
+              <SelectItem value="compact">Compact</SelectItem>
             </SelectContent>
           </Select>
         </div>
