@@ -1,3 +1,4 @@
+
 import { Heart, Share2, ChevronDown, Circle, Check, Languages } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -57,14 +58,8 @@ export function QuoteCardMain({
       className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
       style={{ height: 'fit-content' }} 
     >
-      {/* Verification Status and Language Switcher */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
-        {hasTranslation && (
-          <LanguageSwitcher
-            currentLanguage={currentLanguage}
-            onLanguageChange={setCurrentLanguage}
-          />
-        )}
+      {/* Verification Status */}
+      <div className="absolute top-4 right-4 z-10">
         {isVerified ? (
           <div className="relative">
             <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
@@ -77,9 +72,11 @@ export function QuoteCardMain({
 
       <div className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative">
         {/* Quote Text */}
-        <p className="text-balance text-lg leading-relaxed mb-4">
-          "{displayText}"
-        </p>
+        <div className="pr-12"> {/* Add padding to prevent overlap with verification icon */}
+          <p className="text-balance text-lg leading-relaxed mb-4">
+            "{displayText}"
+          </p>
+        </div>
         
         {/* Quote Meta */}
         <div className="mt-6 flex items-start justify-between">
@@ -109,6 +106,13 @@ export function QuoteCardMain({
           
           {/* Actions */}
           <div className="flex flex-col gap-2">
+            {hasTranslation && (
+              <LanguageSwitcher
+                currentLanguage={currentLanguage}
+                onLanguageChange={setCurrentLanguage}
+              />
+            )}
+            
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleFavorite}
