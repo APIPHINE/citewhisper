@@ -58,7 +58,7 @@ export function QuoteCardMain({
       style={{ height: 'fit-content' }} 
     >
       {/* Verification Status */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+      <div className="absolute top-4 right-4 z-10">
         {isVerified ? (
           <div className="relative">
             <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
@@ -67,20 +67,12 @@ export function QuoteCardMain({
         ) : (
           <Circle size={24} className="text-[#ea384c] fill-[#ea384c]" />
         )}
-
-        {/* Language Switcher positioned right below verification circle */}
-        {hasTranslation && (
-          <LanguageSwitcher
-            currentLanguage={currentLanguage}
-            onLanguageChange={setCurrentLanguage}
-          />
-        )}
       </div>
 
       <div className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative">
         {/* Quote Text */}
-        <div className="pr-12"> {/* Add padding to prevent overlap with verification icon */}
-          <p className="text-balance text-lg leading-relaxed mb-4">
+        <div className="pr-12"> {/* Maintain padding for verification icon */}
+          <p className="text-lg leading-relaxed mb-4">
             "{displayText}"
           </p>
         </div>
@@ -113,8 +105,15 @@ export function QuoteCardMain({
           
           {/* Actions */}
           <div className="flex flex-col gap-2">
+            {/* Language Switcher */}
+            {hasTranslation && (
+              <LanguageSwitcher
+                currentLanguage={currentLanguage}
+                onLanguageChange={setCurrentLanguage}
+              />
+            )}
             
-            
+            {/* Favorite Button */}
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleFavorite}
@@ -131,6 +130,7 @@ export function QuoteCardMain({
               </span>
             </div>
             
+            {/* Share Button */}
             <div className="flex items-center gap-2">
               <button
                 onClick={handleShare}
@@ -144,6 +144,7 @@ export function QuoteCardMain({
               </span>
             </div>
             
+            {/* Expand Button */}
             <button
               onClick={() => toggleExpanded()}
               className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
