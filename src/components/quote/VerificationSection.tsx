@@ -19,7 +19,7 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
   return (
     <SectionBox title="Source Verification" icon={<Fingerprint size={18} />}>
       <div className="space-y-4">
-        {/* Evidence Image */}
+        {/* Combined Evidence Image and OCR Section */}
         {quote.evidenceImage && (
           <div>
             <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
@@ -37,15 +37,19 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
                 />
               )}
             </div>
-          </div>
-        )}
-        
-        {/* OCR Information */}
-        {quote.ocrExtractedText && (
-          <div>
-            <h4 className="font-medium text-sm mb-1">OCR Extraction</h4>
-            <p className="text-muted-foreground text-sm">{quote.ocrExtractedText}</p>
-            <p className="text-xs text-muted-foreground mt-1">Confidence Score: {quote.ocrConfidenceScore ? `${(quote.ocrConfidenceScore * 100).toFixed(1)}%` : "Unknown"}</p>
+            
+            {/* Extracted Text */}
+            {quote.ocrExtractedText && (
+              <div className="mt-2 bg-secondary/20 p-3 rounded-md">
+                <h4 className="font-medium text-sm mb-1">Extracted Text</h4>
+                <p className="text-muted-foreground text-sm">{quote.ocrExtractedText}</p>
+                {quote.ocrConfidenceScore && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Confidence Score: {(quote.ocrConfidenceScore * 100).toFixed(1)}%
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
         
@@ -76,3 +80,4 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
     </SectionBox>
   );
 }
+
