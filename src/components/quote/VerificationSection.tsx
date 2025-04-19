@@ -19,10 +19,8 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
   return (
     <SectionBox title="Source Verification" icon={<Fingerprint size={18} />}>
       <div className="space-y-4">
-        {/* Combined Evidence Image and OCR Section */}
         {quote.evidenceImage && (
           <div>
-            <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
             <div className="border border-border/50 rounded-lg overflow-hidden">
               {imageError ? (
                 <div className="bg-muted/30 h-48 flex items-center justify-center text-muted-foreground">
@@ -38,7 +36,6 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
               )}
             </div>
             
-            {/* Extracted Text */}
             {quote.ocrExtractedText && (
               <div className="mt-2 bg-secondary/20 p-3 rounded-md">
                 <h4 className="font-medium text-sm mb-1">Extracted Text</h4>
@@ -56,7 +53,6 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
         {/* Citation Chain */}
         {quote.citationChain && quote.citationChain.length > 0 && (
           <div>
-            <h4 className="font-medium text-sm mb-1">Citation Chain</h4>
             <div className="space-y-2">
               {quote.citationChain.map((citation, index) => (
                 <div key={index} className="text-sm">
@@ -71,7 +67,6 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
         {/* IIIF & Screenshot */}
         {quote.iiifImageUrl && (
           <div>
-            <h4 className="font-medium text-sm mb-1">Digital Archives</h4>
             <p className="text-xs text-muted-foreground">IIIF Manifest Available</p>
             <p className="text-xs text-muted-foreground">Image Coordinates: {JSON.stringify(quote.imageCoordinates)}</p>
           </div>
@@ -80,4 +75,3 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
     </SectionBox>
   );
 }
-
