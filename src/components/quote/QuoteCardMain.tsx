@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { useFormatDate } from '../../hooks/use-format-date';
-import { useToast } from '@/hooks/use-toast';
 
 interface QuoteCardMainProps {
   quote: Quote;
@@ -66,10 +65,8 @@ export function QuoteCardMain({
         )}
         
         {/* Quote Text */}
-        <p className="text-balance text-lg leading-relaxed mb-4 relative">
-          <span className="absolute -left-1 -top-3 text-4xl text-accent font-serif opacity-30">"</span>
-          {quote.text}
-          <span className="absolute -bottom-6 -right-1 text-4xl text-accent font-serif opacity-30">"</span>
+        <p className="text-balance text-lg leading-relaxed mb-4">
+          "{quote.text}"
         </p>
         
         {/* Quote Meta */}

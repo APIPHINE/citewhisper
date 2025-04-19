@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Heart, Share2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -94,10 +93,8 @@ export function ExpandedQuoteCard({
         <div className="overflow-y-auto p-6 max-h-[calc(90vh-80px)]">
           {/* Quote Text */}
           <div className="mb-8">
-            <p className="text-balance text-xl leading-relaxed font-medium mb-2 relative">
-              <span className="absolute -left-1 -top-3 text-4xl text-accent font-serif opacity-30">"</span>
-              {quote.text}
-              <span className="absolute -bottom-6 -right-1 text-4xl text-accent font-serif opacity-30">"</span>
+            <p className="text-balance text-xl leading-relaxed font-medium mb-2">
+              "{quote.text}"
             </p>
             <div className="mt-8 text-sm text-muted-foreground">
               <p>Source: {quote.source}</p>
