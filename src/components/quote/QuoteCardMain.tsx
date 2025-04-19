@@ -1,4 +1,3 @@
-
 import { Heart, Share2, ChevronDown, Circle, Check, Languages } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -59,7 +58,7 @@ export function QuoteCardMain({
       style={{ height: 'fit-content' }} 
     >
       {/* Verification Status and Language Switcher */}
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
         {hasTranslation && (
           <LanguageSwitcher
             currentLanguage={currentLanguage}
