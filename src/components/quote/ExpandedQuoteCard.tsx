@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Heart, Share2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -21,6 +20,8 @@ interface ExpandedQuoteCardProps {
   favorite: boolean;
   toggleFavorite: () => void;
   showEmbedCode: boolean;
+  shareCount: number;
+  favoriteCount: number;
   copyEmbedCode: () => void;
 }
 
@@ -31,6 +32,8 @@ export function ExpandedQuoteCard({
   favorite,
   toggleFavorite,
   showEmbedCode,
+  shareCount,
+  favoriteCount,
   copyEmbedCode
 }: ExpandedQuoteCardProps) {
   const { formatDate } = useFormatDate();
@@ -161,7 +164,7 @@ export function ExpandedQuoteCard({
                 <Share2 size={20} />
               </button>
               <span className="text-sm text-muted-foreground">
-                {quote.shareCount ?? 0}
+                {shareCount}
               </span>
             </div>
           
@@ -177,7 +180,7 @@ export function ExpandedQuoteCard({
                 />
               </button>
               <span className="text-sm text-muted-foreground">
-                {quote.shareCount ?? 0}
+                {favoriteCount}
               </span>
             </div>
           </div>

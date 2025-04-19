@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
@@ -20,30 +19,29 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [showEmbedCode, setShowEmbedCode] = useState(false);
+  const [shareCount, setShareCount] = useState(0);
+  const [favoriteCount, setFavoriteCount] = useState(0);
   const favorite = isFavorite(quote.id);
-  
-  // Handle copying to clipboard
-  const handleCopy = () => {
-    navigator.clipboard.writeText(`"${quote.text}" — ${quote.author}`);
-    setCopied(true);
-    toast({
-      title: "Copied to clipboard",
-      description: "The quote has been copied to your clipboard.",
-    });
-    
-    setTimeout(() => setCopied(false), 2000);
+
+  // Handle copying to clipboard and increment share count
+  const handleShare = () => {
+    setShowEmbedCode(true);
+    setShareCount(prev => prev + 1);
+    toggleExpanded();
   };
   
-  // Toggle favorite status
+  // Toggle favorite status and update count
   const toggleFavorite = () => {
     if (favorite) {
       removeFavorite(quote.id);
+      setFavoriteCount(prev => prev - 1);
       toast({
         title: "Removed from favorites",
         description: "The quote has been removed from your favorites.",
       });
     } else {
       addFavorite(quote);
+      setFavoriteCount(prev => prev + 1);
       toast({
         title: "Added to favorites",
         description: "The quote has been added to your favorites.",
@@ -76,16 +74,9 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
       }, 300);
     }
   };
-  
-  // Handle share button click (from main card)
-  const handleShare = () => {
-    setShowEmbedCode(true);
-    toggleExpanded();
-  };
 
   return (
     <>
-      {/* Main card */}
       <QuoteCardMain
         quote={quote}
         delay={delay}
@@ -95,9 +86,10 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
         toggleFavorite={toggleFavorite}
         handleShare={handleShare}
         toggleExpanded={toggleExpanded}
+        shareCount={shareCount}
+        favoriteCount={favoriteCount}
       />
       
-      {/* Expanded Overlay */}
       <AnimatePresence>
         <ExpandedQuoteCard
           quote={quote}
@@ -106,6 +98,8 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
           favorite={favorite}
           toggleFavorite={toggleFavorite}
           showEmbedCode={showEmbedCode}
+          shareCount={shareCount}
+          favoriteCount={favoriteCount}
           copyEmbedCode={() => {
             navigator.clipboard.writeText(`<iframe 
   src="https://citequotes.com/embed/quote/${quote.id}?style=standard&color=light&size=medium" 

@@ -1,5 +1,3 @@
-
-import { useState } from 'react';
 import { Heart, Share2, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +13,8 @@ interface QuoteCardMainProps {
   toggleFavorite: () => void;
   handleShare: () => void;
   toggleExpanded: (scrollToCitedBy?: boolean) => void;
+  shareCount: number;
+  favoriteCount: number;
 }
 
 export function QuoteCardMain({
@@ -25,7 +25,9 @@ export function QuoteCardMain({
   favorite,
   toggleFavorite,
   handleShare,
-  toggleExpanded
+  toggleExpanded,
+  shareCount,
+  favoriteCount
 }: QuoteCardMainProps) {
   const { formatDate } = useFormatDate();
   
@@ -96,7 +98,7 @@ export function QuoteCardMain({
                 />
               </button>
               <span className="text-sm text-muted-foreground">
-                {quote.shareCount ?? 0}
+                {favoriteCount}
               </span>
             </div>
             
@@ -109,7 +111,7 @@ export function QuoteCardMain({
                 <Share2 size={20} />
               </button>
               <span className="text-sm text-muted-foreground">
-                {quote.shareCount ?? 0}
+                {shareCount}
               </span>
             </div>
             
