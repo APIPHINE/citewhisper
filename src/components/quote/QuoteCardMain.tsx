@@ -49,7 +49,7 @@ export function QuoteCardMain({
       }
     }
     
-    if (currentLanguage === "fr" && quote.translations?.fr) {
+    if (!Array.isArray(quote.translations) && quote.translations && currentLanguage === "fr") {
       return quote.translations.fr;
     }
     
@@ -66,8 +66,11 @@ export function QuoteCardMain({
     (translation?.source || quote.source);
     
   const isVerified = Boolean(quote.evidenceImage);
-  const hasTranslation = Boolean(quote.translations?.fr) || 
-    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
+  const hasTranslation = (
+    !Array.isArray(quote.translations) && quote.translations && !!quote.translations.fr
+  ) || (
+    Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr")
+  );
 
   const displayDate = formatDate(quote.date);
 

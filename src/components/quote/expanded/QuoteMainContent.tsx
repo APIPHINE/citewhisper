@@ -23,7 +23,7 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
       }
     }
     
-    if (currentLanguage === "fr" && quote.translations?.fr) {
+    if (!Array.isArray(quote.translations) && quote.translations && currentLanguage === "fr") {
       return quote.translations.fr;
     }
     
@@ -39,8 +39,11 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
     quote.source : 
     (translation?.source || quote.source);
 
-  const hasTranslation = Boolean(quote.translations?.fr) || 
-    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
+  const hasTranslation = (
+    !Array.isArray(quote.translations) && quote.translations && !!quote.translations.fr
+  ) || (
+    Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr")
+  );
   
   return (
     <div className="mb-8">
