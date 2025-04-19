@@ -3,12 +3,19 @@ import { Fingerprint } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { SectionBox } from './SectionBox';
+import { useState } from 'react';
 
 interface VerificationSectionProps {
   quote: Quote;
 }
 
 export function VerificationSection({ quote }: VerificationSectionProps) {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <SectionBox title="Source Verification" icon={<Fingerprint size={18} />}>
       <div className="space-y-4">
@@ -17,11 +24,18 @@ export function VerificationSection({ quote }: VerificationSectionProps) {
           <div>
             <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
             <div className="border border-border/50 rounded-lg overflow-hidden">
-              <img 
-                src={quote.evidenceImage} 
-                alt="Source verification" 
-                className="w-full object-contain max-h-64"
-              />
+              {imageError ? (
+                <div className="bg-muted/30 h-48 flex items-center justify-center text-muted-foreground">
+                  <p>Image could not be loaded</p>
+                </div>
+              ) : (
+                <img 
+                  src={quote.evidenceImage} 
+                  alt="Source verification" 
+                  className="w-full object-contain max-h-64"
+                  onError={handleImageError}
+                />
+              )}
             </div>
           </div>
         )}
