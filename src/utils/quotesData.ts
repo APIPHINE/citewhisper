@@ -1,3 +1,4 @@
+
 export interface Quote {
   id: string,
   text: string,
@@ -858,3 +859,6 @@ export const quotes: Quote[] = [
     author: "Mark Zuckerberg",
     date: "2011-01-01",
     topics: ["risk", "business"],
+    theme: "courage"
+  }
+];
