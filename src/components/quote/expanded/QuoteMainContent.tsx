@@ -8,33 +8,39 @@ interface QuoteMainContentProps {
 }
 
 export function QuoteMainContent({ quote }: QuoteMainContentProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "fr">("en");
+  const [currentLanguage, setCurrentLanguage] = useState<"en" | "es" | "fr">("en");
   
-  // Check if quote has translations in either format
-  const hasTranslation = Boolean(quote.translations?.fr) || 
-    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
-
+  // Handle translations and original text
   const getTranslation = () => {
-    // Check array format first
+    if (currentLanguage === 'es' && quote.originalLanguage === 'es') {
+      return { text: quote.originalText, source: quote.originalSource?.title };
+    }
+    
     if (Array.isArray(quote.translations)) {
       const translation = quote.translations.find(t => t.language === currentLanguage);
       if (translation) {
-        return {
-          text: translation.text,
-          source: translation.source
-        };
+        return translation;
       }
     }
-    // Fallback to old format
+    
     if (currentLanguage === "fr" && quote.translations?.fr) {
       return quote.translations.fr;
     }
+    
     return null;
   };
 
   const translation = getTranslation();
-  const displayText = currentLanguage === "en" ? quote.text : translation?.text || quote.text;
-  const displaySource = currentLanguage === "en" ? quote.source : translation?.source || quote.source;
+  const displayText = currentLanguage === "en" ? 
+    quote.text : 
+    (translation?.text || quote.text);
+    
+  const displaySource = currentLanguage === "en" ? 
+    quote.source : 
+    (translation?.source || quote.source);
+
+  const hasTranslation = Boolean(quote.translations?.fr) || 
+    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
   
   return (
     <div className="mb-8">
@@ -42,11 +48,13 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
         <p className="text-balance text-xl leading-relaxed font-medium">
           "{displayText}"
         </p>
-        {hasTranslation && (
+        {(hasTranslation || quote.originalLanguage === 'es') && (
           <div className="ml-4">
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setCurrentLanguage}
+              hasTranslations={hasTranslation}
+              originalLanguage={quote.originalLanguage}
             />
           </div>
         )}

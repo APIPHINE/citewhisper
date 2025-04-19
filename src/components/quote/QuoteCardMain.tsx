@@ -1,4 +1,3 @@
-
 import { Heart, Share2, ChevronDown, Circle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -33,33 +32,43 @@ export function QuoteCardMain({
   favoriteCount
 }: QuoteCardMainProps) {
   const { formatDate } = useFormatDate();
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "fr">("en");
+  const [currentLanguage, setCurrentLanguage] = useState<"en" | "es" | "fr">("en");
   
   if (expanded) return null;
 
-  const isVerified = Boolean(quote.evidenceImage);
-  const hasTranslation = Boolean(quote.translations?.fr) || 
-    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
-  
+  // Handle translations and original text
   const getTranslation = () => {
+    if (currentLanguage === 'es' && quote.originalLanguage === 'es') {
+      return { text: quote.originalText, source: quote.originalSource?.title };
+    }
+    
     if (Array.isArray(quote.translations)) {
       const translation = quote.translations.find(t => t.language === currentLanguage);
       if (translation) {
-        return {
-          text: translation.text,
-          source: translation.source
-        };
+        return translation;
       }
     }
+    
     if (currentLanguage === "fr" && quote.translations?.fr) {
       return quote.translations.fr;
     }
+    
     return null;
   };
 
   const translation = getTranslation();
-  const displayText = currentLanguage === "en" ? quote.text : translation?.text || quote.text;
-  const displaySource = currentLanguage === "en" ? quote.source : translation?.source || quote.source;
+  const displayText = currentLanguage === "en" ? 
+    quote.text : 
+    (translation?.text || quote.text);
+    
+  const displaySource = currentLanguage === "en" ? 
+    quote.source : 
+    (translation?.source || quote.source);
+    
+  const isVerified = Boolean(quote.evidenceImage);
+  const hasTranslation = Boolean(quote.translations?.fr) || 
+    (Array.isArray(quote.translations) && quote.translations.some(t => t.language === "fr"));
+
   const displayDate = formatDate(quote.date);
 
   return (
@@ -124,10 +133,12 @@ export function QuoteCardMain({
           
           {/* Actions */}
           <div className="flex flex-col gap-2">
-            {hasTranslation && (
+            {(hasTranslation || quote.originalLanguage === 'es') && (
               <LanguageSwitcher
                 currentLanguage={currentLanguage}
                 onLanguageChange={setCurrentLanguage}
+                hasTranslations={hasTranslation}
+                originalLanguage={quote.originalLanguage}
               />
             )}
             

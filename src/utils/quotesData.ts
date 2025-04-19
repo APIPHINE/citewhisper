@@ -36,21 +36,28 @@ export interface Quote {
     siteUrl: string,
     embedDate: string
   }[],
-  translations?: {
+  originalSource?: {
+    title: string;
+    publisher: string;
+    publicationDate: string;
+    location: string;
+    isbn: string;
+    sourceUrl: string;
+  };
+  translations?: Array<{
+    language: string;
+    text: string;
+    source?: string;
+    translator?: string;
+    publication?: string;
+    publicationDate?: string;
+    sourceUrl?: string;
+  }> | {
     fr?: {
-      text: string,
-      source?: string
+      text: string;
+      source?: string;
     }
-  } & {
-    [key: string]: {
-      text: string,
-      source?: string,
-      translator?: string,
-      publication?: string,
-      publicationDate?: string,
-      sourceUrl?: string
-    }
-  }[]
+  };
 }
 
 export const quotes: Quote[] = [
