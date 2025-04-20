@@ -1,25 +1,81 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search as SearchIcon } from 'lucide-react';
+import { Search as SearchIcon, LayoutGrid, LayoutList } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import FilterMenu from '../components/FilterMenu';
 import SortMenu from '../components/SortMenu';
 import QuoteCard from '../components/QuoteCard';
 import { useSearch } from '../context/SearchContext';
+import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+
+const QUOTES_PER_PAGE = 10;
 
 const Index = () => {
   const { filteredQuotes, searchQuery } = useSearch();
   const [mounted, setMounted] = useState(false);
   const [anyExpanded, setAnyExpanded] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
   
   // Set mounted after initial render to ensure animations work properly
   useEffect(() => {
     setMounted(true);
   }, []);
   
+  // Reset page when quotes change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredQuotes.length]);
+  
   const handleExpand = (isExpanded: boolean) => {
     setAnyExpanded(isExpanded);
+  };
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredQuotes.length / QUOTES_PER_PAGE);
+  const startIndex = (currentPage - 1) * QUOTES_PER_PAGE;
+  const endIndex = startIndex + QUOTES_PER_PAGE;
+  const paginatedQuotes = filteredQuotes.slice(startIndex, endIndex);
+  
+  // Generate page numbers
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if we have few pages
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Always show first page
+      pageNumbers.push(1);
+      
+      if (currentPage > 3) {
+        pageNumbers.push(null); // Ellipsis
+      }
+      
+      // Show pages around current page
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      if (currentPage < totalPages - 2) {
+        pageNumbers.push(null); // Ellipsis
+      }
+      
+      // Always show last page
+      if (totalPages > 1) {
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
   };
   
   if (!mounted) return null;
@@ -73,6 +129,26 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-3">
+              {/* View mode toggle */}
+              <div className="flex items-center border border-border rounded-lg overflow-hidden">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-9 rounded-none px-3 ${viewMode === 'grid' ? 'bg-secondary text-foreground' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <LayoutGrid size={18} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-9 rounded-none px-3 ${viewMode === 'list' ? 'bg-secondary text-foreground' : ''}`}
+                  onClick={() => setViewMode('list')}
+                >
+                  <LayoutList size={18} />
+                </Button>
+              </div>
+              
               <FilterMenu />
               <SortMenu />
             </div>
@@ -90,19 +166,59 @@ const Index = () => {
           )}
         </motion.div>
         
-        {/* Quotes Grid */}
+        {/* Quotes Grid or List */}
         {filteredQuotes.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            {filteredQuotes.map((quote, index) => (
-              <QuoteCard 
-                key={quote.id} 
-                quote={quote} 
-                delay={index} 
-                isAnyExpanded={anyExpanded}
-                onExpand={handleExpand}
-              />
-            ))}
-          </div>
+          <>
+            <div className={`mt-8 ${!anyExpanded ? (viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-4') : ''}`}>
+              {paginatedQuotes.map((quote, index) => (
+                <QuoteCard 
+                  key={quote.id} 
+                  quote={quote} 
+                  delay={index} 
+                  isAnyExpanded={anyExpanded}
+                  onExpand={handleExpand}
+                />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && !anyExpanded && (
+              <Pagination className="mt-10">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                    />
+                  </PaginationItem>
+                  
+                  {getPageNumbers().map((pageNumber, index) => (
+                    pageNumber === null ? (
+                      <PaginationItem key={`ellipsis-${index}`}>
+                        <span className="px-2">...</span>
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          isActive={currentPage === pageNumber}
+                          onClick={() => setCurrentPage(pageNumber as number)}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </>
         )}
       </div>
     </div>

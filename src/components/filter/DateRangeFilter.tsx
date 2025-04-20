@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
-import FilterSection from './FilterSection';
+import { Button } from '@/components/ui/button';
 import { useSearch } from '../../context/SearchContext';
 
 // Date range constants
@@ -12,25 +12,44 @@ const RANGE = MAX_YEAR - MIN_YEAR;
 const DateRangeFilter = () => {
   const { filters, updateFilter } = useSearch();
   
-  // Convert filter dates to slider values
-  const startYear = filters.date.start 
-    ? new Date(filters.date.start).getFullYear() 
-    : MIN_YEAR;
+  // Convert filter dates to years for the slider
+  const getYearFromDateString = (dateString: string | undefined) => {
+    if (!dateString) return null;
     
-  const endYear = filters.date.end 
-    ? new Date(filters.date.end).getFullYear() 
-    : MAX_YEAR;
+    const bceMatch = dateString.match(/(\d+).*BCE/);
+    if (bceMatch) {
+      return -parseInt(bceMatch[1], 10); // Negative for BCE years
+    }
+    
+    const ceYear = new Date(dateString).getFullYear();
+    return isNaN(ceYear) ? null : ceYear;
+  };
+  
+  const startYear = getYearFromDateString(filters.date.start) ?? MIN_YEAR;
+  const endYear = getYearFromDateString(filters.date.end) ?? MAX_YEAR;
   
   // Convert years to normalized values for slider (0-100)
   const normalizedStart = ((startYear - MIN_YEAR) / RANGE) * 100;
   const normalizedEnd = ((endYear - MIN_YEAR) / RANGE) * 100;
   
-  // Handle slider change
+  const [sliderValues, setSliderValues] = useState<number[]>([normalizedStart, normalizedEnd]);
+  
+  // Update slider when filters change
+  useEffect(() => {
+    setSliderValues([normalizedStart, normalizedEnd]);
+  }, [normalizedStart, normalizedEnd]);
+  
+  // Handle slider change (real-time update)
   const handleSliderChange = (values: number[]) => {
-    if (values.length === 2) {
+    setSliderValues(values);
+  };
+  
+  // Apply the filter when slider is released
+  const applyDateRange = () => {
+    if (sliderValues.length === 2) {
       // Convert normalized values back to years
-      const newStartYear = Math.round((values[0] / 100) * RANGE + MIN_YEAR);
-      const newEndYear = Math.round((values[1] / 100) * RANGE + MIN_YEAR);
+      const newStartYear = Math.round((sliderValues[0] / 100) * RANGE + MIN_YEAR);
+      const newEndYear = Math.round((sliderValues[1] / 100) * RANGE + MIN_YEAR);
       
       // Convert years to date strings
       const startDate = newStartYear < 0 
@@ -49,24 +68,55 @@ const DateRangeFilter = () => {
   const formatYear = (year: number) => {
     return year < 0 ? `${Math.abs(year)} BCE` : `${year} CE`;
   };
+  
+  // Calculate years from slider values
+  const displayStartYear = Math.round((sliderValues[0] / 100) * RANGE + MIN_YEAR);
+  const displayEndYear = Math.round((sliderValues[1] / 100) * RANGE + MIN_YEAR);
+  
+  // Reset date filter
+  const resetDateRange = () => {
+    updateFilter('date', { start: '', end: '' });
+    setSliderValues([0, 100]);
+  };
 
   return (
-    <FilterSection title="Date Range">
+    <div className="space-y-4">
       <div className="px-1 pt-6 pb-2">
         <Slider
-          defaultValue={[normalizedStart, normalizedEnd]}
+          value={sliderValues}
           max={100}
           step={0.1}
           onValueChange={handleSliderChange}
+          onValueCommit={applyDateRange}
           className="mb-6"
         />
         
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{formatYear(startYear)}</span>
-          <span>{formatYear(endYear)}</span>
+          <span>{formatYear(displayStartYear)}</span>
+          <span>{formatYear(displayEndYear)}</span>
         </div>
       </div>
-    </FilterSection>
+      
+      <div className="flex items-center justify-between">
+        <div className="text-sm">
+          <span className="font-medium">Range:</span>{' '}
+          <span className="text-muted-foreground">
+            {formatYear(displayStartYear)} — {formatYear(displayEndYear)}
+          </span>
+        </div>
+        
+        {(filters.date.start || filters.date.end) && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={resetDateRange}
+            className="text-xs h-7 px-2"
+          >
+            Reset
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 
