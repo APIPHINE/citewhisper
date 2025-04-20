@@ -32,7 +32,7 @@ export function ExpandedQuoteContent({
   showEmbedCode
 }: ExpandedQuoteContentProps) {
   const [showEmbedSection, setShowEmbedSection] = useState(showEmbedCode);
-  const [embedStyle, setEmbedStyle] = useState<EmbedStyle>('standard');
+  const [embedStyle, setEmbedStyle] = useState<EmbedStyle>('card');
   const [embedColor, setEmbedColor] = useState<EmbedColor>('light');
   const [embedSize, setEmbedSize] = useState<EmbedSize>('medium');
   
