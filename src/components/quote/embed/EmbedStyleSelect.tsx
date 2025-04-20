@@ -17,7 +17,7 @@ export function EmbedStyleSelect({ embedStyle, setEmbedStyle }: EmbedStyleSelect
           <SelectValue placeholder="Select style" />
         </SelectTrigger>
         <SelectContent className="bg-white border-border shadow-md">
-          <SelectItem value="standard">Standard Quote</SelectItem>
+          <SelectItem value="card">Standard Card</SelectItem>
           <SelectItem value="horizontal">Horizontal Card</SelectItem>
           <SelectItem value="vertical">Vertical Card</SelectItem>
           <SelectItem value="minimal">Minimal</SelectItem>

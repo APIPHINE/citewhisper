@@ -1,5 +1,5 @@
 
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { EmbedColor } from "@/types/embed";
 
@@ -11,25 +11,22 @@ interface EmbedColorSelectProps {
 export function EmbedColorSelect({ embedColor, setEmbedColor }: EmbedColorSelectProps) {
   return (
     <div>
-      <Label className="mb-2 block">Color</Label>
-      <RadioGroup 
-        value={embedColor} 
-        onValueChange={(value) => setEmbedColor(value as EmbedColor)}
-        className="flex space-x-4"
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="light" id="light" />
-          <Label htmlFor="light">Light</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="dark" id="dark" />
-          <Label htmlFor="dark">Dark</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="accent" id="accent" />
-          <Label htmlFor="accent">Accent</Label>
-        </div>
-      </RadioGroup>
+      <Label htmlFor="embed-color" className="mb-2 block">Color & Tone</Label>
+      <Select value={embedColor} onValueChange={(value) => setEmbedColor(value as EmbedColor)}>
+        <SelectTrigger id="embed-color" className="bg-white">
+          <SelectValue placeholder="Select color" />
+        </SelectTrigger>
+        <SelectContent className="bg-white border-border shadow-md">
+          <SelectItem value="light">Light</SelectItem>
+          <SelectItem value="dark">Dark</SelectItem>
+          <SelectItem value="accent">Accent</SelectItem>
+          <SelectItem value="muted">Muted</SelectItem>
+          <SelectItem value="warm">Warm</SelectItem>
+          <SelectItem value="cool">Cool</SelectItem>
+          <SelectItem value="vintage">Vintage</SelectItem>
+          <SelectItem value="modern">Modern</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }
