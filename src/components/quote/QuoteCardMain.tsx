@@ -1,3 +1,4 @@
+
 import { Heart, Share2, ChevronDown, Circle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -41,18 +42,15 @@ export function QuoteCardMain({
     if (currentLanguage === 'es' && quote.originalLanguage === 'es') {
       return { text: quote.originalText, source: quote.originalSource?.title };
     }
-    
     if (Array.isArray(quote.translations)) {
       const translation = quote.translations.find(t => t.language === currentLanguage);
       if (translation) {
         return translation;
       }
     }
-    
     if (!Array.isArray(quote.translations) && quote.translations && currentLanguage === "fr") {
       return quote.translations.fr;
     }
-    
     return null;
   };
 
@@ -107,31 +105,41 @@ export function QuoteCardMain({
           <p className="text-lg leading-relaxed mb-2">
             "{displayText}"
           </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Source: {displaySource}
+        </div>
+
+        {/* (Order starts below) */}
+        <div className="mt-4">
+          <p className="font-semibold text-base text-foreground">{quote.author}</p>
+          <p className="text-sm text-muted-foreground mb-1">{displayDate}</p>
+          <p className="text-sm text-muted-foreground mb-1">
+            <span className="font-medium">Source:</span> {displaySource}
             {quote.translator && currentLanguage === "en" && (
               <span className="ml-1">(translated by {quote.translator})</span>
             )}
           </p>
-        </div>
-        
-        {/* Quote Meta */}
-        <div className="mt-6 flex items-start justify-between">
-          <div>
-            <p className="font-medium text-foreground">{quote.author}</p>
-            <p className="text-sm text-muted-foreground">{displayDate}</p>
-            
-            {/* Topics & Theme */}
-            <div className="mt-3 flex flex-wrap gap-2">
-              {quote.topics.map((topic) => (
-                <Badge key={topic} variant="secondary" className="bg-secondary/80">
-                  {topic}
-                </Badge>
-              ))}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {quote.topics.slice(0, 3).map((topic) => (
+              <Badge key={topic} variant="secondary" className="bg-secondary/80">
+                {topic}
+              </Badge>
+            ))}
+            {quote.theme && (
               <Badge variant="outline" className="border-accent/30 text-accent">
                 {quote.theme}
               </Badge>
-            </div>
+            )}
+          </div>
+        </div>
+        
+        {/* www.CiteQuotes.com branding */}
+        <div className="absolute bottom-2 right-4 text-xs text-muted-foreground/60 select-none pointer-events-none">
+          www.CiteQuotes.com
+        </div>
+
+        {/* Quote Meta */}
+        <div className="mt-6 flex items-start justify-between">
+          <div>
+            {/* Empty to preserve spacing/alignment */}
           </div>
           
           {/* Actions */}
