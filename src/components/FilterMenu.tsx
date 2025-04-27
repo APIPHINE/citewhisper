@@ -1,37 +1,21 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Filter, ChevronDown, ChevronUp } from 'lucide-react';
-import { useSearch } from '@/context/SearchContext';
+import { Filter, X } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import AuthorFilter from './filter/AuthorFilter';
 import TopicFilter from './filter/TopicFilter';
+import AuthorFilter from './filter/AuthorFilter';
+import KeywordFilter from './filter/KeywordFilter';
 import ThemeFilter from './filter/ThemeFilter';
 import DateRangeFilter from './filter/DateRangeFilter';
-import KeywordFilter from './filter/KeywordFilter';
+import { useSearch } from '../context/SearchContext';
 
 const FilterMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { filters, clearFilters } = useSearch();
-  
-  // Section open states
-  const [sectionsOpen, setSectionsOpen] = useState({
-    authors: false,
-    topics: false,
-    themes: false,
-    dates: false,
-    keywords: false
-  });
-  
-  // Toggle section open state
-  const toggleSection = (section: keyof typeof sectionsOpen) => {
-    setSectionsOpen(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-  
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,169 +32,129 @@ const FilterMenu = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
-  
-  // Count active filters
-  const activeFilterCount = 
-    filters.author.length + 
-    filters.topic.length + 
-    filters.theme.length + 
-    filters.keyword.length + 
-    (filters.date.start || filters.date.end ? 1 : 0);
 
-  // Count active filters by type
-  const getActiveCount = (type: keyof typeof filters) => {
-    if (type === 'date') {
-      return (filters.date.start || filters.date.end) ? 1 : 0;
-    }
-    return filters[type].length;
+  // Calculate total active filters
+  const getTotalActiveFilters = () => {
+    return (
+      filters.author.length +
+      filters.topic.length +
+      filters.theme.length +
+      filters.keyword.length +
+      (filters.date.start || filters.date.end ? 1 : 0)
+    );
   };
+
+  const totalActiveFilters = getTotalActiveFilters();
+
+  // Helper function to render active filters as badges
+  const renderActiveFilters = () => {
+    if (totalActiveFilters === 0) return null;
+
+    return (
+      <div className="flex flex-wrap gap-2 py-2">
+        {filters.author.map((author) => (
+          <Badge key={`author-${author}`} variant="secondary">
+            Author: {author}
+          </Badge>
+        ))}
+        {filters.topic.map((topic) => (
+          <Badge key={`topic-${topic}`} variant="secondary">
+            Topic: {topic}
+          </Badge>
+        ))}
+        {filters.theme.map((theme) => (
+          <Badge key={`theme-${theme}`} variant="secondary">
+            Theme: {theme}
+          </Badge>
+        ))}
+        {filters.keyword.map((keyword) => (
+          <Badge key={`keyword-${keyword}`} variant="secondary">
+            Keyword: {keyword}
+          </Badge>
+        ))}
+        {(filters.date.start || filters.date.end) && (
+          <Badge variant="secondary">
+            Date: {filters.date.start || '...'} - {filters.date.end || '...'}
+          </Badge>
+        )}
+      </div>
+    );
+  };
+
+  const hasActiveFilters = totalActiveFilters > 0;
 
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`button-effect inline-flex items-center justify-center px-4 py-2 rounded-full border transition-all ${
-          isOpen || activeFilterCount > 0
-            ? 'bg-primary text-primary-foreground border-primary'
+          hasActiveFilters
+            ? 'bg-accent/10 border-accent/30 text-accent hover:bg-accent/20'
             : 'bg-secondary/50 hover:bg-secondary border-border'
         }`}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         <Filter size={18} className="mr-2" />
-        <span>Filters</span>
-        {activeFilterCount > 0 && (
-          <Badge variant="secondary" className="ml-2 bg-white/20 text-white">
-            {activeFilterCount}
-          </Badge>
+        <span>Filter</span>
+        {hasActiveFilters && (
+          <span className="ml-1.5 flex items-center justify-center bg-accent text-white rounded-full w-5 h-5 text-xs font-medium">
+            {totalActiveFilters}
+          </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute z-40 mt-2 w-72 sm:w-96 origin-top-right right-0 rounded-xl shadow-elevation border border-border bg-white animate-fade-in animate-slide-in">
-          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-            <h3 className="font-medium">Filters</h3>
-            {activeFilterCount > 0 && (
-              <button 
+        <div 
+          className="absolute z-[99999] mt-2 w-80 origin-top-right right-0 rounded-xl shadow-elevation border border-border bg-white animate-fade-in animate-slide-in overflow-hidden"
+          style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0 }}
+        >
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <h3 className="font-medium">Filter Quotes</h3>
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={clearFilters}
-                className="text-sm text-muted-foreground hover:text-foreground button-effect"
+                className="h-8 text-xs flex items-center gap-1 text-muted-foreground hover:text-foreground"
               >
-                Clear all
-              </button>
+                <X size={14} />
+                Clear All
+              </Button>
             )}
           </div>
-          
-          <div className="max-h-[70vh] overflow-y-auto">
-            {/* Authors Filter Section */}
-            <Collapsible 
-              open={sectionsOpen.authors} 
-              onOpenChange={() => toggleSection('authors')}
-              className="border-b border-border"
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 hover:bg-secondary/30 transition-colors">
-                <div className="flex items-center">
-                  <span className="font-medium">Authors</span>
-                  {getActiveCount('author') > 0 && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10 border-primary/30">
-                      {getActiveCount('author')}
-                    </Badge>
-                  )}
-                </div>
-                {sectionsOpen.authors ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="px-4 py-3">
-                <AuthorFilter />
-              </CollapsibleContent>
-            </Collapsible>
+
+          {renderActiveFilters()}
+
+          <Tabs defaultValue="topic" className="p-4">
+            <TabsList className="w-full grid grid-cols-5 mb-4">
+              <TabsTrigger value="topic">Topic</TabsTrigger>
+              <TabsTrigger value="theme">Theme</TabsTrigger>
+              <TabsTrigger value="author">Author</TabsTrigger>
+              <TabsTrigger value="keyword">Keyword</TabsTrigger>
+              <TabsTrigger value="date">Date</TabsTrigger>
+            </TabsList>
             
-            {/* Topics Filter Section */}
-            <Collapsible 
-              open={sectionsOpen.topics} 
-              onOpenChange={() => toggleSection('topics')}
-              className="border-b border-border"
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 hover:bg-secondary/30 transition-colors">
-                <div className="flex items-center">
-                  <span className="font-medium">Topics</span>
-                  {getActiveCount('topic') > 0 && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10 border-primary/30">
-                      {getActiveCount('topic')}
-                    </Badge>
-                  )}
-                </div>
-                {sectionsOpen.topics ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="px-4 py-3">
-                <TopicFilter />
-              </CollapsibleContent>
-            </Collapsible>
+            <TabsContent value="topic">
+              <TopicFilter />
+            </TabsContent>
             
-            {/* Themes Filter Section */}
-            <Collapsible 
-              open={sectionsOpen.themes} 
-              onOpenChange={() => toggleSection('themes')}
-              className="border-b border-border"
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 hover:bg-secondary/30 transition-colors">
-                <div className="flex items-center">
-                  <span className="font-medium">Themes</span>
-                  {getActiveCount('theme') > 0 && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10 border-primary/30">
-                      {getActiveCount('theme')}
-                    </Badge>
-                  )}
-                </div>
-                {sectionsOpen.themes ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="px-4 py-3">
-                <ThemeFilter />
-              </CollapsibleContent>
-            </Collapsible>
+            <TabsContent value="theme">
+              <ThemeFilter />
+            </TabsContent>
             
-            {/* Date Range Filter Section */}
-            <Collapsible 
-              open={sectionsOpen.dates} 
-              onOpenChange={() => toggleSection('dates')}
-              className="border-b border-border"
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 hover:bg-secondary/30 transition-colors">
-                <div className="flex items-center">
-                  <span className="font-medium">Date Range</span>
-                  {getActiveCount('date') > 0 && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10 border-primary/30">
-                      Active
-                    </Badge>
-                  )}
-                </div>
-                {sectionsOpen.dates ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="px-4 py-3">
-                <DateRangeFilter />
-              </CollapsibleContent>
-            </Collapsible>
+            <TabsContent value="author">
+              <AuthorFilter />
+            </TabsContent>
             
-            {/* Keywords Filter Section */}
-            <Collapsible 
-              open={sectionsOpen.keywords} 
-              onOpenChange={() => toggleSection('keywords')}
-              className="border-b border-border last:border-0"
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 hover:bg-secondary/30 transition-colors">
-                <div className="flex items-center">
-                  <span className="font-medium">Keywords</span>
-                  {getActiveCount('keyword') > 0 && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10 border-primary/30">
-                      {getActiveCount('keyword')}
-                    </Badge>
-                  )}
-                </div>
-                {sectionsOpen.keywords ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="px-4 py-3">
-                <KeywordFilter />
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
+            <TabsContent value="keyword">
+              <KeywordFilter />
+            </TabsContent>
+            
+            <TabsContent value="date">
+              <DateRangeFilter />
+            </TabsContent>
+          </Tabs>
         </div>
       )}
     </div>

@@ -71,7 +71,10 @@ const SortMenu = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute z-40 mt-2 w-64 origin-top-right right-0 rounded-xl shadow-elevation border border-border bg-white animate-fade-in animate-slide-in overflow-hidden">
+        <div 
+          className="absolute z-[99999] mt-2 w-64 origin-top-right right-0 rounded-xl shadow-elevation border border-border bg-white animate-fade-in animate-slide-in overflow-hidden"
+          style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0 }}
+        >
           <div className="px-4 py-3 border-b border-border">
             <h3 className="font-medium">Sort by</h3>
           </div>

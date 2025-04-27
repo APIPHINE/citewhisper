@@ -1,10 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Quote, quotes as initialQuotes } from '../utils/quotesData';
 import { dateStringToYear } from '../utils/dateUtils';
 
 export type SortOption = 'author' | 'date' | 'relevance' | 'theme' | 'topic';
-export type FilterOption = 'author' | 'topic' | 'keyword' | 'date' | 'theme';
+export type FilterOption = 'author' | 'topic' | 'keyword' | 'date' | 'theme' | 'language';
 
 interface FilterState {
   author: string[];
@@ -12,6 +11,7 @@ interface FilterState {
   keyword: string[];
   date: { start: string; end: string };
   theme: string[];
+  language: string[];
 }
 
 interface SearchContextType {
@@ -27,6 +27,7 @@ interface SearchContextType {
     authors: string[];
     topics: string[];
     themes: string[];
+    languages: string[];
   };
 }
 
@@ -36,6 +37,7 @@ const initialFilters: FilterState = {
   keyword: [],
   date: { start: '', end: '' },
   theme: [],
+  language: [],
 };
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -60,6 +62,32 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     authors: Array.from(new Set(quotes.map(quote => quote.author))).sort(),
     topics: Array.from(new Set(quotes.flatMap(quote => quote.topics))).sort(),
     themes: Array.from(new Set(quotes.map(quote => quote.theme))).sort(),
+    // Get available languages from quotes
+    languages: Array.from(new Set(
+      quotes
+        .filter(quote => quote.originalLanguage || 
+          (Array.isArray(quote.translations) && quote.translations.length > 0) ||
+          (!Array.isArray(quote.translations) && quote.translations))
+        .map(quote => {
+          const languages = [];
+          if (quote.originalLanguage) languages.push(quote.originalLanguage);
+          if (Array.isArray(quote.translations)) {
+            quote.translations.forEach(t => languages.push(t.language));
+          } else if (quote.translations) {
+            if (quote.translations.fr) languages.push('fr');
+          }
+          return languages;
+        })
+        .flat()
+    )).map(lang => {
+      // Convert language codes to full names
+      switch(lang) {
+        case 'en': return 'English';
+        case 'es': return 'Spanish';
+        case 'fr': return 'French';
+        default: return lang;
+      }
+    }).sort(),
   };
 
   // Update filtered quotes whenever search query, filters, or sort option changes
@@ -73,45 +101,76 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         quote => 
           quote.text.toLowerCase().includes(query) ||
           quote.author.toLowerCase().includes(query) ||
-          quote.topics.some(topic => topic.toLowerCase().includes(query)) ||
-          quote.theme.toLowerCase().includes(query)
+          quote.theme.toLowerCase().includes(query) ||
+          quote.topics.some(topic => topic.toLowerCase().includes(query))
       );
     }
 
-    // Apply filters
-    if (filters.author.length) {
+    // Apply author filter
+    if (filters.author.length > 0) {
       result = result.filter(quote => filters.author.includes(quote.author));
     }
-    
-    if (filters.topic.length) {
+
+    // Apply topic filter
+    if (filters.topic.length > 0) {
       result = result.filter(quote => 
         quote.topics.some(topic => filters.topic.includes(topic))
       );
     }
-    
-    if (filters.theme.length) {
+
+    // Apply theme filter
+    if (filters.theme.length > 0) {
       result = result.filter(quote => filters.theme.includes(quote.theme));
     }
-    
-    if (filters.keyword.length) {
+
+    // Apply language filter
+    if (filters.language.length > 0) {
+      result = result.filter(quote => {
+        // Check original language
+        if (quote.originalLanguage) {
+          const formattedLang = quote.originalLanguage === 'en' ? 'English' :
+                                quote.originalLanguage === 'es' ? 'Spanish' :
+                                quote.originalLanguage === 'fr' ? 'French' : quote.originalLanguage;
+          
+          if (filters.language.includes(formattedLang)) return true;
+        }
+        
+        // Check translations
+        if (Array.isArray(quote.translations)) {
+          for (const trans of quote.translations) {
+            const formattedLang = trans.language === 'en' ? 'English' :
+                                  trans.language === 'es' ? 'Spanish' :
+                                  trans.language === 'fr' ? 'French' : trans.language;
+            
+            if (filters.language.includes(formattedLang)) return true;
+          }
+        } else if (quote.translations) {
+          if (quote.translations.fr && filters.language.includes('French')) return true;
+        }
+        
+        return false;
+      });
+    }
+
+    // Apply keyword filter
+    if (filters.keyword.length > 0) {
       result = result.filter(quote => 
-        filters.keyword.some(keyword => 
-          quote.text.toLowerCase().includes(keyword.toLowerCase())
+        filters.keyword.every(keyword => 
+          quote.text.toLowerCase().includes(keyword.toLowerCase()) ||
+          (quote.keywords && quote.keywords.some(k => k.toLowerCase().includes(keyword.toLowerCase())))
         )
       );
     }
-    
+
+    // Apply date range filter
     if (filters.date.start || filters.date.end) {
       result = result.filter(quote => {
-        // Get the quote year (from the date)
-        const quoteDate = new Date(quote.date);
-        const quoteYear = quoteDate.getFullYear();
+        const quoteYear = dateStringToYear(quote.date);
+        if (!quoteYear) return true;
         
-        // Get start and end years from filters
-        const startYear = filters.date.start ? dateStringToYear(filters.date.start) : -2000; // Default to 2000 BCE
-        const endYear = filters.date.end ? dateStringToYear(filters.date.end) : 2025; // Default to 2025 CE
+        const startYear = filters.date.start ? dateStringToYear(filters.date.start) : -Infinity;
+        const endYear = filters.date.end ? dateStringToYear(filters.date.end) : Infinity;
         
-        // Check if quote year is within range
         return quoteYear >= startYear && quoteYear <= endYear;
       });
     }
@@ -122,7 +181,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         result.sort((a, b) => a.author.localeCompare(b.author));
         break;
       case 'date':
-        result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        result.sort((a, b) => {
+          // Parse dates and handle BCE (negative years)
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          // Sort from newest to oldest
+          return dateB - dateA;
+        });
         break;
       case 'theme':
         result.sort((a, b) => a.theme.localeCompare(b.theme));
@@ -130,12 +195,16 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       case 'topic':
         result.sort((a, b) => a.topics[0].localeCompare(b.topics[0]));
         break;
+      // For relevance, we keep the current order if there's a search query,
+      // otherwise default to sorting by author
       case 'relevance':
       default:
-        // For relevance, we keep the default order or could implement a more sophisticated algorithm
+        if (!searchQuery) {
+          result.sort((a, b) => a.author.localeCompare(b.author));
+        }
         break;
     }
-
+    
     setFilteredQuotes(result);
   }, [searchQuery, filters, activeSort, quotes]);
 
@@ -151,11 +220,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <SearchContext.Provider 
-      value={{ 
-        searchQuery, 
-        setSearchQuery, 
-        activeSort, 
+    <SearchContext.Provider
+      value={{
+        searchQuery,
+        setSearchQuery,
+        activeSort,
         setActiveSort,
         filters,
         updateFilter,
@@ -168,3 +237,5 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     </SearchContext.Provider>
   );
 };
+
+export default SearchContext;

@@ -9,6 +9,7 @@ import QuoteCard from '../components/QuoteCard';
 import { useSearch } from '../context/SearchContext';
 import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import QuoteSidebar from '../components/QuoteSidebar';
 
 const QUOTES_PER_PAGE = 10;
 
@@ -18,6 +19,7 @@ const Index = () => {
   const [anyExpanded, setAnyExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   
   // Set mounted after initial render to ensure animations work properly
   useEffect(() => {
@@ -78,148 +80,167 @@ const Index = () => {
     return pageNumbers;
   };
   
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+  
   if (!mounted) return null;
 
   return (
     <div className="min-h-screen pt-24 pb-20 page-padding">
-      <div className="page-max-width">
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className={anyExpanded ? 'hidden' : ''}
-        >
-          <div className="inline-flex items-center justify-center mb-3 bg-secondary/80 text-foreground px-3 py-1.5 rounded-full text-sm">
-            <SearchIcon size={14} className="mr-1.5" />
-            Discover Wisdom
+      <div className="page-max-width flex">
+        {/* Sidebar */}
+        <div className={`transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+          {sidebarOpen && <QuoteSidebar />}
+        </div>
+        
+        {/* Main content */}
+        <div className="flex-1 ml-0 md:ml-4">
+          {/* Sidebar toggle button for mobile */}
+          <div className="mb-4 md:hidden">
+            <Button variant="outline" size="sm" onClick={toggleSidebar}>
+              {sidebarOpen ? 'Hide Filters' : 'Show Filters'}
+            </Button>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold">Find the Perfect Quote</h1>
-          <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
-            Search through our curated collection of quotes from influential thinkers, designers, and visionaries.
-          </p>
-        </motion.div>
         
-        {/* Search Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          className={anyExpanded ? 'hidden' : 'mb-8'}
-        >
-          <SearchBar />
-        </motion.div>
-        
-        {/* Filters & Results */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: anyExpanded ? 0 : 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className={anyExpanded ? 'hidden' : ''}
-        >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <div className="flex items-center text-muted-foreground">
-              <span className="font-medium text-foreground">{filteredQuotes.length}</span>
-              <span className="ml-1.5">
-                {filteredQuotes.length === 1 ? 'quote' : 'quotes'} found
-              </span>
-              {searchQuery && (
-                <span className="ml-1">for "{searchQuery}"</span>
-              )}
+          {/* Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            className={anyExpanded ? 'hidden' : ''}
+          >
+            <div className="inline-flex items-center justify-center mb-3 bg-secondary/80 text-foreground px-3 py-1.5 rounded-full text-sm">
+              <SearchIcon size={14} className="mr-1.5" />
+              Discover Wisdom
             </div>
-            
-            <div className="flex items-center gap-3">
-              {/* View mode toggle */}
-              <div className="flex items-center border border-border rounded-lg overflow-hidden">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-9 rounded-none px-3 ${viewMode === 'grid' ? 'bg-secondary text-foreground' : ''}`}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <LayoutGrid size={18} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-9 rounded-none px-3 ${viewMode === 'list' ? 'bg-secondary text-foreground' : ''}`}
-                  onClick={() => setViewMode('list')}
-                >
-                  <LayoutList size={18} />
-                </Button>
+            <h1 className="text-4xl md:text-5xl font-bold">Find the Perfect Quote</h1>
+            <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
+              Search through our curated collection of quotes from influential thinkers, designers, and visionaries.
+            </p>
+          </motion.div>
+          
+          {/* Search Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: anyExpanded ? 0 : 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+            className={anyExpanded ? 'hidden' : 'mb-8'}
+          >
+            <SearchBar />
+          </motion.div>
+          
+          {/* Filters & Results */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: anyExpanded ? 0 : 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className={anyExpanded ? 'hidden' : ''}
+          >
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div className="flex items-center text-muted-foreground">
+                <span className="font-medium text-foreground">{filteredQuotes.length}</span>
+                <span className="ml-1.5">
+                  {filteredQuotes.length === 1 ? 'quote' : 'quotes'} found
+                </span>
+                {searchQuery && (
+                  <span className="ml-1">for "{searchQuery}"</span>
+                )}
               </div>
               
-              <FilterMenu />
-              <SortMenu />
-            </div>
-          </div>
-          
-          {/* No Quotes Found Message */}
-          {filteredQuotes.length === 0 && (
-            <div className="bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border">
-              <SearchIcon size={40} className="mx-auto mb-4 text-muted-foreground/50" />
-              <h2 className="text-xl font-medium mb-2">No quotes found</h2>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Try adjusting your search terms or filters to find what you're looking for.
-              </p>
-            </div>
-          )}
-        </motion.div>
-        
-        {/* Quotes Grid or List */}
-        {filteredQuotes.length > 0 && (
-          <>
-            <div className={`mt-8 ${!anyExpanded ? (viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-4') : ''}`}>
-              {paginatedQuotes.map((quote, index) => (
-                <QuoteCard 
-                  key={quote.id} 
-                  quote={quote} 
-                  delay={index} 
-                  isAnyExpanded={anyExpanded}
-                  onExpand={handleExpand}
-                />
-              ))}
+              <div className="flex items-center gap-3">
+                {/* View mode toggle */}
+                <div className="flex items-center border border-border rounded-lg overflow-hidden">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-9 rounded-none px-3 ${viewMode === 'grid' ? 'bg-secondary text-foreground' : ''}`}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <LayoutGrid size={18} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-9 rounded-none px-3 ${viewMode === 'list' ? 'bg-secondary text-foreground' : ''}`}
+                    onClick={() => setViewMode('list')}
+                  >
+                    <LayoutList size={18} />
+                  </Button>
+                </div>
+                
+                <FilterMenu />
+                <SortMenu />
+              </div>
             </div>
             
-            {/* Pagination */}
-            {totalPages > 1 && !anyExpanded && (
-              <Pagination className="mt-10">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-                    />
-                  </PaginationItem>
-                  
-                  {getPageNumbers().map((pageNumber, index) => (
-                    pageNumber === null ? (
-                      <PaginationItem key={`ellipsis-${index}`}>
-                        <span className="px-2">...</span>
-                      </PaginationItem>
-                    ) : (
-                      <PaginationItem key={pageNumber}>
-                        <PaginationLink
-                          isActive={currentPage === pageNumber}
-                          onClick={() => setCurrentPage(pageNumber as number)}
-                        >
-                          {pageNumber}
-                        </PaginationLink>
-                      </PaginationItem>
-                    )
-                  ))}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+            {/* No Quotes Found Message */}
+            {filteredQuotes.length === 0 && (
+              <div className="bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border">
+                <SearchIcon size={40} className="mx-auto mb-4 text-muted-foreground/50" />
+                <h2 className="text-xl font-medium mb-2">No quotes found</h2>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Try adjusting your search terms or filters to find what you're looking for.
+                </p>
+              </div>
             )}
-          </>
-        )}
+          </motion.div>
+          
+          {/* Quotes Grid or List */}
+          {filteredQuotes.length > 0 && (
+            <>
+              <div className={`mt-8 ${!anyExpanded ? (viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-4') : ''}`}>
+                {paginatedQuotes.map((quote, index) => (
+                  <QuoteCard 
+                    key={quote.id} 
+                    quote={quote} 
+                    delay={index} 
+                    isAnyExpanded={anyExpanded}
+                    onExpand={handleExpand}
+                  />
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && !anyExpanded && (
+                <Pagination className="mt-10">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                      />
+                    </PaginationItem>
+                    
+                    {getPageNumbers().map((pageNumber, index) => (
+                      pageNumber === null ? (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <span className="px-2">...</span>
+                        </PaginationItem>
+                      ) : (
+                        <PaginationItem key={pageNumber as number}>
+                          <PaginationLink
+                            isActive={currentPage === pageNumber}
+                            onClick={() => setCurrentPage(pageNumber as number)}
+                          >
+                            {pageNumber}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

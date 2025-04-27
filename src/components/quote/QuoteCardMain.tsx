@@ -107,7 +107,7 @@ export function QuoteCardMain({
           </p>
         </div>
 
-        {/* (Order starts below) */}
+        {/* Updated display order for Author, Date, Source following requirements */}
         <div className="mt-4">
           <p className="font-semibold text-base text-foreground">{quote.author}</p>
           <p className="text-sm text-muted-foreground mb-1">{displayDate}</p>

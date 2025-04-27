@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import NavBar from "./components/NavBar";
 import WhySourcingMatters from "./pages/blog/WhySourcingMatters";
 import EvidenceAndOpenMindedness from "./pages/blog/EvidenceAndOpenMindedness";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/quotes" element={<Index />} />
               <Route path="/add-quote" element={<AddQuote />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/blog/why-sourcing-matters" element={<WhySourcingMatters />} />
               <Route path="/blog/evidence-and-open-mindedness" element={<EvidenceAndOpenMindedness />} />
               <Route path="*" element={<NotFound />} />
