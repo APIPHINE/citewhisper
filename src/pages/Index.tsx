@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search as SearchIcon, LayoutGrid, LayoutList } from 'lucide-react';
@@ -17,7 +18,7 @@ const Index = () => {
   const { filteredQuotes, searchQuery } = useSearch();
   const [mounted, setMounted] = useState(false);
   const [anyExpanded, setAnyExpanded] = useState(false);
-  const [viewMode, setViewMode<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   
