@@ -7,7 +7,7 @@ interface VerificationIndicatorProps {
 
 export function VerificationIndicator({ isVerified }: VerificationIndicatorProps) {
   return (
-    <div className="absolute top-4 right-12 z-10">
+    <div className="absolute top-4 right-4 z-10">
       {isVerified ? (
         <div className="relative">
           <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />

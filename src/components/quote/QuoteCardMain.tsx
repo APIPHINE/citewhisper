@@ -87,27 +87,61 @@ export function QuoteCardMain({
       className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
       style={{ height: 'fit-content' }} 
     >
-      {/* Verification Status */}
-      <div className="absolute top-4 right-4 z-10">
-        {isVerified ? (
-          <div className="relative">
-            <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
-            <Check size={16} className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-          </div>
-        ) : (
-          <Circle size={24} className="text-[#ea384c] fill-[#ea384c]" />
-        )}
-      </div>
-
       <div className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative">
+        {/* Action Buttons and Verification Status in a column on the right */}
+        <div className="absolute top-4 right-4 flex flex-col items-center gap-3">
+          {/* Verification Status */}
+          {isVerified ? (
+            <div className="relative">
+              <Circle size={24} className="text-[#6dbb6c] fill-[#6dbb6c]" />
+              <Check size={16} className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            </div>
+          ) : (
+            <Circle size={24} className="text-[#ea384c] fill-[#ea384c]" />
+          )}
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-3 mt-1">
+            {/* Favorite Button */}
+            <button
+              onClick={toggleFavorite}
+              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+              aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart 
+                size={20} 
+                className={favorite ? "fill-accent text-accent" : "text-foreground"} 
+              />
+            </button>
+            
+            {/* Share Button */}
+            <button
+              onClick={handleShare}
+              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+              aria-label="Share this quote"
+            >
+              <Share2 size={20} />
+            </button>
+            
+            {/* Expand Button */}
+            <button
+              onClick={() => toggleExpanded()}
+              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+              aria-label="Expand quote details"
+            >
+              <ChevronDown size={20} />
+            </button>
+          </div>
+        </div>
+
         {/* Quote Text */}
-        <div className="pr-12">
+        <div className="pr-20">
           <p className="text-lg leading-relaxed mb-2">
             "{displayText}"
           </p>
         </div>
 
-        {/* Updated display order for Author, Date, Source following requirements */}
+        {/* Updated display order for Author, Date, Source */}
         <div className="mt-4">
           <p className="font-semibold text-base text-foreground">{quote.author}</p>
           <p className="text-sm text-muted-foreground mb-1">{displayDate}</p>
@@ -136,62 +170,32 @@ export function QuoteCardMain({
           www.CiteQuotes.com
         </div>
 
-        {/* Quote Meta */}
-        <div className="mt-6 flex items-start justify-between">
-          <div>
-            {/* Empty to preserve spacing/alignment */}
-          </div>
+        {/* Language Switcher */}
+        <div className="mt-6 flex items-center">
+          {(hasTranslation || quote.originalLanguage === 'es') && (
+            <LanguageSwitcher
+              currentLanguage={currentLanguage}
+              onLanguageChange={setCurrentLanguage}
+              hasTranslations={hasTranslation}
+              originalLanguage={quote.originalLanguage}
+            />
+          )}
           
-          {/* Actions */}
-          <div className="flex flex-col gap-2">
-            {(hasTranslation || quote.originalLanguage === 'es') && (
-              <LanguageSwitcher
-                currentLanguage={currentLanguage}
-                onLanguageChange={setCurrentLanguage}
-                hasTranslations={hasTranslation}
-                originalLanguage={quote.originalLanguage}
-              />
-            )}
-            
-            {/* Favorite Button */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleFavorite}
-                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-              >
-                <Heart 
-                  size={20} 
-                  className={favorite ? "fill-accent text-accent" : "text-foreground"} 
-                />
-              </button>
-              <span className="text-sm text-muted-foreground">
+          {/* Display counts */}
+          <div className="ml-auto flex items-center gap-4">
+            {favoriteCount > 0 && (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Heart size={14} className={favorite ? "fill-accent text-accent" : ""} /> 
                 {favoriteCount}
               </span>
-            </div>
+            )}
             
-            {/* Share Button */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleShare}
-                className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-                aria-label="Share this quote"
-              >
-                <Share2 size={20} />
-              </button>
-              <span className="text-sm text-muted-foreground">
+            {shareCount > 0 && (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Share2 size={14} /> 
                 {shareCount}
               </span>
-            </div>
-            
-            {/* Expand Button */}
-            <button
-              onClick={() => toggleExpanded()}
-              className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
-              aria-label="Expand quote details"
-            >
-              <ChevronDown size={20} />
-            </button>
+            )}
           </div>
         </div>
       </div>

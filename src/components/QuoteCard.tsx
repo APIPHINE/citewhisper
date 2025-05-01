@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
