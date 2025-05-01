@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { useSearch } from '../../context/SearchContext';
+import { formatDateYear } from '../../utils/dateUtils';
 
 // Date range constants
 const MIN_YEAR = -2000; // 2000 BCE
@@ -66,7 +67,7 @@ const DateRangeFilter = () => {
   
   // Format year for display
   const formatYear = (year: number) => {
-    return year < 0 ? `${Math.abs(year)} BCE` : `${year} CE`;
+    return formatDateYear(year);
   };
   
   // Calculate years from slider values

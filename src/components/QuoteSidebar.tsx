@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { ArrowDownAZ, ArrowUpZA } from "lucide-react";
 import { useSearch } from "../context/SearchContext";
+import DateRangeFilter from "./filter/DateRangeFilter";
 
 const QuoteSidebar = () => {
   const { filters, updateFilter, availableFilters } = useSearch();
@@ -57,14 +57,10 @@ const QuoteSidebar = () => {
     <div className="h-full w-full border rounded-lg bg-background p-4 flex flex-col">
       <h2 className="text-lg font-semibold mb-4">Browse Quotes</h2>
       
-      {/* Timeline slider */}
+      {/* Timeline slider with two thumbs */}
       <div className="mb-6">
         <h3 className="text-sm font-medium mb-2">Timeline</h3>
-        <Slider defaultValue={[50]} max={100} step={1} className="mb-1" />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>500 BCE</span>
-          <span>2023</span>
-        </div>
+        <DateRangeFilter />
       </div>
       
       {/* Navigation tabs */}
