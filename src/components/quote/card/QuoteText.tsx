@@ -6,7 +6,7 @@ interface QuoteTextProps {
 export function QuoteText({ text }: QuoteTextProps) {
   return (
     <div className="pr-20">
-      <p className="text-lg leading-relaxed mb-2">
+      <p className="text-lg leading-relaxed mb-2 font-serif italic">
         "{text}"
       </p>
     </div>

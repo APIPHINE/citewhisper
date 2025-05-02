@@ -9,7 +9,154 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      original_sources: {
+        Row: {
+          isbn: string | null
+          location: string | null
+          publication_date: string | null
+          publisher: string | null
+          quote_id: string
+          source_url: string | null
+          title: string | null
+        }
+        Insert: {
+          isbn?: string | null
+          location?: string | null
+          publication_date?: string | null
+          publisher?: string | null
+          quote_id: string
+          source_url?: string | null
+          title?: string | null
+        }
+        Update: {
+          isbn?: string | null
+          location?: string | null
+          publication_date?: string | null
+          publisher?: string | null
+          quote_id?: string
+          source_url?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "original_sources_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: true
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          author: string
+          citation_apa: string | null
+          citation_chicago: string | null
+          citation_mla: string | null
+          context: string | null
+          date: string | null
+          historical_context: string | null
+          id: string
+          inserted_at: string | null
+          keywords: string[] | null
+          original_language: string | null
+          original_text: string | null
+          quote_image_url: string | null
+          source: string | null
+          source_publication_date: string | null
+          source_url: string | null
+          text: string
+          theme: string | null
+          topics: string[] | null
+        }
+        Insert: {
+          author: string
+          citation_apa?: string | null
+          citation_chicago?: string | null
+          citation_mla?: string | null
+          context?: string | null
+          date?: string | null
+          historical_context?: string | null
+          id?: string
+          inserted_at?: string | null
+          keywords?: string[] | null
+          original_language?: string | null
+          original_text?: string | null
+          quote_image_url?: string | null
+          source?: string | null
+          source_publication_date?: string | null
+          source_url?: string | null
+          text: string
+          theme?: string | null
+          topics?: string[] | null
+        }
+        Update: {
+          author?: string
+          citation_apa?: string | null
+          citation_chicago?: string | null
+          citation_mla?: string | null
+          context?: string | null
+          date?: string | null
+          historical_context?: string | null
+          id?: string
+          inserted_at?: string | null
+          keywords?: string[] | null
+          original_language?: string | null
+          original_text?: string | null
+          quote_image_url?: string | null
+          source?: string | null
+          source_publication_date?: string | null
+          source_url?: string | null
+          text?: string
+          theme?: string | null
+          topics?: string[] | null
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          id: string
+          language: string | null
+          publication: string | null
+          publication_date: string | null
+          quote_id: string | null
+          source: string | null
+          source_url: string | null
+          text: string | null
+          translator: string | null
+        }
+        Insert: {
+          id?: string
+          language?: string | null
+          publication?: string | null
+          publication_date?: string | null
+          quote_id?: string | null
+          source?: string | null
+          source_url?: string | null
+          text?: string | null
+          translator?: string | null
+        }
+        Update: {
+          id?: string
+          language?: string | null
+          publication?: string | null
+          publication_date?: string | null
+          quote_id?: string | null
+          source?: string | null
+          source_url?: string | null
+          text?: string | null
+          translator?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

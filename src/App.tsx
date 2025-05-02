@@ -14,6 +14,7 @@ import NavBar from "./components/NavBar";
 import WhySourcingMatters from "./pages/blog/WhySourcingMatters";
 import EvidenceAndOpenMindedness from "./pages/blog/EvidenceAndOpenMindedness";
 import Login from "./pages/Login";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/blog/why-sourcing-matters" element={<WhySourcingMatters />} />
               <Route path="/blog/evidence-and-open-mindedness" element={<EvidenceAndOpenMindedness />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
