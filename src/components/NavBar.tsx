@@ -11,6 +11,7 @@ const routePaths = [
   { name: 'Quotes', path: '/quotes' },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Favorites', path: '/favorites' },
+  { name: 'Tools', path: '/tools' },
   { 
     name: 'IIIF Integration', 
     path: 'https://lovable.dev/projects/964cf98a-c636-40bc-afd1-055d6ff3a64d',

@@ -15,6 +15,8 @@ import WhySourcingMatters from "./pages/blog/WhySourcingMatters";
 import EvidenceAndOpenMindedness from "./pages/blog/EvidenceAndOpenMindedness";
 import Login from "./pages/Login";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Tools from "./pages/Tools";
 
 const queryClient = new QueryClient();
 
@@ -31,10 +33,12 @@ const App = () => (
               <Route path="/quotes" element={<Index />} />
               <Route path="/add-quote" element={<AddQuote />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/tools" element={<Tools />} />
               <Route path="/login" element={<Login />} />
               <Route path="/blog/why-sourcing-matters" element={<WhySourcingMatters />} />
               <Route path="/blog/evidence-and-open-mindedness" element={<EvidenceAndOpenMindedness />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
