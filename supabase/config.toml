@@ -1,1 +1,5 @@
+
 project_id = "yrafjktkkspcptkcaowj"
+
+[functions.quotes-api]
+verify_jwt = false
