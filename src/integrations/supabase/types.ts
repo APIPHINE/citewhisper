@@ -62,10 +62,10 @@ export type Database = {
           original_language: string | null
           original_text: string | null
           quote_image_url: string | null
+          quote_text: string
           source: string | null
           source_publication_date: string | null
           source_url: string | null
-          text: string
           theme: string | null
           topics: string[] | null
         }
@@ -83,10 +83,10 @@ export type Database = {
           original_language?: string | null
           original_text?: string | null
           quote_image_url?: string | null
+          quote_text: string
           source?: string | null
           source_publication_date?: string | null
           source_url?: string | null
-          text: string
           theme?: string | null
           topics?: string[] | null
         }
@@ -104,10 +104,10 @@ export type Database = {
           original_language?: string | null
           original_text?: string | null
           quote_image_url?: string | null
+          quote_text?: string
           source?: string | null
           source_publication_date?: string | null
           source_url?: string | null
-          text?: string
           theme?: string | null
           topics?: string[] | null
         }
