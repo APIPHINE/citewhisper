@@ -89,12 +89,14 @@ export const convertMarkdownToCSV = (markdown: string): { csv: string; parsedDat
     });
   }
   
-  // Generate CSV
+  // Generate CSV with proper quoting for fields containing commas
   let csv = headers.join(',') + '\n';
   rows.forEach(row => {
-    // Handle escaping: Wrap fields in quotes if they contain commas, quotes, or newlines
+    // Enhanced escaping logic - Always enclose in quotes if field contains commas, quotes, or newlines
     const escapedRow = row.map(cell => {
-      if (cell.includes('"') || cell.includes(',') || cell.includes('\n')) {
+      // Check if the cell contains characters that need special handling (commas, quotes, or newlines)
+      if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+        // Double any quotes already in the content and wrap the whole content in quotes
         return `"${cell.replace(/"/g, '""')}"`;
       }
       return cell;
