@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { PlusCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -28,9 +27,6 @@ const AddQuote = () => {
       context: '',
       historicalContext: '',
       keywords: [],
-      citationAPA: '',
-      citationMLA: '',
-      citationChicago: '',
     }
   });
 
@@ -52,9 +48,6 @@ const AddQuote = () => {
       context: '',
       historicalContext: '',
       keywords: [],
-      citationAPA: '',
-      citationMLA: '',
-      citationChicago: '',
     });
   };
 

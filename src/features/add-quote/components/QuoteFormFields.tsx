@@ -211,51 +211,6 @@ export function QuoteFormFields({ form }: QuoteFormFieldsProps) {
           <FormMessage />
         </FormItem>
       </div>
-
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Citations</h2>
-        <FormField
-          control={form.control}
-          name="citationAPA"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>APA Citation</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="APA format citation" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="citationMLA"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>MLA Citation</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="MLA format citation" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="citationChicago"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Chicago Citation</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Chicago format citation" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
     </>
   );
 }

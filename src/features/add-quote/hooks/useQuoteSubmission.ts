@@ -26,9 +26,9 @@ export function useQuoteSubmission() {
       context: data.context,
       historicalContext: data.historicalContext,
       keywords: data.keywords,
-      citationAPA: data.citationAPA,
-      citationMLA: data.citationMLA,
-      citationChicago: data.citationChicago,
+      citationAPA: '',
+      citationMLA: '',
+      citationChicago: '',
       exportFormats: {
         json: true,
         csv: true,
