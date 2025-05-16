@@ -36,7 +36,14 @@ export async function getQuotes(req: Request): Promise<Response> {
       citationAPA: quote.citation_apa,
       citationMLA: quote.citation_mla,
       citationChicago: quote.citation_chicago,
-      shareCount: 0, // Default share count
+      shareCount: quote.share_count || 0, // Use actual share_count if available
+      attributionStatus: quote.attribution_status || "Pending",
+      fairUseJustification: {
+        purpose: "Educational/Transformative",
+        natureOfWork: "Factual/Published",
+        amountUsed: "Limited excerpt",
+        marketEffect: "No market substitution"
+      }
     }));
     
     return new Response(JSON.stringify(transformedData), {

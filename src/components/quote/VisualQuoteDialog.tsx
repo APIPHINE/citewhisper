@@ -15,9 +15,10 @@ import {
 
 interface VisualQuoteDialogProps {
   quoteId: string;
+  author?: string;
 }
 
-export function VisualQuoteDialog({ quoteId }: VisualQuoteDialogProps) {
+export function VisualQuoteDialog({ quoteId, author = "author" }: VisualQuoteDialogProps) {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -29,11 +30,19 @@ export function VisualQuoteDialog({ quoteId }: VisualQuoteDialogProps) {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl p-0 bg-transparent border-none">
-              <img
-                src="/lovable-uploads/a1acd22e-ad0b-4842-9f6a-cc35e090316c.png"
-                alt="Steve Jobs quote visualization"
-                className="w-full h-auto rounded-lg shadow-xl"
-              />
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl">
+                <img
+                  src="/lovable-uploads/a1acd22e-ad0b-4842-9f6a-cc35e090316c.png"
+                  alt={`${author} quote visualization`}
+                  className="w-full h-auto"
+                />
+                <div className="p-3 bg-secondary/20 text-xs text-center text-muted-foreground">
+                  <p>
+                    This image is used under Fair Use (17 U.S.C. § 107) for educational purposes. 
+                    <a href="/fair-use-policy" className="text-accent hover:underline ml-1">Fair Use Policy</a>
+                  </p>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
         </TooltipTrigger>

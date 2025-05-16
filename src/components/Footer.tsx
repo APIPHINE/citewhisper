@@ -16,8 +16,11 @@ export function Footer() {
             <Link to="/privacy-policy" className="text-muted-foreground hover:text-foreground transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/terms-of-service" className="text-muted-foreground hover:text-foreground transition-colors">
               Terms of Service
+            </Link>
+            <Link to="/fair-use-policy" className="text-muted-foreground hover:text-foreground transition-colors">
+              Fair Use Policy
             </Link>
             <Link to="/blog/why-sourcing-matters" className="text-muted-foreground hover:text-foreground transition-colors">
               Blog

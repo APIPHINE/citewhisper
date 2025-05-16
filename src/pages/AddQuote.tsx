@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUploadArea } from '@/components/ui/file-upload-area';
-import { QuoteFormSchema, QuoteFormValues } from '@/utils/formSchemas';
+import { quoteSchema, QuoteFormValues } from '@/utils/formSchemas';
 import { useQuoteSubmission } from '@/features/add-quote/hooks/useQuoteSubmission';
 import { QuoteFormFields } from '@/features/add-quote/components/QuoteFormFields';
 
@@ -24,7 +25,7 @@ const AddQuote = () => {
   const { handleSubmit, isSubmitting } = useQuoteSubmission();
   
   const form = useForm<QuoteFormValues>({
-    resolver: zodResolver(QuoteFormSchema),
+    resolver: zodResolver(quoteSchema),
     defaultValues: {
       text: '',
       author: '',

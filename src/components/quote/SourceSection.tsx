@@ -33,6 +33,9 @@ export function SourceSection({ quote }: SourceSectionProps) {
                 className="w-full h-auto"
                 onError={handleImageError}
               />
+              <div className="p-2 bg-secondary/20 text-xs text-muted-foreground">
+                <p>This excerpt is used under Fair Use (17 U.S.C. § 107) for educational and transformative commentary purposes. Source linked and attributed.</p>
+              </div>
             </div>
           </div>
         )}
@@ -97,6 +100,14 @@ export function SourceSection({ quote }: SourceSectionProps) {
           {quote.translator && (
             <p className="text-xs text-muted-foreground mt-2">Translator: {quote.translator}</p>
           )}
+        </div>
+
+        {/* Fair Use Notice */}
+        <div className="text-xs text-muted-foreground mt-4 pt-3 border-t border-border">
+          <p>
+            This excerpt is used under Fair Use (17 U.S.C. § 107) for educational and transformative commentary purposes. 
+            Source linked and attributed. <a href="/fair-use-policy" className="text-accent hover:underline">Learn more</a> about our Fair Use Policy.
+          </p>
         </div>
       </div>
     </SectionBox>
