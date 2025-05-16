@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/utils/quotesData";
 
@@ -119,7 +118,7 @@ export async function fetchQuotes(): Promise<Quote[]> {
   }
 }
 
-export async function uploadEvidenceImage(file: File): Promise<string | null> {
+export async function uploadEvidenceImage(file: File, attributionMetadata?: Record<string, any>): Promise<string | null> {
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
@@ -127,7 +126,9 @@ export async function uploadEvidenceImage(file: File): Promise<string | null> {
 
     const { error: uploadError, data } = await supabase.storage
       .from('quote_evidence')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        metadata: attributionMetadata ? JSON.stringify(attributionMetadata) : undefined
+      });
 
     if (uploadError) {
       console.error('Error uploading evidence image:', uploadError);

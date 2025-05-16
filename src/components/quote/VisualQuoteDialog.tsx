@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Link } from "react-router-dom";
 
 interface VisualQuoteDialogProps {
   quoteId: string;
@@ -36,11 +37,23 @@ export function VisualQuoteDialog({ quoteId, author = "author" }: VisualQuoteDia
                   alt={`${author} quote visualization`}
                   className="w-full h-auto"
                 />
-                <div className="p-3 bg-secondary/20 text-xs text-center text-muted-foreground">
-                  <p>
-                    This image is used under Fair Use (17 U.S.C. § 107) for educational purposes. 
-                    <a href="/fair-use-policy" className="text-accent hover:underline ml-1">Fair Use Policy</a>
+                <div className="p-4 bg-secondary/20 text-sm">
+                  <p className="mb-2 text-center text-muted-foreground">
+                    This image is used under Fair Use (17 U.S.C. § 107) for educational purposes.
                   </p>
+                  <div className="text-xs text-muted-foreground">
+                    <p className="mb-1">
+                      <strong>Attribution:</strong> Quote by {author}
+                    </p>
+                    <p className="mb-2">
+                      <strong>Fair Use Justification:</strong> Transformative use for educational commentary
+                    </p>
+                    <p className="text-center">
+                      <Link to="/fair-use-policy" className="text-accent hover:underline">
+                        View our Fair Use Policy
+                      </Link>
+                    </p>
+                  </div>
                 </div>
               </div>
             </DialogContent>

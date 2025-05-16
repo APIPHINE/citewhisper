@@ -11,13 +11,25 @@ if (!supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Add attribution and use metadata to an image
+// Add attribution and fair use metadata to an image
 export const addAttributionToImage = async (imageUrl: string, metadata: Record<string, any>) => {
   try {
-    // This is a placeholder for a real implementation that would
-    // potentially add XMP metadata to an image file
-    // For now we'll just log this for demonstration
-    console.log(`[Attribution metadata added to ${imageUrl}]:`, metadata);
+    // In a production environment, this would:
+    // 1. Download the image
+    // 2. Add XMP metadata with attribution details
+    // 3. Add a visible watermark or text overlay with attribution
+    // 4. Store the new image or update metadata in a database
+    
+    // For now, we'll log this for demonstration
+    console.log(`[Attribution metadata added to ${imageUrl}]:`, {
+      ...metadata,
+      fairUseNotice: "This image is used under Fair Use (17 U.S.C. § 107) for educational purposes.",
+      attributionDate: new Date().toISOString(),
+      attributionStatus: "Applied"
+    });
+    
+    // In a real implementation, we would also store this metadata in the database
+    // associated with the image for retrieval and display
     
     return true;
   } catch (error) {

@@ -1,5 +1,5 @@
 
-import { supabase } from "../../utils/db.ts";
+import { supabase, addAttributionToImage } from "../../utils/db.ts";
 import { corsHeaders } from "../../utils/cors.ts";
 
 // POST /quotes - Create a new quote
@@ -27,6 +27,20 @@ export async function createQuote(req: Request): Promise<Response> {
     
     // Set insertion timestamp
     quoteData.inserted_at = new Date().toISOString();
+    
+    // Apply attribution metadata if there's an image
+    if (quoteData.evidenceImage) {
+      const attributionMetadata = {
+        author: quoteData.author,
+        source: quoteData.source,
+        quote: quoteData.text.substring(0, 100) + (quoteData.text.length > 100 ? '...' : ''),
+        submissionDate: quoteData.inserted_at,
+        fairUseNotice: "Used under Fair Use (17 U.S.C. § 107) for educational purposes"
+      };
+      
+      // Add attribution metadata to the image
+      await addAttributionToImage(quoteData.evidenceImage, attributionMetadata);
+    }
     
     // Insert quote into database
     const { data, error } = await supabase

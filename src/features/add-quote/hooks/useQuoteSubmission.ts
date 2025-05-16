@@ -15,7 +15,18 @@ export function useQuoteSubmission() {
       // Upload evidence image if provided
       let evidenceImageUrl = data.sourceUrl || '';
       if (evidenceImage) {
-        const uploadedUrl = await uploadEvidenceImage(evidenceImage);
+        // Prepare attribution metadata for the image
+        const attributionMetadata = {
+          quoteAuthor: data.author,
+          quoteSource: data.source,
+          originalWork: data.originalSource?.title || data.source,
+          submissionDate: new Date().toISOString(),
+          copyright: `Attribution to original creator: ${data.author}`,
+          fairUseJustification: "Educational and transformative use under 17 U.S.C. § 107",
+          transformativeElement: "Addition of context, scholarly annotation, and metadata"
+        };
+
+        const uploadedUrl = await uploadEvidenceImage(evidenceImage, attributionMetadata);
         if (uploadedUrl) {
           evidenceImageUrl = uploadedUrl;
         }
