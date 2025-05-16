@@ -1,29 +1,33 @@
-
-import { motion } from 'framer-motion';
-import { PlusCircle } from 'lucide-react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Form } from '@/components/ui/form';
-import { quoteSchema, type QuoteFormValues } from '../utils/formSchemas';
-import { JsonImportSection } from '@/features/add-quote/components/JsonImportSection';
-import { QuoteFormFields } from '@/features/add-quote/components/QuoteFormFields';
+import { useNavigate } from 'react-router-dom';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { FileUploadArea } from '@/components/ui/file-upload-area';
+import { QuoteFormSchema, QuoteFormValues } from '@/utils/formSchemas';
 import { useQuoteSubmission } from '@/features/add-quote/hooks/useQuoteSubmission';
-import { FileUploadArea } from '@/components/tools/FileUploadArea';
+import { QuoteFormFields } from '@/features/add-quote/components/QuoteFormFields';
 
 const AddQuote = () => {
-  const [evidenceImage, setEvidenceImage] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const navigate = useNavigate();
+  const { handleSubmit, isSubmitting } = useQuoteSubmission();
   
   const form = useForm<QuoteFormValues>({
-    resolver: zodResolver(quoteSchema),
+    resolver: zodResolver(QuoteFormSchema),
     defaultValues: {
       text: '',
       author: '',
-      date: new Date().toISOString().split('T')[0],
-      topics: [],
-      theme: '',
       source: '',
       sourceUrl: '',
       sourcePublicationDate: '',
@@ -31,91 +35,92 @@ const AddQuote = () => {
       originalText: '',
       context: '',
       historicalContext: '',
+      topics: [],
+      theme: '',
       keywords: [],
-    }
+      originalSource: {
+        title: '',
+        publisher: '',
+        publicationDate: '',
+        location: '',
+        isbn: '',
+        sourceUrl: ''
+      },
+      translations: []
+    },
+    mode: "onChange"
   });
-
-  const { handleSubmit, isSubmitting } = useQuoteSubmission();
-
-  const onSubmit = async (data: QuoteFormValues) => {
-    const result = await handleSubmit(data, evidenceImage || undefined);
-    if (result) {
-      form.reset({
-        text: '',
-        author: '',
-        date: new Date().toISOString().split('T')[0],
-        topics: [],
-        theme: '',
-        source: '',
-        sourceUrl: '',
-        sourcePublicationDate: '',
-        originalLanguage: '',
-        originalText: '',
-        context: '',
-        historicalContext: '',
-        keywords: [],
-      });
-      setEvidenceImage(null);
-    }
+  
+  // Handle file selection
+  const handleFilesSelected = (files: File[]) => {
+    setSelectedFiles(files);
   };
 
-  const handleFileChange = (files: File[]) => {
-    if (files.length > 0) {
-      setEvidenceImage(files[0]);
+  const onSubmit = async (data: QuoteFormValues) => {
+    const evidenceImage = selectedFiles.length > 0 ? selectedFiles[0] : undefined;
+    const newQuote = await handleSubmit(data, evidenceImage);
+    if (newQuote) {
+      navigate('/quotes');
     }
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-20 page-padding">
-      <div className="page-max-width">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Header section */}
-          <div className="inline-flex items-center justify-center mb-4 bg-secondary/80 text-foreground px-4 py-2 rounded-full text-sm">
-            <PlusCircle size={16} className="mr-2" /> Add New Quote
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Contribute a Quote</h1>
-          
-          {/* JSON Import Section */}
-          <JsonImportSection formReset={form.reset} />
-          
-          <Separator className="my-8" />
-
-          {/* Manual Entry Form */}
-          <p className="text-muted-foreground mb-8 max-w-xl">
-            Help expand our collection of verified quotes. Please provide as much information as possible.
-          </p>
-
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Add a New Quote</h1>
+        <p className="text-muted-foreground">
+          Share your favorite quotes with the world.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <QuoteFormFields form={form} />
               
-              {/* Evidence Image Upload */}
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Evidence Image</h2>
-                <p className="text-sm text-muted-foreground">
-                  Upload an image showing the source of the quote for verification purposes.
-                </p>
+              {/* File upload section */}
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4">Evidence Image</h2>
                 <FileUploadArea
-                  onFilesSelected={handleFileChange}
+                  onFilesSelected={handleFilesSelected}
                   maxFiles={1}
-                  acceptedFileTypes={{
-                    'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-                  }}
+                  acceptedFileTypes={{ 'image/*': ['.jpg', '.jpeg', '.png', '.gif'] }}
                   maxSizeMB={5}
-                  selectedFiles={evidenceImage ? [evidenceImage] : []}
+                  selectedFiles={selectedFiles}
                 />
+                
+                {selectedFiles.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold">Selected Image:</h3>
+                    <img
+                      src={URL.createObjectURL(selectedFiles[0])}
+                      alt="Evidence"
+                      className="max-w-full h-auto rounded-md"
+                    />
+                  </div>
+                )}
               </div>
               
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                <PlusCircle className="mr-2" /> {isSubmitting ? 'Submitting...' : 'Submit Quote'}
-              </Button>
+              <div className="flex justify-end">
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Submitting..." : "Submit Quote"}
+                </Button>
+              </div>
             </form>
           </Form>
-        </motion.div>
+        </div>
+        
+        <aside className="md:col-span-1">
+          <div className="bg-secondary/50 rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-2">Tips for a Good Quote Submission:</h3>
+            <ul className="list-disc list-inside text-sm">
+              <li>Make sure the quote is accurate.</li>
+              <li>Provide a reliable source for the quote.</li>
+              <li>Add context to help others understand the quote's meaning.</li>
+            </ul>
+          </div>
+        </aside>
       </div>
     </div>
   );

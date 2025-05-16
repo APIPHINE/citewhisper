@@ -67,42 +67,46 @@ export async function fetchQuotes(): Promise<Quote[]> {
           siteUrl: citation.site_url,
           embedDate: citation.embed_date
         }));
-      
+
+      // Map DB schema to Quote model
+      // Note: quote_text in DB maps to text in our model
       return {
         id: quote.id,
-        text: quote.text,
+        text: quote.quote_text || '', // Map quote_text from DB to text in model
         author: quote.author,
         date: quote.date,
         topics: quote.topics || [],
         theme: quote.theme || '',
         source: quote.source,
-        evidenceImage: quote.evidence_image,
+        evidenceImage: quote.quote_image_url, // Map quote_image_url to evidenceImage
         sourceUrl: quote.source_url,
         sourcePublicationDate: quote.source_publication_date,
         originalLanguage: quote.original_language,
         originalText: quote.original_text,
         context: quote.context,
         historicalContext: quote.historical_context,
-        keywords: quote.keywords,
+        keywords: quote.keywords || [],
         citationAPA: quote.citation_apa,
         citationMLA: quote.citation_mla,
         citationChicago: quote.citation_chicago,
-        exportFormats: quote.export_formats || { json: true, csv: true, cff: true },
-        shareCount: quote.share_count || 0,
-        ocrExtractedText: quote.ocr_extracted_text,
-        ocrConfidenceScore: quote.ocr_confidence_score,
-        originalManuscriptReference: quote.original_manuscript_reference,
-        attributionStatus: quote.attribution_status,
-        translator: quote.translator,
-        impact: quote.impact,
+        // Default export formats if not provided
+        exportFormats: { json: true, csv: true, cff: true },
+        shareCount: 0, // Default share count
+        // The following fields may not exist in the DB yet
+        ocrExtractedText: '',
+        ocrConfidenceScore: 0,
+        originalManuscriptReference: '',
+        attributionStatus: '',
+        translator: '',
+        impact: '',
         citedBy: citedBy,
         originalSource: originalSource ? {
-          title: originalSource.title,
-          publisher: originalSource.publisher,
-          publicationDate: originalSource.publication_date,
-          location: originalSource.location,
-          isbn: originalSource.isbn,
-          sourceUrl: originalSource.source_url
+          title: originalSource.title || '',
+          publisher: originalSource.publisher || '',
+          publicationDate: originalSource.publication_date || '',
+          location: originalSource.location || '',
+          isbn: originalSource.isbn || '',
+          sourceUrl: originalSource.source_url || ''
         } : undefined,
         translations: translations?.length ? translations : undefined
       };
@@ -146,7 +150,7 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
   try {
     // Transform our Quote structure to match the database schema
     const dbQuote = {
-      text: quoteData.text,
+      quote_text: quoteData.text, // Map text to quote_text for DB
       author: quoteData.author,
       date: quoteData.date,
       topics: quoteData.topics || [],
@@ -162,14 +166,7 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
       citation_apa: quoteData.citationAPA || '',
       citation_mla: quoteData.citationMLA || '',
       citation_chicago: quoteData.citationChicago || '',
-      evidence_image: quoteData.evidenceImage,
-      ocr_extracted_text: quoteData.ocrExtractedText,
-      ocr_confidence_score: quoteData.ocrConfidenceScore,
-      original_manuscript_reference: quoteData.originalManuscriptReference,
-      attribution_status: quoteData.attributionStatus,
-      translator: quoteData.translator,
-      impact: quoteData.impact,
-      export_formats: quoteData.exportFormats || { json: true, csv: true, cff: true }
+      quote_image_url: quoteData.evidenceImage, // Map evidenceImage to quote_image_url
     };
 
     // Insert the quote
