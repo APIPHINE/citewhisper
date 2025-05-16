@@ -47,6 +47,7 @@ export function useQuoteSubmission() {
         context: data.context,
         historicalContext: data.historicalContext,
         keywords: data.keywords,
+        emotionalTone: data.emotionalTone,
         exportFormats: {
           json: true,
           csv: true,

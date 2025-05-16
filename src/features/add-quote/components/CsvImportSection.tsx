@@ -15,9 +15,9 @@ export function CsvImportSection({ formReset }: CsvImportSectionProps) {
   const [csvInput, setCsvInput] = useState('');
   const { toast } = useToast();
 
-  const csvPlaceholder = `text,author,date,source,sourceUrl,theme
-"The future belongs to those who believe in the beauty of their dreams.",Eleanor Roosevelt,1945,"As We Are" journal,,Inspiration
-"Stay hungry. Stay foolish.",Steve Jobs,2005,Stanford Commencement Address,https://news.stanford.edu/news/2005/june15/jobs-061505.html,Ambition`;
+  const csvPlaceholder = `text,author,date,source,sourceUrl,theme,emotionalTone
+"The future belongs to those who believe in the beauty of their dreams.",Eleanor Roosevelt,1945,"As We Are" journal,,Inspiration,Hopeful
+"Stay hungry. Stay foolish.",Steve Jobs,2005,Stanford Commencement Address,https://news.stanford.edu/news/2005/june15/jobs-061505.html,Ambition,Inspiring`;
 
   const handleCsvImport = () => {
     try {

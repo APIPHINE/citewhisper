@@ -15,9 +15,7 @@ export interface Quote {
   context?: string,
   historicalContext?: string,
   keywords?: string[],
-  citationAPA?: string,
-  citationMLA?: string,
-  citationChicago?: string,
+  emotionalTone?: string,
   exportFormats?: {
     json?: boolean,
     csv?: boolean,

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/utils/quotesData";
 
@@ -85,9 +86,7 @@ export async function fetchQuotes(): Promise<Quote[]> {
         context: quote.context,
         historicalContext: quote.historical_context,
         keywords: quote.keywords || [],
-        citationAPA: quote.citation_apa,
-        citationMLA: quote.citation_mla,
-        citationChicago: quote.citation_chicago,
+        emotionalTone: quote.emotional_tone,
         // Default export formats if not provided
         exportFormats: { json: true, csv: true, cff: true },
         shareCount: 0, // Default share count
@@ -118,7 +117,7 @@ export async function fetchQuotes(): Promise<Quote[]> {
   }
 }
 
-export async function uploadEvidenceImage(file: File, attributionMetadata?: Record<string, any>): Promise<string | null> {
+export async function uploadEvidenceImage(file: File, attributionMetadata: Record<string, any>): Promise<string | null> {
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
@@ -127,7 +126,7 @@ export async function uploadEvidenceImage(file: File, attributionMetadata?: Reco
     const { error: uploadError, data } = await supabase.storage
       .from('quote_evidence')
       .upload(filePath, file, {
-        metadata: attributionMetadata ? JSON.stringify(attributionMetadata) : undefined
+        metadata: attributionMetadata
       });
 
     if (uploadError) {
@@ -164,9 +163,7 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
       context: quoteData.context,
       historical_context: quoteData.historicalContext,
       keywords: quoteData.keywords || [],
-      citation_apa: quoteData.citationAPA || '',
-      citation_mla: quoteData.citationMLA || '',
-      citation_chicago: quoteData.citationChicago || '',
+      emotional_tone: quoteData.emotionalTone,
       quote_image_url: quoteData.evidenceImage, // Map evidenceImage to quote_image_url
     };
 

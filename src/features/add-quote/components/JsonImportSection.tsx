@@ -37,9 +37,7 @@ export function JsonImportSection({ formReset }: JsonImportSectionProps) {
   "context": "",
   "historicalContext": "",
   "keywords": ["keyword1", "keyword2"],
-  "citationAPA": "",
-  "citationMLA": "",
-  "citationChicago": "",
+  "emotionalTone": "",
   "translations": [
     {
       "language": "",

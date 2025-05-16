@@ -199,6 +199,20 @@ export function QuoteFormFields({ form }: QuoteFormFieldsProps) {
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="emotionalTone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Emotional Tone</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="e.g., Hopeful, Reflective, Urgent, Cautionary" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormItem>
           <FormLabel>Keywords (comma-separated)</FormLabel>
           <FormControl>

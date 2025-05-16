@@ -43,6 +43,7 @@ const AddQuote = () => {
       topics: [],
       theme: '',
       keywords: [],
+      emotionalTone: '',
       originalSource: {
         title: '',
         publisher: '',

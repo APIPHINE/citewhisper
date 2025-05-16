@@ -36,6 +36,7 @@ export const quoteSchema = z.object({
   historicalContext: z.string().optional(),
   keywords: z.array(z.string()).optional(),
   translations: z.array(translationSchema).optional(),
+  emotionalTone: z.string().optional(),
 });
 
 export type QuoteFormValues = z.infer<typeof quoteSchema>;
