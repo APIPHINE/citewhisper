@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/utils/quotesData";
 
@@ -126,10 +125,13 @@ export async function uploadEvidenceImage(file: File, attributionMetadata: Recor
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${fileName}`;
 
+    console.log('Uploading file to quote_evidence bucket:', filePath);
+    
     const { error: uploadError, data } = await supabase.storage
       .from('quote_evidence')
       .upload(filePath, file, {
-        metadata: attributionMetadata
+        metadata: attributionMetadata,
+        cacheControl: '3600'
       });
 
     if (uploadError) {
@@ -142,6 +144,7 @@ export async function uploadEvidenceImage(file: File, attributionMetadata: Recor
       .from('quote_evidence')
       .getPublicUrl(filePath);
 
+    console.log('File uploaded successfully, public URL:', publicUrl);
     return publicUrl;
   } catch (error) {
     console.error('Error in uploadEvidenceImage:', error);
@@ -151,6 +154,8 @@ export async function uploadEvidenceImage(file: File, attributionMetadata: Recor
 
 export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | null> {
   try {
+    console.log('Creating quote with data:', quoteData);
+    
     // Transform our Quote structure to match the database schema
     const dbQuote = {
       quote_text: quoteData.text, // Map text to quote_text for DB
@@ -166,12 +171,14 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
       context: quoteData.context,
       historical_context: quoteData.historicalContext,
       keywords: quoteData.keywords || [],
-      emotional_tone: quoteData.emotionalTone || '', // Map emotionalTone to emotional_tone for DB
+      emotional_tone: quoteData.emotionalTone || '',
       quote_image_url: quoteData.evidenceImage, // Map evidenceImage to quote_image_url
       citation_apa: quoteData.citationAPA,
       citation_mla: quoteData.citationMLA,
       citation_chicago: quoteData.citationChicago
     };
+
+    console.log('Transformed quote data for DB:', dbQuote);
 
     // Insert the quote
     const { data, error } = await supabase
@@ -185,6 +192,8 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
       return null;
     }
 
+    console.log('Quote created successfully:', data);
+
     // Handle original source if provided
     if (quoteData.originalSource) {
       const originalSourceData = {
@@ -196,6 +205,8 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
         isbn: quoteData.originalSource.isbn,
         source_url: quoteData.originalSource.sourceUrl
       };
+
+      console.log('Creating original source:', originalSourceData);
 
       const { error: originalSourceError } = await supabase
         .from('original_sources')
@@ -218,6 +229,8 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
         publication_date: translation.publicationDate,
         source_url: translation.sourceUrl
       }));
+
+      console.log('Creating translations:', translationsData);
 
       const { error: translationsError } = await supabase
         .from('translations')

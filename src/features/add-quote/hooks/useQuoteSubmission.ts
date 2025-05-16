@@ -12,6 +12,8 @@ export function useQuoteSubmission() {
   const handleSubmit = async (data: QuoteFormValues, evidenceImage?: File) => {
     setIsSubmitting(true);
     try {
+      console.log('Submitting quote with form data:', data);
+      
       // Upload evidence image if provided
       let evidenceImageUrl = data.sourceUrl || '';
       if (evidenceImage) {
@@ -26,9 +28,13 @@ export function useQuoteSubmission() {
           transformativeElement: "Addition of context, scholarly annotation, and metadata"
         };
 
+        console.log('Uploading evidence image with metadata:', attributionMetadata);
         const uploadedUrl = await uploadEvidenceImage(evidenceImage, attributionMetadata);
         if (uploadedUrl) {
+          console.log('Evidence image uploaded successfully:', uploadedUrl);
           evidenceImageUrl = uploadedUrl;
+        } else {
+          console.error('Failed to upload evidence image');
         }
       }
 
@@ -81,6 +87,7 @@ export function useQuoteSubmission() {
         }));
       }
 
+      console.log('Sending quote data to Supabase:', quoteData);
       // Send to Supabase
       const newQuote = await createQuote(quoteData);
       
@@ -88,6 +95,7 @@ export function useQuoteSubmission() {
         throw new Error('Failed to create quote');
       }
 
+      console.log('Quote created successfully:', newQuote);
       toast({
         title: "Quote Submitted",
         description: "Your quote has been submitted successfully.",

@@ -198,7 +198,7 @@ export type Database = {
     }
     Functions: {
       increment_quote_share_count: {
-        Args: { quote_id: string }
+        Args: Record<PropertyKey, never> | { quote_id: string }
         Returns: undefined
       }
     }
