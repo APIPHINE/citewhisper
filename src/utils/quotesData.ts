@@ -30,6 +30,9 @@ export interface Quote {
   attributionStatus?: string,
   translator?: string,
   impact?: string,
+  citationAPA?: string,
+  citationMLA?: string,
+  citationChicago?: string,
   citedBy?: {
     siteName: string,
     siteUrl: string,

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/utils/quotesData";
 
@@ -86,7 +85,10 @@ export async function fetchQuotes(): Promise<Quote[]> {
         context: quote.context,
         historicalContext: quote.historical_context,
         keywords: quote.keywords || [],
-        emotionalTone: quote.emotional_tone,
+        emotionalTone: quote.emotional_tone || '',
+        citationAPA: quote.citation_apa,
+        citationMLA: quote.citation_mla,
+        citationChicago: quote.citation_chicago,
         // Default export formats if not provided
         exportFormats: { json: true, csv: true, cff: true },
         shareCount: 0, // Default share count

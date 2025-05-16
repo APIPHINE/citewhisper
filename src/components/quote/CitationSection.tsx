@@ -19,11 +19,11 @@ export function CitationSection({ quote }: CitationSectionProps) {
   const getCitationText = () => {
     switch (selectedFormat) {
       case 'APA':
-        return quote.citationAPA || "No APA citation available";
+        return quote.citationAPA || `${quote.author} (${quote.date}). "${quote.text}"`;
       case 'MLA':
-        return quote.citationMLA || "No MLA citation available";
+        return quote.citationMLA || `${quote.author}. "${quote.text}." ${quote.date}.`;
       case 'Chicago':
-        return quote.citationChicago || "No Chicago citation available";
+        return quote.citationChicago || `${quote.author}, "${quote.text}," ${quote.date}.`;
       default:
         return "";
     }
