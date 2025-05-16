@@ -16,7 +16,7 @@ export function useQuoteSubmission() {
       let evidenceImageUrl = data.sourceUrl || '';
       if (evidenceImage) {
         // Prepare attribution metadata for the image
-        const attributionMetadata = {
+        const attributionMetadata: Record<string, any> = {
           quoteAuthor: data.author,
           quoteSource: data.source,
           originalWork: data.originalSource?.title || data.source,
