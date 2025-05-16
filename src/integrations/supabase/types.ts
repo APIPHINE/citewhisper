@@ -87,6 +87,7 @@ export type Database = {
           citation_mla: string | null
           context: string | null
           date: string | null
+          emotional_tone: string | null
           historical_context: string | null
           id: string
           inserted_at: string | null
@@ -108,6 +109,7 @@ export type Database = {
           citation_mla?: string | null
           context?: string | null
           date?: string | null
+          emotional_tone?: string | null
           historical_context?: string | null
           id?: string
           inserted_at?: string | null
@@ -129,6 +131,7 @@ export type Database = {
           citation_mla?: string | null
           context?: string | null
           date?: string | null
+          emotional_tone?: string | null
           historical_context?: string | null
           id?: string
           inserted_at?: string | null

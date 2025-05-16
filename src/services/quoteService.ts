@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/utils/quotesData";
 
@@ -85,7 +86,7 @@ export async function fetchQuotes(): Promise<Quote[]> {
         context: quote.context,
         historicalContext: quote.historical_context,
         keywords: quote.keywords || [],
-        emotionalTone: quote.emotional_tone || '',
+        emotionalTone: quote.emotional_tone || '', // Properly map the emotional_tone field
         citationAPA: quote.citation_apa,
         citationMLA: quote.citation_mla,
         citationChicago: quote.citation_chicago,
@@ -165,8 +166,11 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
       context: quoteData.context,
       historical_context: quoteData.historicalContext,
       keywords: quoteData.keywords || [],
-      emotional_tone: quoteData.emotionalTone,
+      emotional_tone: quoteData.emotionalTone || '', // Map emotionalTone to emotional_tone for DB
       quote_image_url: quoteData.evidenceImage, // Map evidenceImage to quote_image_url
+      citation_apa: quoteData.citationAPA,
+      citation_mla: quoteData.citationMLA,
+      citation_chicago: quoteData.citationChicago
     };
 
     // Insert the quote
