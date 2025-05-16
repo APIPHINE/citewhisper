@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { SectionBox } from './SectionBox';
 import { useFormatDate } from '../../hooks/use-format-date';
+import { useState } from 'react';
 
 interface SourceSectionProps {
   quote: Quote;
@@ -11,12 +12,18 @@ interface SourceSectionProps {
 
 export function SourceSection({ quote }: SourceSectionProps) {
   const { formatDate } = useFormatDate();
+  const [imageError, setImageError] = useState(false);
+  
+  const handleImageError = () => {
+    console.warn('Image failed to load:', quote.evidenceImage);
+    setImageError(true);
+  };
   
   return (
     <SectionBox title="Source Information" icon={<BookOpen size={18} />}>
       <div className="space-y-3">
         {/* Evidence Image */}
-        {quote.evidenceImage && (
+        {quote.evidenceImage && !imageError && (
           <div className="mb-4">
             <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
             <div className="border border-border rounded-md overflow-hidden">
@@ -24,6 +31,7 @@ export function SourceSection({ quote }: SourceSectionProps) {
                 src={quote.evidenceImage} 
                 alt={`Evidence for quote by ${quote.author}`} 
                 className="w-full h-auto"
+                onError={handleImageError}
               />
             </div>
           </div>
@@ -36,7 +44,7 @@ export function SourceSection({ quote }: SourceSectionProps) {
             <div className="bg-secondary/20 p-3 rounded-md italic text-sm">
               {quote.ocrExtractedText}
             </div>
-            {quote.ocrConfidenceScore && (
+            {quote.ocrConfidenceScore !== undefined && (
               <p className="text-xs text-muted-foreground mt-1">
                 Confidence Score: {(quote.ocrConfidenceScore * 100).toFixed(1)}%
               </p>
@@ -56,7 +64,9 @@ export function SourceSection({ quote }: SourceSectionProps) {
         <div>
           <h4 className="font-medium text-sm mb-1">Source</h4>
           <p className="text-muted-foreground">{quote.source || "Unknown source"}</p>
-          <p className="text-xs text-muted-foreground mt-1">Publication date: {quote.sourcePublicationDate || "Unknown"}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Publication date: {quote.sourcePublicationDate ? formatDate(quote.sourcePublicationDate) : "Unknown"}
+          </p>
           
           {quote.sourceUrl && (
             <a 

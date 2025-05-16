@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cited_by: {
+        Row: {
+          embed_date: string
+          id: string
+          quote_id: string | null
+          site_name: string
+          site_url: string
+        }
+        Insert: {
+          embed_date: string
+          id?: string
+          quote_id?: string | null
+          site_name: string
+          site_url: string
+        }
+        Update: {
+          embed_date?: string
+          id?: string
+          quote_id?: string | null
+          site_name?: string
+          site_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cited_by_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       original_sources: {
         Row: {
           isbn: string | null
@@ -162,7 +194,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_quote_share_count: {
+        Args: { quote_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

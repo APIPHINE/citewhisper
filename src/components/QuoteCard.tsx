@@ -6,6 +6,7 @@ import { Quote } from '../utils/quotesData';
 import { useToast } from '@/hooks/use-toast';
 import { QuoteCardMain } from './quote/QuoteCardMain';
 import { ExpandedQuoteCard } from './quote/ExpandedQuoteCard';
+import { incrementShareCount } from '@/services/quoteService';
 
 interface QuoteCardProps {
   quote: Quote;
@@ -20,14 +21,18 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand }: QuoteC
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [showEmbedCode, setShowEmbedCode] = useState(false);
-  const [shareCount, setShareCount] = useState(0);
+  const [shareCount, setShareCount] = useState(quote.shareCount || 0);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const favorite = isFavorite(quote.id);
 
   // Handle copying to clipboard and increment share count
-  const handleShare = () => {
+  const handleShare = async () => {
     setShowEmbedCode(true);
     setShareCount(prev => prev + 1);
+    
+    // Update share count in Supabase
+    await incrementShareCount(quote.id);
+    
     toggleExpanded();
   };
   

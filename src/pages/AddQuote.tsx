@@ -1,7 +1,9 @@
+
 import { motion } from 'framer-motion';
 import { PlusCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Form } from '@/components/ui/form';
@@ -9,8 +11,11 @@ import { quoteSchema, type QuoteFormValues } from '../utils/formSchemas';
 import { JsonImportSection } from '@/features/add-quote/components/JsonImportSection';
 import { QuoteFormFields } from '@/features/add-quote/components/QuoteFormFields';
 import { useQuoteSubmission } from '@/features/add-quote/hooks/useQuoteSubmission';
+import { FileUploadArea } from '@/components/tools/FileUploadArea';
 
 const AddQuote = () => {
+  const [evidenceImage, setEvidenceImage] = useState<File | null>(null);
+  
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
     defaultValues: {
@@ -30,25 +35,34 @@ const AddQuote = () => {
     }
   });
 
-  const { handleSubmit } = useQuoteSubmission();
+  const { handleSubmit, isSubmitting } = useQuoteSubmission();
 
-  const onSubmit = (data: QuoteFormValues) => {
-    handleSubmit(data);
-    form.reset({
-      text: '',
-      author: '',
-      date: new Date().toISOString().split('T')[0],
-      topics: [],
-      theme: '',
-      source: '',
-      sourceUrl: '',
-      sourcePublicationDate: '',
-      originalLanguage: '',
-      originalText: '',
-      context: '',
-      historicalContext: '',
-      keywords: [],
-    });
+  const onSubmit = async (data: QuoteFormValues) => {
+    const result = await handleSubmit(data, evidenceImage || undefined);
+    if (result) {
+      form.reset({
+        text: '',
+        author: '',
+        date: new Date().toISOString().split('T')[0],
+        topics: [],
+        theme: '',
+        source: '',
+        sourceUrl: '',
+        sourcePublicationDate: '',
+        originalLanguage: '',
+        originalText: '',
+        context: '',
+        historicalContext: '',
+        keywords: [],
+      });
+      setEvidenceImage(null);
+    }
+  };
+
+  const handleFileChange = (files: File[]) => {
+    if (files.length > 0) {
+      setEvidenceImage(files[0]);
+    }
   };
 
   return (
@@ -78,8 +92,26 @@ const AddQuote = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
               <QuoteFormFields form={form} />
-              <Button type="submit" className="w-full">
-                <PlusCircle className="mr-2" /> Submit Quote
+              
+              {/* Evidence Image Upload */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Evidence Image</h2>
+                <p className="text-sm text-muted-foreground">
+                  Upload an image showing the source of the quote for verification purposes.
+                </p>
+                <FileUploadArea
+                  onFilesSelected={handleFileChange}
+                  maxFiles={1}
+                  acceptedFileTypes={{
+                    'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+                  }}
+                  maxSizeMB={5}
+                  selectedFiles={evidenceImage ? [evidenceImage] : []}
+                />
+              </div>
+              
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                <PlusCircle className="mr-2" /> {isSubmitting ? 'Submitting...' : 'Submit Quote'}
               </Button>
             </form>
           </Form>
