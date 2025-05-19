@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, PlusCircle, ExternalLink } from 'lucide-react';
+import { Menu, X, PlusCircle } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 
@@ -11,13 +10,7 @@ const routePaths = [
   { name: 'Quotes', path: '/quotes' },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Favorites', path: '/favorites' },
-  { name: 'Tools', path: '/tools' },
-  { 
-    name: 'IIIF Integration', 
-    path: 'https://lovable.dev/projects/964cf98a-c636-40bc-afd1-055d6ff3a64d',
-    external: true,
-    icon: ExternalLink 
-  }
+  { name: 'Tools', path: '/tools' }
 ];
 
 const NavBar = () => {
