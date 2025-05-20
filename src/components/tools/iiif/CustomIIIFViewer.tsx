@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { ZoomIn, ZoomOut, RotateCw, RotateCcw, MaximizeIcon, MinimizeIcon } from 'lucide-react';
@@ -6,9 +5,10 @@ import { Button } from '@/components/ui/button';
 
 interface CustomIIIFViewerProps {
   manifestUrl?: string;
+  onManifestLoad?: (manifest: any) => void;
 }
 
-const CustomIIIFViewer = ({ manifestUrl }: CustomIIIFViewerProps) => {
+const CustomIIIFViewer = ({ manifestUrl, onManifestLoad }: CustomIIIFViewerProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +39,11 @@ const CustomIIIFViewer = ({ manifestUrl }: CustomIIIFViewerProps) => {
       .then(data => {
         console.log('Manifest loaded:', data);
         setManifest(data);
+        
+        // Call the onManifestLoad callback if provided
+        if (onManifestLoad) {
+          onManifestLoad(data);
+        }
 
         // IIIF Presentation API v2 and v3 handling
         if (data.sequences) {
@@ -66,7 +71,7 @@ const CustomIIIFViewer = ({ manifestUrl }: CustomIIIFViewerProps) => {
         setError(`Failed to load IIIF manifest: ${err.message}`);
         setIsLoading(false);
       });
-  }, [manifestUrl]);
+  }, [manifestUrl, onManifestLoad]);
 
   const handleImageLoad = () => {
     setIsLoading(false);

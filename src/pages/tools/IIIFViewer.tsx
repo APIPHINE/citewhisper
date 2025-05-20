@@ -23,6 +23,7 @@ const IIIFViewer = () => {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [newHostName, setNewHostName] = useState('');
   const [isAddHostDialogOpen, setIsAddHostDialogOpen] = useState(false);
+  const [manifestData, setManifestData] = useState<any>(null);
   const { toast } = useToast();
 
   // Load saved manifests on component mount
@@ -60,14 +61,31 @@ const IIIFViewer = () => {
     setIsLoadingManifest(true);
     setActiveManifest(manifestUrl);
     
-    // When loading is complete
-    setTimeout(() => {
-      setIsLoadingManifest(false);
-      toast({
-        title: "Success",
-        description: "IIIF manifest loaded successfully",
+    // Fetch the manifest to get the title
+    fetch(manifestUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch manifest: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setManifestData(data);
+        setIsLoadingManifest(false);
+        toast({
+          title: "Success",
+          description: "IIIF manifest loaded successfully",
+        });
+      })
+      .catch(err => {
+        console.error('Error loading manifest:', err);
+        setIsLoadingManifest(false);
+        toast({
+          title: "Error",
+          description: `Failed to load manifest: ${err.message}`,
+          variant: "destructive"
+        });
       });
-    }, 1000);
   };
 
   const saveManifest = async () => {
@@ -108,7 +126,31 @@ const IIIFViewer = () => {
   
   const saveManifestToDatabase = async (hostName: string) => {
     try {
-      await saveIIIFManifest(hostName, activeManifest);
+      // Extract a human-readable title from the manifest data if available
+      let title = "Manifest from " + hostName;
+      
+      if (manifestData) {
+        // Try to get title from manifest (handling both v2 and v3 formats)
+        if (manifestData.label) {
+          if (typeof manifestData.label === 'string') {
+            title = manifestData.label;
+          } else if (manifestData.label.en) {
+            // v3 format with language map
+            title = Array.isArray(manifestData.label.en) 
+              ? manifestData.label.en[0] 
+              : manifestData.label.en;
+          } else if (manifestData.label['@value']) {
+            // Some v2 format
+            title = manifestData.label['@value'];
+          } else if (Array.isArray(manifestData.label) && manifestData.label.length > 0) {
+            // Array format
+            const firstLabel = manifestData.label[0];
+            title = firstLabel['@value'] || firstLabel.value || String(firstLabel);
+          }
+        }
+      }
+      
+      await saveIIIFManifest(hostName, activeManifest, title);
       
       toast({
         title: "Success",
@@ -136,6 +178,16 @@ const IIIFViewer = () => {
   const loadSavedManifest = (url: string) => {
     setManifestUrl(url);
     setActiveManifest(url);
+    
+    // Fetch the manifest to get its data
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        setManifestData(data);
+      })
+      .catch(err => {
+        console.error('Error loading saved manifest data:', err);
+      });
   };
 
   return (
@@ -170,7 +222,10 @@ const IIIFViewer = () => {
                       
                       <div className="h-full min-h-[600px]">
                         {activeManifest ? (
-                          <CustomIIIFViewer manifestUrl={activeManifest} />
+                          <CustomIIIFViewer 
+                            manifestUrl={activeManifest} 
+                            onManifestLoad={(data) => setManifestData(data)} 
+                          />
                         ) : (
                           <div className="h-[600px] flex items-center justify-center text-muted-foreground border rounded-md bg-background">
                             Enter a IIIF manifest URL and click "Load" to view the content

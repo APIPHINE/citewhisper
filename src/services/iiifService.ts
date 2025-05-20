@@ -46,14 +46,18 @@ export const fetchIIIFData = async (): Promise<IIIFHost[]> => {
   }
 };
 
-export const saveIIIFManifest = async (hostName: string, manifestUrl: string): Promise<void> => {
+export const saveIIIFManifest = async (
+  hostName: string, 
+  manifestUrl: string, 
+  title: string = "Manifest from " + hostName
+): Promise<void> => {
   try {
     const { error } = await supabase
       .from('iiif_manifests')
       .insert({
         host_name: hostName,
         manifest_url: manifestUrl,
-        title: "Manifest from " + hostName,
+        title: title,
       });
       
     if (error) {
