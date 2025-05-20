@@ -170,7 +170,7 @@ const IIIFViewer = () => {
                       
                       <div className="h-full min-h-[600px] bg-background border rounded-md">
                         {activeManifest ? (
-                          <MiradorViewer />
+                          <MiradorViewer manifestUrl={activeManifest} />
                         ) : (
                           <div className="h-[600px] flex items-center justify-center text-muted-foreground">
                             Enter a IIIF manifest URL and click "Load" to view the content
