@@ -1,5 +1,4 @@
-
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Quote } from '../../utils/quotesData';
 import { useFormatDate } from '../../hooks/use-format-date';
 import { useState } from 'react';
@@ -75,65 +74,78 @@ export function QuoteCardMain({
   const displayDate = formatDate(quote.date);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ 
-        opacity: 1,
-        y: 0 
-      }}
-      transition={{ 
-        duration: 0.5, 
-        ease: [0.25, 0.1, 0.25, 1],
-        delay: delay * 0.08 
-      }}
-      className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
-      style={{ height: 'fit-content' }} 
-    >
-      <div className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative">
-        {/* Action Buttons and Verification Status in a column on the right */}
-        <div className="absolute top-4 right-4 flex flex-col items-center gap-3">
-          {/* Verification Status */}
-          <VerificationBadge isVerified={isVerified} />
-          
-          {/* Action Buttons */}
-          <ActionButtons 
-            favorite={favorite}
-            toggleFavorite={toggleFavorite}
-            handleShare={handleShare}
-            toggleExpanded={toggleExpanded}
-          />
-        </div>
+    <AnimatePresence>
+      {!expanded && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1,
+            y: 0 
+          }}
+          exit={{ 
+            opacity: 0, 
+            y: -20,
+            transition: { duration: 0.5, ease: 'easeInOut' }
+          }}
+          transition={{ 
+            duration: 0.5, 
+            ease: 'easeInOut',
+            delay: delay * 0.08 
+          }}
+          className={`group relative ${isAnyExpanded && !expanded ? 'hidden' : ''}`}
+          style={{ height: 'fit-content' }} 
+        >
+          <motion.div 
+            className="rounded-2xl transition-all duration-350 ease-apple border-border/80 hover:border-accent/50 bg-white p-6 shadow-subtle hover:shadow-elevation border-2 overflow-hidden h-full relative"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Action Buttons and Verification Status in a column on the right */}
+            <div className="absolute top-4 right-4 flex flex-col items-center gap-3">
+              {/* Verification Status */}
+              <VerificationBadge isVerified={isVerified} />
+              
+              {/* Action Buttons */}
+              <ActionButtons 
+                favorite={favorite}
+                toggleFavorite={toggleFavorite}
+                handleShare={handleShare}
+                toggleExpanded={toggleExpanded}
+              />
+            </div>
 
-        {/* Quote Text */}
-        <QuoteText text={displayText} />
+            {/* Quote Text */}
+            <QuoteText text={displayText} />
 
-        {/* Quote Metadata */}
-        <QuoteMetadata 
-          author={quote.author}
-          date={displayDate}
-          source={displaySource}
-          translator={quote.translator}
-          currentLanguage={currentLanguage}
-          topics={quote.topics}
-          theme={quote.theme}
-        />
-        
-        {/* www.CiteQuotes.com branding */}
-        <div className="absolute bottom-2 right-4 text-xs text-muted-foreground/60 select-none pointer-events-none">
-          www.CiteQuotes.com
-        </div>
+            {/* Quote Metadata */}
+            <QuoteMetadata 
+              author={quote.author}
+              date={displayDate}
+              source={displaySource}
+              translator={quote.translator}
+              currentLanguage={currentLanguage}
+              topics={quote.topics}
+              theme={quote.theme}
+            />
+            
+            {/* www.CiteQuotes.com branding */}
+            <div className="absolute bottom-2 right-4 text-xs text-muted-foreground/60 select-none pointer-events-none">
+              www.CiteQuotes.com
+            </div>
 
-        {/* Footer with Language Switcher and Counts */}
-        <QuoteFooter 
-          currentLanguage={currentLanguage}
-          setCurrentLanguage={setCurrentLanguage}
-          hasTranslation={hasTranslation}
-          originalLanguage={quote.originalLanguage}
-          favoriteCount={favoriteCount}
-          shareCount={shareCount}
-          favorite={favorite}
-        />
-      </div>
-    </motion.div>
+            {/* Footer with Language Switcher and Counts */}
+            <QuoteFooter 
+              currentLanguage={currentLanguage}
+              setCurrentLanguage={setCurrentLanguage}
+              hasTranslation={hasTranslation}
+              originalLanguage={quote.originalLanguage}
+              favoriteCount={favoriteCount}
+              shareCount={shareCount}
+              favorite={favorite}
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

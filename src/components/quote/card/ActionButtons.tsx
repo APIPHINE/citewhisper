@@ -1,5 +1,6 @@
 
 import { Heart, Share2, ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ActionButtonsProps {
   favorite: boolean;
@@ -38,13 +39,14 @@ export function ActionButtons({
       </button>
       
       {/* Expand Button */}
-      <button
+      <motion.button
         onClick={() => toggleExpanded()}
         className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
         aria-label="Expand quote details"
+        whileTap={{ scale: 0.95 }}
       >
         <ChevronDown size={20} />
-      </button>
+      </motion.button>
     </div>
   );
 }
