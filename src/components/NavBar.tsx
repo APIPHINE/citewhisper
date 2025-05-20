@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,7 +6,15 @@ import { Menu, X, PlusCircle } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 
-const routePaths = [
+// Define the type for route items
+type RouteItem = {
+  name: string;
+  path: string;
+  icon?: React.ComponentType<any>;
+  external?: boolean;
+};
+
+const routePaths: RouteItem[] = [
   { name: 'Home', path: '/' },
   { name: 'Quotes', path: '/quotes' },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
