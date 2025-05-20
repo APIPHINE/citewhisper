@@ -41,6 +41,30 @@ export type Database = {
           },
         ]
       }
+      iiif_manifests: {
+        Row: {
+          created_at: string
+          host_name: string
+          id: string
+          manifest_url: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          host_name: string
+          id?: string
+          manifest_url: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          host_name?: string
+          id?: string
+          manifest_url?: string
+          title?: string
+        }
+        Relationships: []
+      }
       original_sources: {
         Row: {
           isbn: string | null

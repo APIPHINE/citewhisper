@@ -10,6 +10,15 @@ import { Download, Save, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
+
+// Define TypeScript types for our IIIF items
+type IIIFItem = Database['public']['Tables']['iiif_manifests']['Row'];
+
+type IIIFHost = {
+  host_name: string;
+  items: IIIFItem[];
+};
 
 // Load Mirador dynamically on the client side only
 const MiradorViewer = () => {
@@ -64,19 +73,6 @@ const MiradorViewer = () => {
   return <div ref={containerRef} id="mirador" className="h-[600px]"></div>;
 };
 
-type IIIFItem = {
-  id: string;
-  host_name: string;
-  manifest_url: string;
-  title: string;
-  created_at: string;
-};
-
-type IIIFHost = {
-  host_name: string;
-  items: IIIFItem[];
-};
-
 const IIIFViewer = () => {
   const [manifestUrl, setManifestUrl] = useState('');
   const [activeManifest, setActiveManifest] = useState('');
@@ -96,8 +92,6 @@ const IIIFViewer = () => {
   const fetchIIIFData = async () => {
     setIsLoadingData(true);
     try {
-      // This is where we would fetch data from Supabase
-      // For now, we'll just simulate this with a mock response
       const { data, error } = await supabase
         .from('iiif_manifests')
         .select('*')
@@ -208,15 +202,13 @@ const IIIFViewer = () => {
   
   const saveManifestToDatabase = async (hostName: string) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('iiif_manifests')
-        .insert([
-          {
-            host_name: hostName,
-            manifest_url: activeManifest,
-            title: "Manifest from " + hostName,
-          }
-        ]);
+        .insert({
+          host_name: hostName,
+          manifest_url: activeManifest,
+          title: "Manifest from " + hostName,
+        });
         
       if (error) {
         throw error;
