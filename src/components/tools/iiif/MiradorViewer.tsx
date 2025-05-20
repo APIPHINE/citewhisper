@@ -9,30 +9,26 @@ const MiradorViewer = () => {
     setIsMounted(true);
     
     if (typeof window !== 'undefined') {
+      // Load Mirador without the image tools plugin that's causing the build error
       import('mirador').then((Mirador) => {
-        import('mirador-image-tools').then((MiradorImageTools) => {
-          if (containerRef.current) {
-            // Clear any existing viewers
-            while (containerRef.current.firstChild) {
-              containerRef.current.removeChild(containerRef.current.firstChild);
-            }
-            
-            Mirador.default.viewer({
-              id: 'mirador',
-              plugins: [
-                MiradorImageTools.default
-              ],
-              windows: [],
-              theme: {
-                palette: {
-                  primary: {
-                    main: 'rgb(var(--primary))',
-                  },
+        if (containerRef.current) {
+          // Clear any existing viewers
+          while (containerRef.current.firstChild) {
+            containerRef.current.removeChild(containerRef.current.firstChild);
+          }
+          
+          Mirador.default.viewer({
+            id: 'mirador',
+            windows: [],
+            theme: {
+              palette: {
+                primary: {
+                  main: 'rgb(var(--primary))',
                 },
               },
-            });
-          }
-        });
+            },
+          });
+        }
       });
     }
 
