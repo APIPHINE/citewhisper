@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import MiradorViewer from '@/components/tools/iiif/MiradorViewer';
+import CustomIIIFViewer from '@/components/tools/iiif/CustomIIIFViewer';
 import ManifestForm from '@/components/tools/iiif/ManifestForm';
 import ManifestDatabase from '@/components/tools/iiif/ManifestDatabase';
 import AddHostDialog from '@/components/tools/iiif/AddHostDialog';
@@ -168,11 +168,11 @@ const IIIFViewer = () => {
                         onSaveManifest={saveManifest}
                       />
                       
-                      <div className="h-full min-h-[600px] bg-background border rounded-md">
+                      <div className="h-full min-h-[600px]">
                         {activeManifest ? (
-                          <MiradorViewer manifestUrl={activeManifest} />
+                          <CustomIIIFViewer manifestUrl={activeManifest} />
                         ) : (
-                          <div className="h-[600px] flex items-center justify-center text-muted-foreground">
+                          <div className="h-[600px] flex items-center justify-center text-muted-foreground border rounded-md bg-background">
                             Enter a IIIF manifest URL and click "Load" to view the content
                           </div>
                         )}
