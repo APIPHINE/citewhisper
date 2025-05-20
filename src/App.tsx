@@ -18,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import FairUsePolicy from "./pages/FairUsePolicy";
 import Tools from "./pages/Tools";
+import IIIFViewer from "./pages/tools/IIIFViewer";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/add-quote" element={<AddQuote />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/tools" element={<Tools />} />
+              <Route path="/tools/iiif-viewer" element={<IIIFViewer />} />
               <Route path="/login" element={<Login />} />
               <Route path="/blog/why-sourcing-matters" element={<WhySourcingMatters />} />
               <Route path="/blog/evidence-and-open-mindedness" element={<EvidenceAndOpenMindedness />} />
