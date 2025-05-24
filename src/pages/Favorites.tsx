@@ -5,6 +5,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import QuoteCard from '../components/QuoteCard';
 import { Heart } from 'lucide-react';
 import { FavoriteQuotesCarousel } from '../components/quote/favorites/FavoriteQuotesCarousel';
+import { FavoriteQuoteActions } from '../components/quote/favorites/FavoriteQuoteActions';
 
 const Favorites = () => {
   const { favorites } = useFavorites();
@@ -35,6 +36,9 @@ const Favorites = () => {
 
         {/* Favorites Carousel */}
         {favorites.length > 0 && <FavoriteQuotesCarousel quotes={favorites} />}
+
+        {/* Quote Actions for Selection and Sharing */}
+        {favorites.length > 0 && <FavoriteQuoteActions quotes={favorites} />}
 
         {favorites.length === 0 ? (
           <div className={anyExpanded ? 'hidden' : 'bg-secondary/50 text-center py-16 px-6 rounded-2xl mt-8 border border-border'}>
