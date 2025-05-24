@@ -3,9 +3,7 @@ import { useState } from 'react';
 import { Quote } from '../../../utils/quotesData';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Share, Download, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useFavorites } from '../../../context/FavoritesContext';
+import { Check, X } from 'lucide-react';
 
 interface FavoriteQuoteActionsProps {
   quotes: Quote[];
@@ -13,15 +11,13 @@ interface FavoriteQuoteActionsProps {
 
 export function FavoriteQuoteActions({ quotes }: FavoriteQuoteActionsProps) {
   const [selectedQuotes, setSelectedQuotes] = useState<string[]>([]);
-  const { removeFavorite } = useFavorites();
-  const { toast } = useToast();
 
   const handleSelectAll = () => {
-    if (selectedQuotes.length === quotes.length) {
-      setSelectedQuotes([]);
-    } else {
-      setSelectedQuotes(quotes.map(q => q.id));
-    }
+    setSelectedQuotes(quotes.map(q => q.id));
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedQuotes([]);
   };
 
   const handleSelectQuote = (quoteId: string) => {
@@ -32,97 +28,36 @@ export function FavoriteQuoteActions({ quotes }: FavoriteQuoteActionsProps) {
     );
   };
 
-  const handleShare = () => {
-    const selectedQuoteTexts = quotes
-      .filter(q => selectedQuotes.includes(q.id))
-      .map(q => `"${q.text}" — ${q.author}`)
-      .join('\n\n');
-    
-    navigator.clipboard.writeText(selectedQuoteTexts);
-    toast({
-      title: "Quotes copied to clipboard",
-      description: `${selectedQuotes.length} quotes copied for sharing.`,
-    });
-  };
-
-  const handleExport = () => {
-    const selectedQuoteData = quotes.filter(q => selectedQuotes.includes(q.id));
-    const dataStr = JSON.stringify(selectedQuoteData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = 'favorite-quotes.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-    
-    toast({
-      title: "Quotes exported",
-      description: `${selectedQuotes.length} quotes exported as JSON.`,
-    });
-  };
-
-  const handleDelete = () => {
-    selectedQuotes.forEach(quoteId => {
-      removeFavorite(quoteId);
-    });
-    setSelectedQuotes([]);
-    toast({
-      title: "Quotes removed",
-      description: `${selectedQuotes.length} quotes removed from favorites.`,
-    });
-  };
-
   if (quotes.length === 0) return null;
 
   return (
     <div className="mb-6 space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="select-all"
-            checked={selectedQuotes.length === quotes.length}
-            onCheckedChange={handleSelectAll}
-          />
-          <label htmlFor="select-all" className="text-sm font-medium">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSelectAll}
+            className="h-8"
+          >
+            <Check className="h-4 w-4 mr-1" />
             Select all ({quotes.length})
-          </label>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDeselectAll}
+            className="h-8"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Deselect all
+          </Button>
         </div>
         
         {selectedQuotes.length > 0 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">
-              {selectedQuotes.length} selected
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="h-8"
-            >
-              <Share className="h-4 w-4 mr-1" />
-              Share
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-              className="h-8"
-            >
-              <Download className="h-4 w-4 mr-1" />
-              Export
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDelete}
-              className="h-8"
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Remove
-            </Button>
-          </div>
+          <span className="text-sm text-muted-foreground">
+            {selectedQuotes.length} selected
+          </span>
         )}
       </div>
       
