@@ -31,7 +31,9 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
       quote_image_url: quoteData.evidenceImage, // Map evidenceImage to quote_image_url
       citation_apa: quoteData.citationAPA,
       citation_mla: quoteData.citationMLA,
-      citation_chicago: quoteData.citationChicago
+      citation_chicago: quoteData.citationChicago,
+      seo_keywords: quoteData.keywords || [],
+      updated_at: new Date().toISOString()
     };
 
     console.log('Transformed quote data for DB:', dbQuote);
@@ -127,9 +129,11 @@ async function createTranslations(
       text: translation.text,
       source: translation.source,
       translator: translation.translator,
+      translator_name: translation.translator,
       publication: translation.publication,
       publication_date: translation.publicationDate,
-      source_url: translation.sourceUrl
+      source_url: translation.sourceUrl,
+      source_reference: translation.source
     }));
 
     console.log('Creating translations:', dbTranslations);

@@ -67,6 +67,8 @@ export type Database = {
       }
       original_sources: {
         Row: {
+          created_at: string | null
+          id: string
           isbn: string | null
           location: string | null
           publication_date: string | null
@@ -76,6 +78,8 @@ export type Database = {
           title: string | null
         }
         Insert: {
+          created_at?: string | null
+          id?: string
           isbn?: string | null
           location?: string | null
           publication_date?: string | null
@@ -85,6 +89,8 @@ export type Database = {
           title?: string | null
         }
         Update: {
+          created_at?: string | null
+          id?: string
           isbn?: string | null
           location?: string | null
           publication_date?: string | null
@@ -95,10 +101,140 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "original_sources_quote_id_fkey"
+            foreignKeyName: "fk_original_sources_quote_id"
             columns: ["quote_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_genconten: {
+        Row: {
+          academic_citation_style: string | null
+          alt_text: string | null
+          audio_url: string | null
+          audio_voice_style: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          language: string | null
+          quote_id: string | null
+          seo_keywords: string[] | null
+          seo_slug: string | null
+          style_description: string | null
+          transcript_or_caption_url: string | null
+        }
+        Insert: {
+          academic_citation_style?: string | null
+          alt_text?: string | null
+          audio_url?: string | null
+          audio_voice_style?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          language?: string | null
+          quote_id?: string | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          style_description?: string | null
+          transcript_or_caption_url?: string | null
+        }
+        Update: {
+          academic_citation_style?: string | null
+          alt_text?: string | null
+          audio_url?: string | null
+          audio_voice_style?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          language?: string | null
+          quote_id?: string | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          style_description?: string | null
+          transcript_or_caption_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_quote_genconten_quote_id"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_paraphrases: {
+        Row: {
+          audience_context: string | null
+          created_at: string | null
+          creator_name: string | null
+          id: string
+          language: string | null
+          paraphrase_text: string | null
+          paraphrase_type: string | null
+          quote_id: string | null
+        }
+        Insert: {
+          audience_context?: string | null
+          created_at?: string | null
+          creator_name?: string | null
+          id?: string
+          language?: string | null
+          paraphrase_text?: string | null
+          paraphrase_type?: string | null
+          quote_id?: string | null
+        }
+        Update: {
+          audience_context?: string | null
+          created_at?: string | null
+          creator_name?: string | null
+          id?: string
+          language?: string | null
+          paraphrase_text?: string | null
+          paraphrase_type?: string | null
+          quote_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_quote_paraphrases_quote_id"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_topics: {
+        Row: {
+          id: string
+          quote_id: string | null
+          topic_id: string | null
+        }
+        Insert: {
+          id?: string
+          quote_id?: string | null
+          topic_id?: string | null
+        }
+        Update: {
+          id?: string
+          quote_id?: string | null
+          topic_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_quote_topics_quote_id"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_quote_topics_topic_id"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
             referencedColumns: ["id"]
           },
         ]
@@ -120,11 +256,14 @@ export type Database = {
           original_text: string | null
           quote_image_url: string | null
           quote_text: string
+          seo_keywords: string[] | null
+          seo_slug: string | null
           source: string | null
           source_publication_date: string | null
           source_url: string | null
           theme: string | null
           topics: string[] | null
+          updated_at: string | null
         }
         Insert: {
           author: string
@@ -142,11 +281,14 @@ export type Database = {
           original_text?: string | null
           quote_image_url?: string | null
           quote_text: string
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
           source?: string | null
           source_publication_date?: string | null
           source_url?: string | null
           theme?: string | null
           topics?: string[] | null
+          updated_at?: string | null
         }
         Update: {
           author?: string
@@ -164,11 +306,32 @@ export type Database = {
           original_text?: string | null
           quote_image_url?: string | null
           quote_text?: string
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
           source?: string | null
           source_publication_date?: string | null
           source_url?: string | null
           theme?: string | null
           topics?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          id: string
+          seo_slug: string | null
+          topic_name: string | null
+        }
+        Insert: {
+          id?: string
+          seo_slug?: string | null
+          topic_name?: string | null
+        }
+        Update: {
+          id?: string
+          seo_slug?: string | null
+          topic_name?: string | null
         }
         Relationships: []
       }
@@ -180,9 +343,12 @@ export type Database = {
           publication_date: string | null
           quote_id: string | null
           source: string | null
+          source_reference: string | null
           source_url: string | null
           text: string | null
+          translation_notes: string | null
           translator: string | null
+          translator_name: string | null
         }
         Insert: {
           id?: string
@@ -191,9 +357,12 @@ export type Database = {
           publication_date?: string | null
           quote_id?: string | null
           source?: string | null
+          source_reference?: string | null
           source_url?: string | null
           text?: string | null
+          translation_notes?: string | null
           translator?: string | null
+          translator_name?: string | null
         }
         Update: {
           id?: string
@@ -202,9 +371,12 @@ export type Database = {
           publication_date?: string | null
           quote_id?: string | null
           source?: string | null
+          source_reference?: string | null
           source_url?: string | null
           text?: string | null
+          translation_notes?: string | null
           translator?: string | null
+          translator_name?: string | null
         }
         Relationships: [
           {

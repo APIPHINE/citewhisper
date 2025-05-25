@@ -8,15 +8,7 @@ export async function createTranslation(req: Request): Promise<Response> {
     const translationData = await req.json();
     
     // Validate required fields
-    const requiredFields = [
-      'quote_id', 
-      'language', 
-      'text', 
-      'source', 
-      'translator', 
-      'publication', 
-      'publication_date'
-    ];
+    const requiredFields = ['quote_id', 'language', 'text'];
     const missingFields = requiredFields.filter(field => !translationData[field]);
     
     if (missingFields.length > 0) {
@@ -26,11 +18,6 @@ export async function createTranslation(req: Request): Promise<Response> {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
-    }
-    
-    // Generate ID if not provided, following the required format
-    if (!translationData.id) {
-      translationData.id = `${translationData.quote_id}_${translationData.language}`;
     }
     
     // Insert translation into database

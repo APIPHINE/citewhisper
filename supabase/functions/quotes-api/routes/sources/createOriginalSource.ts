@@ -8,7 +8,7 @@ export async function createOriginalSource(req: Request): Promise<Response> {
     const sourceData = await req.json();
     
     // Validate required fields
-    const requiredFields = ['quote_id', 'title', 'publisher', 'publication_date', 'location'];
+    const requiredFields = ['quote_id'];
     const missingFields = requiredFields.filter(field => !sourceData[field]);
     
     if (missingFields.length > 0) {
