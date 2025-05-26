@@ -7,18 +7,7 @@ export async function createOriginalSource(req: Request): Promise<Response> {
   try {
     const sourceData = await req.json();
     
-    // Validate required fields
-    const requiredFields = ['quote_id'];
-    const missingFields = requiredFields.filter(field => !sourceData[field]);
-    
-    if (missingFields.length > 0) {
-      return new Response(JSON.stringify({ 
-        error: `Missing required fields: ${missingFields.join(', ')}` 
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    // No required fields validation since all fields are optional in the new schema
     
     // Insert original source into database
     const { data, error } = await supabase

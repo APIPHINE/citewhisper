@@ -8,25 +8,19 @@ import { Quote } from "@/utils/quotesData";
  */
 export async function fetchQuotes(): Promise<Quote[]> {
   try {
-    // Fetch main quotes data
+    // Fetch main quotes data with source relationship
     const { data: quotesData, error: quotesError } = await supabase
       .from('quotes')
-      .select('*');
+      .select(`
+        *,
+        source:original_sources(*)
+      `);
     
     if (quotesError) {
       console.error('Error fetching quotes:', quotesError);
       throw quotesError;
     }
 
-    // Fetch original sources
-    const { data: sourcesData, error: sourcesError } = await supabase
-      .from('original_sources')
-      .select('*');
-    
-    if (sourcesError) {
-      console.error('Error fetching original sources:', sourcesError);
-    }
-    
     // Fetch translations
     const { data: translationsData, error: translationsError } = await supabase
       .from('translations')
@@ -36,63 +30,60 @@ export async function fetchQuotes(): Promise<Quote[]> {
       console.error('Error fetching translations:', translationsError);
     }
     
-    // Fetch cited_by data
-    const { data: citedByData, error: citedByError } = await supabase
-      .from('cited_by')
-      .select('*');
+    // Fetch quote topics with topic details
+    const { data: quoteTopicsData, error: quoteTopicsError } = await supabase
+      .from('quote_topics')
+      .select(`
+        quote_id,
+        topic:topics(topic_name)
+      `);
     
-    if (citedByError) {
-      console.error('Error fetching cited_by data:', citedByError);
+    if (quoteTopicsError) {
+      console.error('Error fetching quote topics:', quoteTopicsError);
     }
     
     // Transform database data into our Quote format
     const quotes: Quote[] = quotesData.map(quote => {
-      // Find related original source
-      const originalSource = sourcesData?.find(source => source.quote_id === quote.id);
-      
       // Find related translations
       const translations = translationsData
         ?.filter(translation => translation.quote_id === quote.id)
         .map(translation => ({
           language: translation.language,
-          text: translation.text,
+          text: translation.translated_text,
           source: translation.source,
-          translator: translation.translator,
+          translator: translation.translator_name || translation.translator,
           publication: translation.publication,
           publicationDate: translation.publication_date,
           sourceUrl: translation.source_url
         }));
       
-      // Find related citations
-      const citedBy = citedByData
-        ?.filter(citation => citation.quote_id === quote.id)
-        .map(citation => ({
-          siteName: citation.site_name,
-          siteUrl: citation.site_url,
-          embedDate: citation.embed_date
-        }));
+      // Find related topics
+      const topics = quoteTopicsData
+        ?.filter(qt => qt.quote_id === quote.id)
+        .map(qt => qt.topic?.topic_name)
+        .filter(Boolean) || [];
 
       // Map DB schema to Quote model
       return {
         id: quote.id,
         text: quote.quote_text || '',
-        author: quote.author,
-        date: quote.date,
-        topics: quote.topics || [],
-        theme: quote.theme || '',
-        source: quote.source,
+        author: quote.author_name || '',
+        date: quote.date_original || new Date().toISOString().split('T')[0],
+        topics: topics,
+        theme: '',
+        source: quote.source?.title || '',
         evidenceImage: quote.quote_image_url,
-        sourceUrl: quote.source_url,
-        sourcePublicationDate: quote.source_publication_date,
-        originalLanguage: quote.original_language,
-        originalText: quote.original_text,
-        context: quote.context,
-        historicalContext: quote.historical_context,
-        keywords: quote.keywords || [],
-        emotionalTone: quote.emotional_tone || '',
-        citationAPA: quote.citation_apa,
-        citationMLA: quote.citation_mla,
-        citationChicago: quote.citation_chicago,
+        sourceUrl: quote.source?.archive_url,
+        sourcePublicationDate: quote.source?.publication_year,
+        originalLanguage: '',
+        originalText: '',
+        context: quote.quote_context,
+        historicalContext: '',
+        keywords: [],
+        emotionalTone: '',
+        citationAPA: '',
+        citationMLA: '',
+        citationChicago: '',
         exportFormats: { json: true, csv: true, cff: true },
         shareCount: 0,
         ocrExtractedText: '',
@@ -101,14 +92,14 @@ export async function fetchQuotes(): Promise<Quote[]> {
         attributionStatus: '',
         translator: '',
         impact: '',
-        citedBy: citedBy,
-        originalSource: originalSource ? {
-          title: originalSource.title || '',
-          publisher: originalSource.publisher || '',
-          publicationDate: originalSource.publication_date || '',
-          location: originalSource.location || '',
-          isbn: originalSource.isbn || '',
-          sourceUrl: originalSource.source_url || ''
+        citedBy: [],
+        originalSource: quote.source ? {
+          title: quote.source.title || '',
+          publisher: quote.source.publisher || '',
+          publicationDate: quote.source.publication_year || '',
+          location: quote.source.archive_url || '',
+          isbn: '',
+          sourceUrl: quote.source.archive_url || ''
         } : undefined,
         translations: translations?.length ? translations : undefined
       };

@@ -7,7 +7,13 @@ export async function getQuotes(req: Request): Promise<Response> {
   try {
     const { data, error } = await supabase
       .from('quotes')
-      .select('*');
+      .select(`
+        *,
+        source:original_sources(*),
+        quote_topics(
+          topic:topics(topic_name)
+        )
+      `);
     
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {
@@ -17,34 +23,39 @@ export async function getQuotes(req: Request): Promise<Response> {
     }
 
     // Transform the response to match the frontend Quote model
-    const transformedData = data.map(quote => ({
-      id: quote.id,
-      text: quote.quote_text || '', // Map DB quote_text to text in model
-      author: quote.author,
-      date: quote.date,
-      topics: quote.topics || [],
-      theme: quote.theme || '',
-      source: quote.source,
-      evidenceImage: quote.quote_image_url, // Map DB quote_image_url to evidenceImage
-      sourceUrl: quote.source_url,
-      sourcePublicationDate: quote.source_publication_date,
-      originalLanguage: quote.original_language,
-      originalText: quote.original_text,
-      context: quote.context,
-      historicalContext: quote.historical_context,
-      keywords: quote.keywords || [],
-      citationAPA: quote.citation_apa,
-      citationMLA: quote.citation_mla,
-      citationChicago: quote.citation_chicago,
-      shareCount: quote.share_count || 0, // Use actual share_count if available
-      attributionStatus: quote.attribution_status || "Pending",
-      fairUseJustification: {
-        purpose: "Educational/Transformative",
-        natureOfWork: "Factual/Published",
-        amountUsed: "Limited excerpt",
-        marketEffect: "No market substitution"
-      }
-    }));
+    const transformedData = data.map(quote => {
+      // Extract topics from the junction table
+      const topics = quote.quote_topics?.map(qt => qt.topic?.topic_name).filter(Boolean) || [];
+
+      return {
+        id: quote.id,
+        text: quote.quote_text || '',
+        author: quote.author_name || '',
+        date: quote.date_original || new Date().toISOString().split('T')[0],
+        topics: topics,
+        theme: '',
+        source: quote.source?.title || '',
+        evidenceImage: quote.quote_image_url,
+        sourceUrl: quote.source?.archive_url,
+        sourcePublicationDate: quote.source?.publication_year,
+        originalLanguage: '',
+        originalText: '',
+        context: quote.quote_context,
+        historicalContext: '',
+        keywords: quote.seo_keywords || [],
+        citationAPA: '',
+        citationMLA: '',
+        citationChicago: '',
+        shareCount: 0,
+        attributionStatus: "Pending",
+        fairUseJustification: {
+          purpose: "Educational/Transformative",
+          natureOfWork: "Factual/Published",
+          amountUsed: "Limited excerpt",
+          marketEffect: "No market substitution"
+        }
+      };
+    });
     
     return new Response(JSON.stringify(transformedData), {
       status: 200,

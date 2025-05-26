@@ -67,47 +67,51 @@ export type Database = {
       }
       original_sources: {
         Row: {
+          archive_url: string | null
+          author: string | null
           created_at: string | null
+          edition: string | null
           id: string
-          isbn: string | null
-          location: string | null
-          publication_date: string | null
+          language: string | null
+          notes: string | null
+          page_reference: string | null
+          publication_year: string | null
           publisher: string | null
-          quote_id: string
-          source_url: string | null
+          source_type: string | null
           title: string | null
+          verified_by: string | null
         }
         Insert: {
+          archive_url?: string | null
+          author?: string | null
           created_at?: string | null
+          edition?: string | null
           id?: string
-          isbn?: string | null
-          location?: string | null
-          publication_date?: string | null
+          language?: string | null
+          notes?: string | null
+          page_reference?: string | null
+          publication_year?: string | null
           publisher?: string | null
-          quote_id: string
-          source_url?: string | null
+          source_type?: string | null
           title?: string | null
+          verified_by?: string | null
         }
         Update: {
+          archive_url?: string | null
+          author?: string | null
           created_at?: string | null
+          edition?: string | null
           id?: string
-          isbn?: string | null
-          location?: string | null
-          publication_date?: string | null
+          language?: string | null
+          notes?: string | null
+          page_reference?: string | null
+          publication_year?: string | null
           publisher?: string | null
-          quote_id?: string
-          source_url?: string | null
+          source_type?: string | null
           title?: string | null
+          verified_by?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_original_sources_quote_id"
-            columns: ["quote_id"]
-            isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       quote_genconten: {
         Row: {
@@ -119,7 +123,7 @@ export type Database = {
           id: string
           image_url: string | null
           language: string | null
-          quote_id: string | null
+          quote_id: string
           seo_keywords: string[] | null
           seo_slug: string | null
           style_description: string | null
@@ -134,7 +138,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           language?: string | null
-          quote_id?: string | null
+          quote_id: string
           seo_keywords?: string[] | null
           seo_slug?: string | null
           style_description?: string | null
@@ -149,7 +153,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           language?: string | null
-          quote_id?: string | null
+          quote_id?: string
           seo_keywords?: string[] | null
           seo_slug?: string | null
           style_description?: string | null
@@ -157,7 +161,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_quote_genconten_quote_id"
+            foreignKeyName: "quote_genconten_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
@@ -171,34 +175,34 @@ export type Database = {
           created_at: string | null
           creator_name: string | null
           id: string
-          language: string | null
-          paraphrase_text: string | null
+          language: string
+          paraphrase_text: string
           paraphrase_type: string | null
-          quote_id: string | null
+          quote_id: string
         }
         Insert: {
           audience_context?: string | null
           created_at?: string | null
           creator_name?: string | null
           id?: string
-          language?: string | null
-          paraphrase_text?: string | null
+          language: string
+          paraphrase_text: string
           paraphrase_type?: string | null
-          quote_id?: string | null
+          quote_id: string
         }
         Update: {
           audience_context?: string | null
           created_at?: string | null
           creator_name?: string | null
           id?: string
-          language?: string | null
-          paraphrase_text?: string | null
+          language?: string
+          paraphrase_text?: string
           paraphrase_type?: string | null
-          quote_id?: string | null
+          quote_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_quote_paraphrases_quote_id"
+            foreignKeyName: "quote_paraphrases_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
@@ -209,29 +213,29 @@ export type Database = {
       quote_topics: {
         Row: {
           id: string
-          quote_id: string | null
-          topic_id: string | null
+          quote_id: string
+          topic_id: string
         }
         Insert: {
           id?: string
-          quote_id?: string | null
-          topic_id?: string | null
+          quote_id: string
+          topic_id: string
         }
         Update: {
           id?: string
-          quote_id?: string | null
-          topic_id?: string | null
+          quote_id?: string
+          topic_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_quote_topics_quote_id"
+            foreignKeyName: "quote_topics_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_quote_topics_topic_id"
+            foreignKeyName: "quote_topics_topic_id_fkey"
             columns: ["topic_id"]
             isOneToOne: false
             referencedRelation: "topics"
@@ -241,81 +245,53 @@ export type Database = {
       }
       quotes: {
         Row: {
-          author: string
-          citation_apa: string | null
-          citation_chicago: string | null
-          citation_mla: string | null
-          context: string | null
-          date: string | null
-          emotional_tone: string | null
-          historical_context: string | null
+          author_name: string | null
+          date_original: string | null
           id: string
           inserted_at: string | null
-          keywords: string[] | null
-          original_language: string | null
-          original_text: string | null
+          quote_context: string | null
           quote_image_url: string | null
           quote_text: string
           seo_keywords: string[] | null
           seo_slug: string | null
-          source: string | null
-          source_publication_date: string | null
-          source_url: string | null
-          theme: string | null
-          topics: string[] | null
+          source_id: string | null
           updated_at: string | null
         }
         Insert: {
-          author: string
-          citation_apa?: string | null
-          citation_chicago?: string | null
-          citation_mla?: string | null
-          context?: string | null
-          date?: string | null
-          emotional_tone?: string | null
-          historical_context?: string | null
+          author_name?: string | null
+          date_original?: string | null
           id?: string
           inserted_at?: string | null
-          keywords?: string[] | null
-          original_language?: string | null
-          original_text?: string | null
+          quote_context?: string | null
           quote_image_url?: string | null
           quote_text: string
           seo_keywords?: string[] | null
           seo_slug?: string | null
-          source?: string | null
-          source_publication_date?: string | null
-          source_url?: string | null
-          theme?: string | null
-          topics?: string[] | null
+          source_id?: string | null
           updated_at?: string | null
         }
         Update: {
-          author?: string
-          citation_apa?: string | null
-          citation_chicago?: string | null
-          citation_mla?: string | null
-          context?: string | null
-          date?: string | null
-          emotional_tone?: string | null
-          historical_context?: string | null
+          author_name?: string | null
+          date_original?: string | null
           id?: string
           inserted_at?: string | null
-          keywords?: string[] | null
-          original_language?: string | null
-          original_text?: string | null
+          quote_context?: string | null
           quote_image_url?: string | null
           quote_text?: string
           seo_keywords?: string[] | null
           seo_slug?: string | null
-          source?: string | null
-          source_publication_date?: string | null
-          source_url?: string | null
-          theme?: string | null
-          topics?: string[] | null
+          source_id?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_quotes_source_id"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "original_sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       topics: {
         Row: {
@@ -338,42 +314,42 @@ export type Database = {
       translations: {
         Row: {
           id: string
-          language: string | null
+          language: string
           publication: string | null
           publication_date: string | null
           quote_id: string | null
           source: string | null
           source_reference: string | null
           source_url: string | null
-          text: string | null
+          translated_text: string
           translation_notes: string | null
           translator: string | null
           translator_name: string | null
         }
         Insert: {
           id?: string
-          language?: string | null
+          language: string
           publication?: string | null
           publication_date?: string | null
           quote_id?: string | null
           source?: string | null
           source_reference?: string | null
           source_url?: string | null
-          text?: string | null
+          translated_text: string
           translation_notes?: string | null
           translator?: string | null
           translator_name?: string | null
         }
         Update: {
           id?: string
-          language?: string | null
+          language?: string
           publication?: string | null
           publication_date?: string | null
           quote_id?: string | null
           source?: string | null
           source_reference?: string | null
           source_url?: string | null
-          text?: string | null
+          translated_text?: string
           translation_notes?: string | null
           translator?: string | null
           translator_name?: string | null

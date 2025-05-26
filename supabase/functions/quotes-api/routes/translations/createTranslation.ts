@@ -7,8 +7,8 @@ export async function createTranslation(req: Request): Promise<Response> {
   try {
     const translationData = await req.json();
     
-    // Validate required fields
-    const requiredFields = ['quote_id', 'language', 'text'];
+    // Validate required fields for the new schema
+    const requiredFields = ['quote_id', 'language', 'translated_text'];
     const missingFields = requiredFields.filter(field => !translationData[field]);
     
     if (missingFields.length > 0) {

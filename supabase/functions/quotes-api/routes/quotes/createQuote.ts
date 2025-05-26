@@ -8,7 +8,7 @@ export async function createQuote(req: Request): Promise<Response> {
     const quoteData = await req.json();
     
     // Validate required fields
-    const requiredFields = ['quote_text', 'author'];
+    const requiredFields = ['quote_text', 'author_name'];
     const missingFields = requiredFields.filter(field => !quoteData[field]);
     
     if (missingFields.length > 0) {
@@ -32,8 +32,8 @@ export async function createQuote(req: Request): Promise<Response> {
     // Apply attribution metadata if there's an image
     if (quoteData.quote_image_url) {
       const attributionMetadata = {
-        author: quoteData.author,
-        source: quoteData.source,
+        author: quoteData.author_name,
+        source: quoteData.source_title,
         quote: quoteData.quote_text.substring(0, 100) + (quoteData.quote_text.length > 100 ? '...' : ''),
         submissionDate: quoteData.inserted_at,
         fairUseNotice: "Used under Fair Use (17 U.S.C. § 107) for educational purposes"

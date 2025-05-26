@@ -12,26 +12,13 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
   try {
     console.log('Creating quote with data:', quoteData);
     
-    // Transform our Quote structure to match the database schema
+    // Transform our Quote structure to match the new database schema
     const dbQuote = {
-      quote_text: quoteData.text, // Map text to quote_text for DB
-      author: quoteData.author,
-      date: quoteData.date,
-      topics: quoteData.topics || [],
-      theme: quoteData.theme || '',
-      source: quoteData.source,
-      source_url: quoteData.sourceUrl,
-      source_publication_date: quoteData.sourcePublicationDate,
-      original_language: quoteData.originalLanguage,
-      original_text: quoteData.originalText,
-      context: quoteData.context,
-      historical_context: quoteData.historicalContext,
-      keywords: quoteData.keywords || [],
-      emotional_tone: quoteData.emotionalTone || '',
-      quote_image_url: quoteData.evidenceImage, // Map evidenceImage to quote_image_url
-      citation_apa: quoteData.citationAPA,
-      citation_mla: quoteData.citationMLA,
-      citation_chicago: quoteData.citationChicago,
+      quote_text: quoteData.text,
+      author_name: quoteData.author,
+      date_original: quoteData.date,
+      quote_image_url: quoteData.evidenceImage,
+      quote_context: quoteData.context,
       seo_keywords: quoteData.keywords || [],
       updated_at: new Date().toISOString()
     };
@@ -54,7 +41,19 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
 
     // Handle original source if provided
     if (quoteData.originalSource) {
-      await createOriginalSource(data.id, quoteData.originalSource);
+      const sourceId = await createOriginalSource(quoteData.originalSource);
+      if (sourceId) {
+        // Update quote with source_id
+        await supabase
+          .from('quotes')
+          .update({ source_id: sourceId })
+          .eq('id', data.id);
+      }
+    }
+
+    // Handle topics if provided
+    if (Array.isArray(quoteData.topics) && quoteData.topics.length > 0) {
+      await createQuoteTopics(data.id, quoteData.topics);
     }
 
     // Handle translations if provided
@@ -74,39 +73,100 @@ export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | nu
 }
 
 /**
- * Creates an original source record linked to a quote
+ * Creates an original source record
  * 
- * @param quoteId - The ID of the quote
  * @param originalSourceData - The original source data
+ * @returns The ID of the created source or null if failed
  */
 async function createOriginalSource(
-  quoteId: string, 
   originalSourceData: Quote['originalSource']
-): Promise<void> {
-  if (!originalSourceData) return;
+): Promise<string | null> {
+  if (!originalSourceData) return null;
 
   const dbOriginalSource = {
-    quote_id: quoteId,
     title: originalSourceData.title,
     publisher: originalSourceData.publisher,
-    publication_date: originalSourceData.publicationDate,
-    location: originalSourceData.location,
-    isbn: originalSourceData.isbn,
-    source_url: originalSourceData.sourceUrl
+    publication_year: originalSourceData.publicationDate,
+    archive_url: originalSourceData.sourceUrl
   };
 
   console.log('Creating original source:', dbOriginalSource);
 
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('original_sources')
-      .insert([dbOriginalSource]);
+      .insert([dbOriginalSource])
+      .select('id')
+      .single();
 
     if (error) {
       console.error('Error creating original source:', error);
+      return null;
     }
+
+    return data.id;
   } catch (error) {
     console.error('Error in createOriginalSource:', error);
+    return null;
+  }
+}
+
+/**
+ * Creates topic records and links them to a quote
+ * 
+ * @param quoteId - The ID of the quote
+ * @param topics - Array of topic names
+ */
+async function createQuoteTopics(
+  quoteId: string, 
+  topics: string[]
+): Promise<void> {
+  if (!Array.isArray(topics) || topics.length === 0) return;
+
+  try {
+    // First, ensure all topics exist in the topics table
+    for (const topicName of topics) {
+      const seoSlug = topicName.toLowerCase().replace(/\s+/g, '-');
+      
+      // Insert topic if it doesn't exist
+      await supabase
+        .from('topics')
+        .upsert({ 
+          topic_name: topicName, 
+          seo_slug: seoSlug 
+        }, { 
+          onConflict: 'topic_name' 
+        });
+    }
+
+    // Get topic IDs
+    const { data: topicsData, error: topicsError } = await supabase
+      .from('topics')
+      .select('id, topic_name')
+      .in('topic_name', topics);
+
+    if (topicsError) {
+      console.error('Error fetching topics:', topicsError);
+      return;
+    }
+
+    // Create quote-topic relationships
+    const quoteTopics = topicsData.map(topic => ({
+      quote_id: quoteId,
+      topic_id: topic.id
+    }));
+
+    console.log('Creating quote topics:', quoteTopics);
+
+    const { error } = await supabase
+      .from('quote_topics')
+      .insert(quoteTopics);
+
+    if (error) {
+      console.error('Error creating quote topics:', error);
+    }
+  } catch (error) {
+    console.error('Error in createQuoteTopics:', error);
   }
 }
 
@@ -126,9 +186,8 @@ async function createTranslations(
     const dbTranslations = translationsData.map(translation => ({
       quote_id: quoteId,
       language: translation.language,
-      text: translation.text,
+      translated_text: translation.text,
       source: translation.source,
-      translator: translation.translator,
       translator_name: translation.translator,
       publication: translation.publication,
       publication_date: translation.publicationDate,
