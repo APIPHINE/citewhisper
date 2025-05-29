@@ -15,9 +15,8 @@ export function CsvImportSection({ formReset }: CsvImportSectionProps) {
   const [csvInput, setCsvInput] = useState('');
   const { toast } = useToast();
 
-  const csvPlaceholder = `text,author,date,source,sourceUrl,theme,emotionalTone
-"The future belongs to those who believe in the beauty of their dreams.",Eleanor Roosevelt,1945,"As We Are" journal,,Inspiration,Hopeful
-"Stay hungry. Stay foolish.",Steve Jobs,2005,Stanford Commencement Address,https://news.stanford.edu/news/2005/june15/jobs-061505.html,Ambition,Inspiring`;
+  const csvPlaceholder = `text,author,date,topics,theme,source,sourceUrl,sourcePublicationDate,originalLanguage,originalText,originalSourceTitle,originalSourcePublisher,originalSourcePublicationDate,originalSourceLocation,originalSourceIsbn,originalSourceUrl,context,historicalContext,keywords,emotionalTone,translationLanguage,translationText,translationSource,translator,translationPublication,translationPublicationDate,translationSourceUrl
+"The future belongs to those who believe in the beauty of their dreams.",Eleanor Roosevelt,1945-06-15,"Dreams;Inspiration",Inspiration,"As We Are" journal,,1945-06-15,English,,"As We Are" journal,Roosevelt Foundation,1945-06-15,New York,,https://example.com/source,"Spoken during a speech about hope and perseverance",Post-war America context,"dreams;hope;future;inspiration",Hopeful,,,,,,,`;
 
   const handleCsvImport = () => {
     try {
@@ -27,7 +26,7 @@ export function CsvImportSection({ formReset }: CsvImportSectionProps) {
       }
 
       const headers = rows[0].split(',').map(h => h.trim().replace(/^"(.*)"$/, '$1'));
-      const dataRow = rows[1].split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
+      const dataRow = parseCSVRow(rows[1]);
       
       // Basic validation
       if (headers.length < 2 || dataRow.length < 2) {
@@ -43,25 +42,104 @@ export function CsvImportSection({ formReset }: CsvImportSectionProps) {
         text: '',
         author: '',
         topics: [],
-        keywords: []
+        keywords: [],
+        originalSource: {
+          title: '',
+          publisher: '',
+          publicationDate: '',
+          location: '',
+          isbn: '',
+          sourceUrl: ''
+        },
+        translations: []
       };
       
       headers.forEach((header, index) => {
-        if (index < dataRow.length) {
-          if (header === 'topics' || header === 'keywords') {
-            quoteData[header] = dataRow[index].split(';').map(item => item.trim());
-          } else if (header in quoteData) {
-            quoteData[header] = dataRow[index];
+        if (index < dataRow.length && dataRow[index]) {
+          const value = dataRow[index];
+          
+          switch (header) {
+            case 'topics':
+            case 'keywords':
+              quoteData[header] = value.split(';').map(item => item.trim()).filter(Boolean);
+              break;
+            case 'originalSourceTitle':
+              if (!quoteData.originalSource) quoteData.originalSource = {};
+              quoteData.originalSource.title = value;
+              break;
+            case 'originalSourcePublisher':
+              if (!quoteData.originalSource) quoteData.originalSource = {};
+              quoteData.originalSource.publisher = value;
+              break;
+            case 'originalSourcePublicationDate':
+              if (!quoteData.originalSource) quoteData.originalSource = {};
+              quoteData.originalSource.publicationDate = value;
+              break;
+            case 'originalSourceLocation':
+              if (!quoteData.originalSource) quoteData.originalSource = {};
+              quoteData.originalSource.location = value;
+              break;
+            case 'originalSourceIsbn':
+              if (!quoteData.originalSource) quoteData.originalSource = {};
+              quoteData.originalSource.isbn = value;
+              break;
+            case 'originalSourceUrl':
+              if (!quoteData.originalSource) quoteData.originalSource = {};
+              quoteData.originalSource.sourceUrl = value;
+              break;
+            case 'translationLanguage':
+            case 'translationText':
+            case 'translationSource':
+            case 'translator':
+            case 'translationPublication':
+            case 'translationPublicationDate':
+            case 'translationSourceUrl':
+              // Handle translations - collect all translation data
+              if (!quoteData.translations) quoteData.translations = [];
+              if (quoteData.translations.length === 0) {
+                quoteData.translations.push({
+                  language: '',
+                  text: '',
+                  source: '',
+                  translator: '',
+                  publication: '',
+                  publicationDate: '',
+                  sourceUrl: ''
+                });
+              }
+              
+              const translationField = header.replace('translation', '').toLowerCase();
+              const mappedField = translationField === 'publicationdate' ? 'publicationDate' : 
+                                 translationField === 'sourceurl' ? 'sourceUrl' : translationField;
+              
+              if (quoteData.translations[0] && mappedField in quoteData.translations[0]) {
+                quoteData.translations[0][mappedField] = value;
+              }
+              break;
+            default:
+              if (header in quoteData && typeof quoteData[header as keyof QuoteFormValues] === 'string') {
+                (quoteData as any)[header] = value;
+              }
+              break;
           }
         }
       });
+      
+      // Clean up empty originalSource and translations
+      if (quoteData.originalSource && !Object.values(quoteData.originalSource).some(v => v)) {
+        quoteData.originalSource = undefined;
+      }
+      
+      if (quoteData.translations && (!quoteData.translations[0] || !Object.values(quoteData.translations[0]).some(v => v))) {
+        quoteData.translations = [];
+      }
       
       // Fill form with CSV data
       formReset(quoteData as QuoteFormValues);
       
       toast({
         title: "CSV Imported",
-        description: "Form has been populated with the first row of CSV data.",
+        description: "Form has been populated with the CSV data including nested objects.",
       });
     } catch (error) {
       toast({
@@ -70,6 +148,39 @@ export function CsvImportSection({ formReset }: CsvImportSectionProps) {
         variant: "destructive"
       });
     }
+  };
+
+  // Helper function to properly parse CSV row with quoted fields
+  const parseCSVRow = (row: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      
+      if (char === '"') {
+        if (inQuotes && row[i + 1] === '"') {
+          // Escaped quote
+          current += '"';
+          i++; // Skip next quote
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // End of field
+        result.push(current);
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    // Add the last field
+    result.push(current);
+    
+    return result;
   };
 
   const handleCopyCsvStructure = () => {
@@ -93,11 +204,15 @@ export function CsvImportSection({ formReset }: CsvImportSectionProps) {
         <FileText className="mr-2 h-5 w-5" /> CSV Import
       </h3>
       <div className="space-y-3">
+        <div className="text-sm text-muted-foreground mb-2">
+          <p>Use semicolons (;) to separate multiple topics, keywords, etc.</p>
+          <p>All fields from the JSON structure are supported as CSV columns.</p>
+        </div>
         <Textarea 
           value={csvInput}
           onChange={(e) => setCsvInput(e.target.value)}
           placeholder={csvPlaceholder}
-          className="h-28 font-mono text-sm"
+          className="h-32 font-mono text-xs"
         />
         <div className="flex flex-col space-y-2">
           <Button onClick={handleCsvImport} size="sm" className="w-full">
