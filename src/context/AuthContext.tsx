@@ -10,7 +10,6 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, fullName?: string, displayName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
   signInWithMagicLink: (email: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
@@ -138,35 +137,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithGoogle = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
-      });
-
-      if (error) {
-        toast({
-          title: "Google sign in failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
-
-      return { error };
-    } catch (error: any) {
-      const errorMessage = error?.message || 'An unexpected error occurred';
-      toast({
-        title: "Google sign in failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return { error };
-    }
-  };
-
   const signInWithMagicLink = async (email: string) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -231,7 +201,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
-    signInWithGoogle,
     signInWithMagicLink,
     signOut,
     isAuthenticated: !!user
