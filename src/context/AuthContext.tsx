@@ -40,6 +40,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Handle successful sign-in events
+        if (event === 'SIGNED_IN' && session?.user) {
+          toast({
+            title: "Welcome!",
+            description: "You've successfully signed in."
+          });
+        }
       }
     );
 
@@ -51,11 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   const signUp = async (email: string, password: string, fullName?: string, displayName?: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/email-verification`;
+      const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -64,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           emailRedirectTo: redirectUrl,
           data: { 
             full_name: fullName,
-            display_name: displayName
+            display_name: displayName || fullName
           }
         }
       });
@@ -102,7 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        // More specific error handling
         let errorMessage = error.message;
         if (error.message.includes('Invalid login credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials and try again.';
@@ -116,11 +123,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Sign in failed",
           description: errorMessage,
           variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Welcome back!",
-          description: "You've successfully signed in."
         });
       }
 

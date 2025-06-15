@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -107,13 +108,9 @@ const SignUpForm = () => {
     setGoogleLoading(true);
     try {
       const { error } = await signInWithGoogle();
-      if (error) {
-        setErrors({ submit: error.message });
-      }
-      // Note: Google OAuth will redirect, so we don't need to handle success here
+      // Don't need to handle success here as OAuth will redirect
     } catch (err) {
       setErrors({ submit: 'Google sign-up failed. Please try again.' });
-    } finally {
       setGoogleLoading(false);
     }
   };

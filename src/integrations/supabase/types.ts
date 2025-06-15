@@ -395,6 +395,7 @@ export type Database = {
         Row: {
           assigned_at: string
           assigned_by: string | null
+          display_name: string | null
           id: string
           privilege: Database["public"]["Enums"]["user_privilege"]
           updated_at: string
@@ -403,6 +404,7 @@ export type Database = {
         Insert: {
           assigned_at?: string
           assigned_by?: string | null
+          display_name?: string | null
           id?: string
           privilege?: Database["public"]["Enums"]["user_privilege"]
           updated_at?: string
@@ -411,6 +413,7 @@ export type Database = {
         Update: {
           assigned_at?: string
           assigned_by?: string | null
+          display_name?: string | null
           id?: string
           privilege?: Database["public"]["Enums"]["user_privilege"]
           updated_at?: string

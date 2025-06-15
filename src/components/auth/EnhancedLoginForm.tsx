@@ -61,16 +61,8 @@ const EnhancedLoginForm = () => {
     try {
       const { error } = await signIn(formData.email, formData.password);
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          setErrors({ submit: 'Invalid email or password. Please try again.' });
-        } else if (error.message.includes('Email not confirmed')) {
-          setErrors({ submit: 'Please check your email and click the verification link.' });
-        } else {
-          setErrors({ submit: error.message });
-        }
-      } else {
-        // Success handled by AuthContext toast
+      if (!error) {
+        // Success - redirect will happen via auth state change
         navigate('/');
       }
     } catch (err) {
@@ -84,13 +76,9 @@ const EnhancedLoginForm = () => {
     setGoogleLoading(true);
     try {
       const { error } = await signInWithGoogle();
-      if (error) {
-        setErrors({ submit: error.message });
-      }
-      // Note: Google OAuth will redirect, so we don't need to handle success here
+      // Don't need to handle success here as OAuth will redirect
     } catch (err) {
       setErrors({ submit: 'Google sign-in failed. Please try again.' });
-    } finally {
       setGoogleLoading(false);
     }
   };
