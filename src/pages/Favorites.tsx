@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
 import { useAccessControl } from '@/hooks/useAccessControl';
