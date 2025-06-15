@@ -2,9 +2,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, PlusCircle } from 'lucide-react';
+import { Menu, X, PlusCircle, User, LogOut } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // Define the type for route items
 type RouteItem = {
@@ -27,6 +35,7 @@ const NavBar = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
+  const { user, signOut, loading } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -36,7 +45,11 @@ const NavBar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  if (!mounted) {
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (!mounted || loading) {
     return null;
   }
 
@@ -89,6 +102,34 @@ const NavBar = () => {
                 </Link>
               )
             ))}
+            
+            {/* Authentication Section */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <User size={16} />
+                    <span className="hidden lg:inline">
+                      {user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem disabled>
+                    {user.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut size={16} className="mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild variant="default" size="sm">
+                <Link to="/login">Sign In</Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -129,6 +170,29 @@ const NavBar = () => {
                 </Link>
               )
             ))}
+            
+            {/* Mobile Authentication */}
+            {user ? (
+              <div className="border-t pt-4 space-y-2">
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <Button 
+                  variant="outline" 
+                  onClick={handleSignOut}
+                  className="w-full justify-start"
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <div className="border-t pt-4">
+                <Button asChild variant="default" className="w-full">
+                  <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    Sign In
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
       )}

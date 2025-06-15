@@ -2,25 +2,44 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogIn, User } from 'lucide-react';
+import { LogIn, User, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [loading, setLoading] = useState(false);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const { signIn, signUp, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This is where we would connect to an authentication service
-    console.log('Authentication form submitted:', { email, password, name });
+    setLoading(true);
     
-    // Here you would typically:
-    // 1. Call an authentication API (like Supabase, Firebase, etc.)
-    // 2. Store the user token/session
-    // 3. Redirect to the appropriate page
-    
-    alert('Authentication not yet implemented. Please connect to Supabase for full functionality.');
+    try {
+      if (isLogin) {
+        const { error } = await signIn(email, password);
+        if (!error) {
+          navigate('/');
+        }
+      } else {
+        const { error } = await signUp(email, password, fullName);
+        // Don't redirect on signup since user needs to verify email
+      }
+    } finally {
+      setLoading(false);
+    }
   };
   
   return (
@@ -38,16 +57,17 @@ const LoginForm = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {!isLogin && (
           <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Name
+            <label htmlFor="fullName" className="block text-sm font-medium mb-1">
+              Full Name
             </label>
             <Input
-              id="name"
+              id="fullName"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Your full name"
               required={!isLogin}
+              disabled={loading}
             />
           </div>
         )}
@@ -63,6 +83,7 @@ const LoginForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your.email@example.com"
             required
+            disabled={loading}
           />
         </div>
         
@@ -77,6 +98,8 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="********"
             required
+            disabled={loading}
+            minLength={6}
           />
         </div>
         
@@ -88,9 +111,17 @@ const LoginForm = () => {
           </div>
         )}
         
-        <Button type="submit" className="w-full flex items-center justify-center gap-2">
-          <LogIn size={16} />
-          {isLogin ? 'Sign In' : 'Create Account'}
+        <Button 
+          type="submit" 
+          className="w-full flex items-center justify-center gap-2"
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <LogIn size={16} />
+          )}
+          {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
         </Button>
       </form>
       
@@ -100,15 +131,17 @@ const LoginForm = () => {
           type="button"
           onClick={() => setIsLogin(!isLogin)}
           className="text-accent hover:underline font-medium"
+          disabled={loading}
         >
           {isLogin ? 'Sign Up' : 'Sign In'}
         </button>
       </div>
       
-      <div className="mt-6 text-center text-xs text-muted-foreground">
-        <p>Note: Authentication requires backend integration.</p>
-        <p>Please integrate with Supabase to enable full user authentication functionality.</p>
-      </div>
+      {!isLogin && (
+        <div className="mt-4 text-center text-xs text-muted-foreground">
+          <p>By creating an account, you agree to our terms of service and privacy policy.</p>
+        </div>
+      )}
     </div>
   );
 };
