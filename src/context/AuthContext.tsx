@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +10,8 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, fullName?: string, displayName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
 }
@@ -93,15 +96,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
       if (error) {
+        // More specific error handling
+        let errorMessage = error.message;
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and click the verification link to activate your account.';
+        } else if (error.message.includes('Too many requests')) {
+          errorMessage = 'Too many login attempts. Please wait a moment before trying again.';
+        }
+
         toast({
           title: "Sign in failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
       } else {
@@ -116,6 +129,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const errorMessage = error?.message || 'An unexpected error occurred';
       toast({
         title: "Sign in failed",
+        description: errorMessage,
+        variant: "destructive"
+      });
+      return { error };
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Google sign in failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+
+      return { error };
+    } catch (error: any) {
+      const errorMessage = error?.message || 'An unexpected error occurred';
+      toast({
+        title: "Google sign in failed",
+        description: errorMessage,
+        variant: "destructive"
+      });
+      return { error };
+    }
+  };
+
+  const signInWithMagicLink = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Magic link failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Magic link sent",
+          description: "Check your email for the magic login link."
+        });
+      }
+
+      return { error };
+    } catch (error: any) {
+      const errorMessage = error?.message || 'An unexpected error occurred';
+      toast({
+        title: "Magic link failed",
         description: errorMessage,
         variant: "destructive"
       });
@@ -153,6 +229,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
+    signInWithMagicLink,
     signOut,
     isAuthenticated: !!user
   };
