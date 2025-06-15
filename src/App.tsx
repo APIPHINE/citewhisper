@@ -21,6 +21,10 @@ import FairUsePolicy from "./pages/FairUsePolicy";
 import Tools from "./pages/Tools";
 import IIIFViewer from "./pages/tools/IIIFViewer";
 import SignUp from "./pages/SignUp";
+import EmailVerification from "./pages/EmailVerification";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +46,10 @@ const App = () => (
                 <Route path="/tools/iiif-viewer" element={<IIIFViewer />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/email-verification" element={<EmailVerification />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/blog/why-sourcing-matters" element={<WhySourcingMatters />} />
                 <Route path="/blog/evidence-and-open-mindedness" element={<EvidenceAndOpenMindedness />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

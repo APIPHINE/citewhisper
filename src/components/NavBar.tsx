@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, PlusCircle, User, LogOut } from 'lucide-react';
+import { Menu, X, PlusCircle, User, LogOut, Settings } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -119,6 +119,13 @@ const NavBar = () => {
                     {user.email}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center">
+                      <Settings size={16} className="mr-2" />
+                      Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut size={16} className="mr-2" />
                     Sign Out
@@ -180,6 +187,16 @@ const NavBar = () => {
             {user ? (
               <div className="border-t pt-4 space-y-2">
                 <p className="text-sm text-muted-foreground">{user.email}</p>
+                <Button 
+                  asChild
+                  variant="outline" 
+                  className="w-full justify-start"
+                >
+                  <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Settings size={16} className="mr-2" />
+                    Profile Settings
+                  </Link>
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={handleSignOut}
