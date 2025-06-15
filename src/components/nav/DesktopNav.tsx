@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Shield } from 'lucide-react';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 const routePaths = [
   { name: 'Home', path: '/' },
@@ -13,10 +14,16 @@ const routePaths = [
 
 export const DesktopNav = () => {
   const location = useLocation();
+  const { canManageRoles } = useUserRoles();
+
+  // Add admin route if user has admin privileges
+  const allRoutes = canManageRoles() 
+    ? [...routePaths, { name: 'Admin', path: '/admin', icon: Shield }]
+    : routePaths;
 
   return (
     <div className="hidden md:flex items-center space-x-6">
-      {routePaths.map((route) => (
+      {allRoutes.map((route) => (
         <Link
           key={route.path}
           to={route.path}

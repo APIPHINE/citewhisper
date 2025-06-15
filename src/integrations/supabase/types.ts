@@ -391,18 +391,56 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          privilege: Database["public"]["Enums"]["user_privilege"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          privilege?: Database["public"]["Enums"]["user_privilege"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          privilege?: Database["public"]["Enums"]["user_privilege"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_user_privilege: {
+        Args: { user_id: string }
+        Returns: Database["public"]["Enums"]["user_privilege"]
+      }
+      has_privilege_level: {
+        Args: {
+          user_id: string
+          required_level: Database["public"]["Enums"]["user_privilege"]
+        }
+        Returns: boolean
+      }
       increment_quote_share_count: {
         Args: Record<PropertyKey, never> | { quote_id: string }
         Returns: undefined
       }
     }
     Enums: {
-      [_ in never]: never
+      user_privilege: "user" | "moderator" | "admin" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -517,6 +555,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_privilege: ["user", "moderator", "admin", "super_admin"],
+    },
   },
 } as const
