@@ -110,7 +110,7 @@ const NavBar = () => {
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">
                     <User size={16} />
                     <span className="hidden lg:inline">
-                      {user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                      {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -126,9 +126,14 @@ const NavBar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="default" size="sm">
-                <Link to="/login">Sign In</Link>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button asChild variant="default" size="sm">
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -185,10 +190,15 @@ const NavBar = () => {
                 </Button>
               </div>
             ) : (
-              <div className="border-t pt-4">
-                <Button asChild variant="default" className="w-full">
+              <div className="border-t pt-4 space-y-2">
+                <Button asChild variant="outline" className="w-full">
                   <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                     Sign In
+                  </Link>
+                </Button>
+                <Button asChild variant="default" className="w-full">
+                  <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                    Sign Up
                   </Link>
                 </Button>
               </div>
