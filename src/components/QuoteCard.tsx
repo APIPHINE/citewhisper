@@ -30,12 +30,14 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState(quote);
   const [showEmbedCode, setShowEmbedCode] = useState(false);
   const [shareCount, setShareCount] = useState(quote.shareCount || 0);
   const [favoriteCount, setFavoriteCount] = useState(0);
-  const favorite = isFavorite(quote.id);
+  const favorite = isFavorite(currentQuote.id);
 
-  const generatedQuoteImageKey = Object.keys(generatedQuotesMap).find(key => quote.text.startsWith(key));
+  const generatedQuoteImageKey = Object.keys(generatedQuotesMap).find(key => currentQuote.text.startsWith(key));
   const generatedQuoteImageUrl = generatedQuoteImageKey ? generatedQuotesMap[generatedQuoteImageKey] : null;
 
   // Handle copying to clipboard and increment share count
@@ -44,7 +46,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
     setShareCount(prev => prev + 1);
     
     // Update share count in Supabase
-    await incrementShareCount(quote.id);
+    await incrementShareCount(currentQuote.id);
     
     toggleExpanded();
   };
@@ -52,14 +54,14 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
   // Toggle favorite status and update count
   const toggleFavorite = () => {
     if (favorite) {
-      removeFavorite(quote.id);
+      removeFavorite(currentQuote.id);
       setFavoriteCount(prev => prev - 1);
       toast({
         title: "Removed from favorites",
         description: "The quote has been removed from your favorites.",
       });
     } else {
-      addFavorite(quote);
+      addFavorite(currentQuote);
       setFavoriteCount(prev => prev + 1);
       toast({
         title: "Added to favorites",
@@ -73,9 +75,10 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
     const newExpandedState = !expanded;
     setExpanded(newExpandedState);
     
-    // Reset embed code visibility when closing the expanded view
+    // Reset embed code visibility and edit mode when closing the expanded view
     if (!newExpandedState) {
       setShowEmbedCode(false);
+      setEditMode(false);
     }
     
     // Notify parent component about expansion state
@@ -86,7 +89,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
     // If requested, scroll to the cited-by section after expansion
     if (newExpandedState && scrollToCitedBy) {
       setTimeout(() => {
-        const citedBySection = document.getElementById(`cited-by-section-${quote.id}`);
+        const citedBySection = document.getElementById(`cited-by-section-${currentQuote.id}`);
         if (citedBySection) {
           citedBySection.scrollIntoView({ behavior: 'smooth' });
         }
@@ -94,10 +97,18 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
     }
   };
 
+  const handleEditToggle = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleQuoteUpdate = (updatedQuote: Quote) => {
+    setCurrentQuote(updatedQuote);
+  };
+
   return (
     <>
       <QuoteCardMain
-        quote={quote}
+        quote={currentQuote}
         delay={delay}
         isAnyExpanded={isAnyExpanded}
         expanded={expanded}
@@ -112,7 +123,7 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
       
       <AnimatePresence>
         <ExpandedQuoteCard
-          quote={quote}
+          quote={currentQuote}
           expanded={expanded}
           toggleExpanded={toggleExpanded}
           favorite={favorite}
@@ -120,15 +131,18 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
           showEmbedCode={showEmbedCode}
           shareCount={shareCount}
           favoriteCount={favoriteCount}
+          editMode={editMode}
+          onEditToggle={handleEditToggle}
+          onQuoteUpdate={handleQuoteUpdate}
           copyEmbedCode={() => {
             navigator.clipboard.writeText(`<iframe 
-  src="https://citequotes.com/embed/quote/${quote.id}?style=standard&color=light&size=medium" 
+  src="https://citequotes.com/embed/quote/${currentQuote.id}?style=standard&color=light&size=medium" 
   width="450" 
   height="240" 
   frameborder="0"
-  title="Quote by ${quote.author}"
+  title="Quote by ${currentQuote.author}"
 ></iframe>
-<a href="https://citequotes.com/quotes/${quote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View on CiteQuotes</a>`);
+<a href="https://citequotes.com/quotes/${currentQuote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View on CiteQuotes</a>`);
             
             toast({
               title: "Embed code copied",

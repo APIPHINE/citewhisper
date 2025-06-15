@@ -1,6 +1,9 @@
 
 import { Heart, Share2, ChevronDown, Edit } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { useEffect } from 'react';
 
 interface ActionButtonsProps {
   favorite: boolean;
@@ -17,15 +20,27 @@ export function ActionButtons({
   toggleExpanded,
   isAdmin = false
 }: ActionButtonsProps) {
+  const { user } = useAuth();
+  const { userRole, loadRole } = useUserRoles();
+
+  useEffect(() => {
+    if (user?.id) {
+      loadRole(user.id);
+    }
+  }, [user?.id, loadRole]);
+
+  const isSuperAdmin = userRole === 'super_admin';
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleExpanded(); // This will open the expanded view, and the edit button in the header will handle edit mode
+  };
+
   return (
     <div className="flex flex-col gap-3 mt-1">
-      {isAdmin && (
+      {isSuperAdmin && (
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            // TODO: Implement edit functionality
-            console.log('Edit clicked for quote');
-          }}
+          onClick={handleEditClick}
           className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
           aria-label="Edit quote"
         >
