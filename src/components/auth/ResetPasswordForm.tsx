@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const ResetPasswordForm = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -19,28 +18,11 @@ const ResetPasswordForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isValidToken, setIsValidToken] = useState(false);
 
   // Password validation
   const hasPasswordRequirements = password.length >= 6;
   const passwordsMatch = password === confirmPassword && confirmPassword !== '';
   const passwordsDoNotMatch = confirmPassword !== '' && password !== confirmPassword;
-
-  useEffect(() => {
-    const token = searchParams.get('token');
-    const type = searchParams.get('type');
-    
-    if (token && type === 'recovery') {
-      setIsValidToken(true);
-    } else {
-      toast({
-        title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired.",
-        variant: "destructive"
-      });
-      navigate('/login');
-    }
-  }, [searchParams, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,10 +75,6 @@ const ResetPasswordForm = () => {
       setLoading(false);
     }
   };
-
-  if (!isValidToken) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen pt-36 pb-20 page-padding">

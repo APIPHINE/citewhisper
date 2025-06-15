@@ -1,11 +1,28 @@
 
-import React, { useState, useRef, useCallback } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { CheckCircle, XCircle, Circle, Square, Triangle, Diamond } from 'lucide-react';
 
 interface DragDropCaptchaProps {
   onVerificationChange: (verified: boolean) => void;
   className?: string;
 }
+
+const SHAPES = [
+  { id: 'circle', Icon: Circle },
+  { id: 'square', Icon: Square },
+  { id: 'triangle', Icon: Triangle },
+  { id: 'diamond', Icon: Diamond },
+];
+
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
 
 export const DragDropCaptcha: React.FC<DragDropCaptchaProps> = ({
   onVerificationChange,
@@ -13,19 +30,26 @@ export const DragDropCaptcha: React.FC<DragDropCaptchaProps> = ({
 }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [showFeedback, setShowFeedback] = useState(false);
   
-  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const [correctShape, setCorrectShape] = useState(SHAPES[0]);
+  const [targetShapes, setTargetShapes] = useState(shuffleArray(SHAPES));
+
   const draggableRef = useRef<HTMLDivElement>(null);
+
+  const randomizeCaptcha = useCallback(() => {
+    const shuffledShapes = shuffleArray(SHAPES);
+    setCorrectShape(shuffledShapes[0]);
+    setTargetShapes(shuffleArray(SHAPES));
+  }, []);
+
+  useEffect(() => {
+    randomizeCaptcha();
+  }, [randomizeCaptcha]);
 
   const handleDragStart = useCallback((e: React.DragEvent) => {
     setIsDragging(true);
-    const rect = e.currentTarget.getBoundingClientRect();
-    setDragPosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
+    e.dataTransfer.effectAllowed = 'move';
   }, []);
 
   const handleDragEnd = useCallback(() => {
@@ -34,28 +58,22 @@ export const DragDropCaptcha: React.FC<DragDropCaptchaProps> = ({
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    
-    if (!dropZoneRef.current) return;
-    
-    const dropRect = dropZoneRef.current.getBoundingClientRect();
-    const isInDropZone = 
-      e.clientX >= dropRect.left &&
-      e.clientX <= dropRect.right &&
-      e.clientY >= dropRect.top &&
-      e.clientY <= dropRect.bottom;
+    const targetElement = e.currentTarget as HTMLDivElement;
+    const droppedOnShapeId = targetElement.dataset.shapeId;
 
-    if (isInDropZone) {
+    if (droppedOnShapeId === correctShape.id) {
       setIsVerified(true);
       setShowFeedback(true);
       onVerificationChange(true);
-      setTimeout(() => setShowFeedback(false), 3000);
     } else {
       setIsVerified(false);
       onVerificationChange(false);
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 2000);
     }
     
     setIsDragging(false);
-  }, [onVerificationChange]);
+  }, [onVerificationChange, correctShape.id]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -65,16 +83,17 @@ export const DragDropCaptcha: React.FC<DragDropCaptchaProps> = ({
     setIsVerified(false);
     setShowFeedback(false);
     onVerificationChange(false);
+    randomizeCaptcha();
   };
 
   return (
     <div className={`p-4 border rounded-lg bg-secondary/20 ${className}`}>
       <div className="mb-2 text-sm font-medium">
-        Verify you're human: Drag the circle to the target area
+        Verify you're human: Drag the shape to the matching area.
       </div>
       
       <div className="relative flex items-center justify-between min-h-[100px]">
-        {/* Draggable Circle */}
+        {/* Draggable Shape */}
         <div className="flex-1 flex justify-start">
           {!isVerified && (
             <div
@@ -82,33 +101,37 @@ export const DragDropCaptcha: React.FC<DragDropCaptchaProps> = ({
               draggable
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
-              className={`w-12 h-12 bg-blue-500 rounded-full cursor-move flex items-center justify-center text-white font-bold transition-transform ${
+              className={`w-12 h-12 bg-blue-500 rounded-lg cursor-move flex items-center justify-center text-white transition-transform ${
                 isDragging ? 'opacity-50 scale-110' : 'hover:scale-105'
               }`}
             >
-              ●
+              <correctShape.Icon className="w-8 h-8 text-white" />
             </div>
           )}
         </div>
 
-        {/* Drop Zone */}
-        <div className="flex-1 flex justify-end">
-          <div
-            ref={dropZoneRef}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            className={`w-16 h-16 border-2 border-dashed rounded-full flex items-center justify-center transition-colors ${
-              isVerified 
-                ? 'border-green-500 bg-green-50' 
-                : 'border-gray-400 hover:border-blue-500'
-            }`}
-          >
-            {isVerified ? (
-              <CheckCircle className="w-8 h-8 text-green-500" />
-            ) : (
-              <div className="text-gray-400 text-xs text-center">Drop here</div>
-            )}
-          </div>
+        {/* Drop Zones */}
+        <div className="flex-1 flex justify-end items-center gap-2">
+           {isVerified 
+            ? (
+                <div className={`w-16 h-16 border-2 border-green-500 bg-green-50 rounded-lg flex items-center justify-center`}>
+                  <correctShape.Icon className="w-8 h-8 text-green-500" />
+                </div>
+              )
+            : (
+              targetShapes.map(shape => (
+                <div
+                  key={shape.id}
+                  data-shape-id={shape.id}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  className={`w-16 h-16 border-2 border-dashed rounded-lg flex items-center justify-center transition-colors border-gray-400 hover:border-blue-500`}
+                >
+                  <shape.Icon className="w-8 h-8 text-gray-400" />
+                </div>
+              ))
+            )
+          }
         </div>
       </div>
 
