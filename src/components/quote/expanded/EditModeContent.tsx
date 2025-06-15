@@ -84,25 +84,13 @@ export function EditModeContent({ quote, onSave, onCancel }: EditModeContentProp
         }
       }
 
-      // Update quote in database
+      // Update quote in database using correct column names
       const updatedQuoteData = {
-        text: formData.text,
-        author: formData.author,
-        source: formData.source,
-        date: formData.date,
-        topics: formData.topics.split(',').map(t => t.trim()).filter(t => t),
-        theme: formData.theme,
-        context: formData.context,
-        original_text: formData.originalText,
-        original_language: formData.originalLanguage,
-        translator: formData.translator,
-        source_publication_date: formData.sourcePublicationDate,
-        source_url: formData.sourceUrl,
-        attribution_status: formData.attributionStatus,
-        original_manuscript_reference: formData.originalManuscriptReference,
-        ocr_extracted_text: formData.ocrExtractedText,
-        ocr_confidence_score: formData.ocrConfidenceScore,
-        evidence_image: evidenceImageUrl
+        quote_text: formData.text,
+        author_name: formData.author,
+        date_original: formData.date,
+        quote_context: formData.context,
+        quote_image_url: evidenceImageUrl
       };
 
       const { error } = await supabase
@@ -116,9 +104,23 @@ export function EditModeContent({ quote, onSave, onCancel }: EditModeContentProp
 
       const updatedQuote: Quote = {
         ...quote,
-        ...formData,
+        text: formData.text,
+        author: formData.author,
+        date: formData.date,
+        context: formData.context,
+        evidenceImage: evidenceImageUrl,
         topics: formData.topics.split(',').map(t => t.trim()).filter(t => t),
-        evidenceImage: evidenceImageUrl
+        theme: formData.theme,
+        source: formData.source,
+        originalText: formData.originalText,
+        originalLanguage: formData.originalLanguage,
+        translator: formData.translator,
+        sourcePublicationDate: formData.sourcePublicationDate,
+        sourceUrl: formData.sourceUrl,
+        attributionStatus: formData.attributionStatus,
+        originalManuscriptReference: formData.originalManuscriptReference,
+        ocrExtractedText: formData.ocrExtractedText,
+        ocrConfidenceScore: formData.ocrConfidenceScore
       };
 
       onSave(updatedQuote);
