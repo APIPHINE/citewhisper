@@ -3,9 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { User, Shield, Users, Crown } from 'lucide-react';
-import type { Database } from '@/integrations/supabase/types';
-
-type UserPrivilege = Database['public']['Enums']['user_privilege'];
+import type { UserPrivilege } from '@/types/userRoles';
 
 const privilegeConfig = {
   user: {

@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { Shield, User, Users, Crown } from 'lucide-react';
-import type { Database } from '@/integrations/supabase/types';
-
-type UserPrivilege = Database['public']['Enums']['user_privilege'];
+import type { UserPrivilege } from '@/types/userRoles';
 
 const privilegeIcons = {
   user: <User size={16} />,
