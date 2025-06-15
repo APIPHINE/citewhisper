@@ -7,9 +7,10 @@ interface QuotesGridProps {
   viewMode: 'grid' | 'list';
   anyExpanded: boolean;
   onExpand: (expanded: boolean) => void;
+  isAdmin: boolean;
 }
 
-const QuotesGrid = ({ quotes, viewMode, anyExpanded, onExpand }: QuotesGridProps) => {
+const QuotesGrid = ({ quotes, viewMode, anyExpanded, onExpand, isAdmin }: QuotesGridProps) => {
   return (
     <div className={`mt-8 ${!anyExpanded ? (viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-4') : ''}`}>
       {quotes.map((quote, index) => (
@@ -19,6 +20,7 @@ const QuotesGrid = ({ quotes, viewMode, anyExpanded, onExpand }: QuotesGridProps
           delay={index} 
           isAnyExpanded={anyExpanded}
           onExpand={onExpand}
+          isAdmin={isAdmin}
         />
       ))}
     </div>

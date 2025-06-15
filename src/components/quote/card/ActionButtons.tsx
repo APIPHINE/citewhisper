@@ -1,5 +1,5 @@
 
-import { Heart, Share2, ChevronDown } from 'lucide-react';
+import { Heart, Share2, ChevronDown, Edit } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ActionButtonsProps {
@@ -7,16 +7,31 @@ interface ActionButtonsProps {
   toggleFavorite: () => void;
   handleShare: () => void;
   toggleExpanded: (scrollToCitedBy?: boolean) => void;
+  isAdmin?: boolean;
 }
 
 export function ActionButtons({ 
   favorite, 
   toggleFavorite, 
   handleShare, 
-  toggleExpanded 
+  toggleExpanded,
+  isAdmin = false
 }: ActionButtonsProps) {
   return (
     <div className="flex flex-col gap-3 mt-1">
+      {isAdmin && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            // TODO: Implement edit functionality
+            console.log('Edit clicked for quote');
+          }}
+          className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
+          aria-label="Edit quote"
+        >
+          <Edit size={20} />
+        </button>
+      )}
       {/* Favorite Button */}
       <button
         onClick={toggleFavorite}

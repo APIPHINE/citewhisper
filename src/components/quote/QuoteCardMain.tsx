@@ -19,6 +19,7 @@ interface QuoteCardMainProps {
   toggleExpanded: (scrollToCitedBy?: boolean) => void;
   shareCount: number;
   favoriteCount: number;
+  isAdmin?: boolean;
 }
 
 export function QuoteCardMain({
@@ -31,7 +32,8 @@ export function QuoteCardMain({
   handleShare,
   toggleExpanded,
   shareCount,
-  favoriteCount
+  favoriteCount,
+  isAdmin = false
 }: QuoteCardMainProps) {
   const { formatDate } = useFormatDate();
   const [currentLanguage, setCurrentLanguage] = useState<"en" | "es" | "fr">("en");
@@ -111,6 +113,7 @@ export function QuoteCardMain({
                 toggleFavorite={toggleFavorite}
                 handleShare={handleShare}
                 toggleExpanded={toggleExpanded}
+                isAdmin={isAdmin}
               />
             </div>
 

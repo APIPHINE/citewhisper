@@ -12,6 +12,7 @@ interface QuotesContentProps {
   searchQuery: string;
   anyExpanded: boolean;
   setAnyExpanded: (expanded: boolean) => void;
+  isAdmin: boolean;
 }
 
 const QUOTES_PER_PAGE = 10;
@@ -20,7 +21,8 @@ const QuotesContent = ({
   quotes, 
   searchQuery, 
   anyExpanded,
-  setAnyExpanded
+  setAnyExpanded,
+  isAdmin
 }: QuotesContentProps) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,6 +69,7 @@ const QuotesContent = ({
               viewMode={viewMode}
               anyExpanded={anyExpanded}
               onExpand={handleExpand}
+              isAdmin={isAdmin}
             />
 
             {!anyExpanded && (

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
@@ -8,6 +8,8 @@ import QuoteCard from '../components/QuoteCard';
 import { Heart } from 'lucide-react';
 import { FavoriteQuotesCarousel } from '../components/quote/favorites/FavoriteQuotesCarousel';
 import { FavoriteQuoteActions } from '../components/quote/favorites/FavoriteQuoteActions';
+import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 const Favorites = () => {
   // Check access immediately - this will redirect if not authenticated
@@ -15,10 +17,21 @@ const Favorites = () => {
   
   React.useEffect(() => {
     checkAccess('view your favorites');
-  }, []);
+  }, [checkAccess]);
 
   const { favorites } = useFavorites();
   const [anyExpanded, setAnyExpanded] = useState(false);
+
+  const { user } = useAuth();
+  const { userRole, loadRole } = useUserRoles();
+
+  useEffect(() => {
+    if (user?.id) {
+      loadRole(user.id);
+    }
+  }, [user?.id, loadRole]);
+
+  const isAdmin = ['admin', 'super_admin'].includes(userRole);
   
   const handleExpand = (isExpanded: boolean) => {
     setAnyExpanded(isExpanded);
@@ -66,6 +79,7 @@ const Favorites = () => {
                 delay={index} 
                 isAnyExpanded={anyExpanded}
                 onExpand={handleExpand}
+                isAdmin={isAdmin}
               />
             ))}
           </div>
