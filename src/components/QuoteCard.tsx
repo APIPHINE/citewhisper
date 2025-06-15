@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
 import { Quote } from '../utils/quotesData';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 import { ProtectedButton } from './auth/ProtectedButton';
 import { PermissionWrapper } from './auth/PermissionWrapper';
 import { QuoteCardMain } from './quote/QuoteCardMain';
@@ -28,6 +28,7 @@ const generatedQuotesMap: Record<string, string> = {
 const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin = false }: QuoteCardProps) => {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -51,8 +52,12 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
     toggleExpanded();
   };
   
-  // Toggle favorite status and update count
+  // Toggle favorite status and update count - only for authenticated users
   const toggleFavorite = () => {
+    if (!user) {
+      return; // This should be handled by the ActionButtons component
+    }
+    
     if (favorite) {
       removeFavorite(currentQuote.id);
       setFavoriteCount(prev => prev - 1);
@@ -70,7 +75,6 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
     }
   };
 
-  // Toggle expanded status
   const toggleExpanded = (scrollToCitedBy = false) => {
     const newExpandedState = !expanded;
     setExpanded(newExpandedState);

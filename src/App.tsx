@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +14,7 @@ import { Footer } from "./components/Footer";
 // Lazy load components
 const Index = lazy(() => import("./pages/Index"));
 const AddQuote = lazy(() => import("./pages/AddQuote"));
+const Favorites = lazy(() => import("./pages/Favorites"));
 const Tools = lazy(() => import("./pages/Tools"));
 const IIIFViewer = lazy(() => import("./pages/tools/IIIFViewer"));
 const FairUsePolicy = lazy(() => import("./pages/FairUsePolicy"));
@@ -48,7 +50,7 @@ const App = () => (
                       <Route path="/" element={<Index />} />
                       <Route path="/quotes" element={<Index />} />
                       <Route path="/add-quote" element={<AddQuote />} />
-                      <Route path="/favorites" element={<Index />} />
+                      <Route path="/favorites" element={<Favorites />} />
                       <Route path="/tools" element={<Tools />} />
                       <Route path="/tools/iiif-viewer" element={<IIIFViewer />} />
                       <Route path="/fair-use" element={<FairUsePolicy />} />

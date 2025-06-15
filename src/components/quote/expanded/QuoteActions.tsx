@@ -1,6 +1,9 @@
 
 import { Heart, Share2 } from 'lucide-react';
 import { VisualQuoteDialog } from '../VisualQuoteDialog';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface QuoteActionsProps {
   handleShareClick: () => void;
@@ -19,6 +22,23 @@ export function QuoteActions({
   favoriteCount,
   quoteId
 }: QuoteActionsProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleFavoriteClick = () => {
+    if (!user) {
+      toast({
+        title: "Log In to add to favourites",
+        description: "Please sign in to save quotes to your favorites.",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+    toggleFavorite();
+  };
+
   return (
     <div className="flex justify-end gap-4 mt-6 pt-4 border-t border-border">
       <VisualQuoteDialog quoteId={quoteId} />
@@ -38,7 +58,7 @@ export function QuoteActions({
     
       <div className="flex items-center gap-2">
         <button
-          onClick={toggleFavorite}
+          onClick={handleFavoriteClick}
           className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
           aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
         >

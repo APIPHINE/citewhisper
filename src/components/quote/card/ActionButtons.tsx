@@ -3,6 +3,8 @@ import { Heart, Share2, ChevronDown, Edit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 interface ActionButtonsProps {
@@ -22,6 +24,8 @@ export function ActionButtons({
 }: ActionButtonsProps) {
   const { user } = useAuth();
   const { userRole, loadRole } = useUserRoles();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.id) {
@@ -34,6 +38,20 @@ export function ActionButtons({
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleExpanded(); // This will open the expanded view, and the edit button in the header will handle edit mode
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      toast({
+        title: "Log In to add to favourites",
+        description: "Please sign in to save quotes to your favorites.",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+    toggleFavorite();
   };
 
   return (
@@ -49,7 +67,7 @@ export function ActionButtons({
       )}
       {/* Favorite Button */}
       <button
-        onClick={toggleFavorite}
+        onClick={handleFavoriteClick}
         className="button-effect p-2 rounded-full bg-secondary/50 hover:bg-secondary transition-colors"
         aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
       >
