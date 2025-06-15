@@ -4,6 +4,8 @@ import { AnimatePresence } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
 import { Quote } from '../utils/quotesData';
 import { useToast } from '@/hooks/use-toast';
+import { ProtectedButton } from './auth/ProtectedButton';
+import { PermissionWrapper } from './auth/PermissionWrapper';
 import { QuoteCardMain } from './quote/QuoteCardMain';
 import { ExpandedQuoteCard } from './quote/ExpandedQuoteCard';
 import { incrementShareCount } from '@/services/quoteService';

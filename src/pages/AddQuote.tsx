@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
+import { useAccessControl } from '@/hooks/useAccessControl';
 import {
   Form,
   FormControl,
@@ -24,6 +25,13 @@ import { Link } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 
 const AddQuote = () => {
+  // Check access immediately - this will redirect if not authenticated
+  const { checkAccess } = useAccessControl();
+  
+  React.useEffect(() => {
+    checkAccess('add quotes');
+  }, []);
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const navigate = useNavigate();
   const { handleSubmit, isSubmitting } = useQuoteSubmission();

@@ -2,12 +2,20 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
+import { useAccessControl } from '@/hooks/useAccessControl';
 import QuoteCard from '../components/QuoteCard';
 import { Heart } from 'lucide-react';
 import { FavoriteQuotesCarousel } from '../components/quote/favorites/FavoriteQuotesCarousel';
 import { FavoriteQuoteActions } from '../components/quote/favorites/FavoriteQuoteActions';
 
 const Favorites = () => {
+  // Check access immediately - this will redirect if not authenticated
+  const { checkAccess } = useAccessControl();
+  
+  React.useEffect(() => {
+    checkAccess('view your favorites');
+  }, []);
+
   const { favorites } = useFavorites();
   const [anyExpanded, setAnyExpanded] = useState(false);
   
