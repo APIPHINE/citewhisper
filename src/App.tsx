@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,7 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { SearchProvider } from "./context/SearchContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import NavBar from "./components/NavBar";
-import Footer from "./components/Footer";
+import { Footer } from "./components/Footer";
 
 // Lazy load components
 const Index = lazy(() => import("./pages/Index"));

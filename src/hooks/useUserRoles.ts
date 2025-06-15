@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Database } from '@/integrations/supabase/types';
+import type { User } from '@supabase/supabase-js';
 
 type UserPrivilege = Database['public']['Enums']['user_privilege'];
 
@@ -80,13 +81,13 @@ export const useUserRoles = () => {
         return;
       }
 
-      // Get auth users (this might be limited by RLS)
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      // Get auth users with proper typing
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
 
       const usersWithRoles: UserWithRole[] = [];
 
-      if (authUsers && authUsers.users) {
-        authUsers.users.forEach(authUser => {
+      if (authData && authData.users) {
+        (authData.users as User[]).forEach(authUser => {
           const profile = profiles?.find(p => p.id === authUser.id);
           const role = roles?.find(r => r.user_id === authUser.id);
           
