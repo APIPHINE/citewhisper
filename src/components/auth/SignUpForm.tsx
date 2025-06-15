@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import DragDropCaptcha from './DragDropCaptcha';
+import { DragDropCaptcha } from './DragDropCaptcha';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -323,7 +322,7 @@ const SignUpForm = () => {
           {/* CAPTCHA */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Verification</Label>
-            <DragDropCaptcha onComplete={setCaptchaCompleted} />
+            <DragDropCaptcha onVerificationChange={setCaptchaCompleted} />
             {errors.captcha && (
               <p className="text-sm text-red-600 flex items-center gap-1">
                 <X size={14} />
