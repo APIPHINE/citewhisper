@@ -16,50 +16,95 @@ const EmailVerificationHandler = () => {
 
   useEffect(() => {
     const handleEmailVerification = async () => {
-      const token = searchParams.get('token');
-      const type = searchParams.get('type');
+      // Check for hash fragments (used by Supabase for auth redirects)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type');
       
-      if (!token || type !== 'signup') {
-        setVerificationState('error');
-        setMessage('Invalid verification link.');
-        return;
-      }
+      // Also check URL search params as fallback
+      const urlToken = searchParams.get('token');
+      const urlType = searchParams.get('type');
+      
+      if (accessToken && refreshToken && type === 'signup') {
+        // Handle auth token from URL hash
+        try {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
 
-      try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'signup'
-        });
-
-        if (error) {
+          if (error) {
+            setVerificationState('error');
+            setMessage(error.message);
+            toast({
+              title: "Verification failed",
+              description: error.message,
+              variant: "destructive"
+            });
+          } else {
+            setVerificationState('success');
+            setMessage('Your email has been verified successfully!');
+            toast({
+              title: "Email verified",
+              description: "Welcome! Your account is now active."
+            });
+            
+            // Redirect to home after a short delay
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
+          }
+        } catch (err) {
           setVerificationState('error');
-          setMessage(error.message);
+          setMessage('An unexpected error occurred during verification.');
           toast({
             title: "Verification failed",
-            description: error.message,
+            description: "An unexpected error occurred.",
             variant: "destructive"
           });
-        } else {
-          setVerificationState('success');
-          setMessage('Your email has been verified successfully!');
-          toast({
-            title: "Email verified",
-            description: "Welcome! Your account is now active."
-          });
-          
-          // Redirect to home after a short delay
-          setTimeout(() => {
-            navigate('/');
-          }, 2000);
         }
-      } catch (err) {
+      } else if (urlToken && urlType === 'signup') {
+        // Handle legacy token verification
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: urlToken,
+            type: 'signup'
+          });
+
+          if (error) {
+            setVerificationState('error');
+            setMessage(error.message);
+            toast({
+              title: "Verification failed",
+              description: error.message,
+              variant: "destructive"
+            });
+          } else {
+            setVerificationState('success');
+            setMessage('Your email has been verified successfully!');
+            toast({
+              title: "Email verified",
+              description: "Welcome! Your account is now active."
+            });
+            
+            // Redirect to home after a short delay
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
+          }
+        } catch (err) {
+          setVerificationState('error');
+          setMessage('An unexpected error occurred during verification.');
+          toast({
+            title: "Verification failed",
+            description: "An unexpected error occurred.",
+            variant: "destructive"
+          });
+        }
+      } else {
         setVerificationState('error');
-        setMessage('An unexpected error occurred during verification.');
-        toast({
-          title: "Verification failed",
-          description: "An unexpected error occurred.",
-          variant: "destructive"
-        });
+        setMessage('Invalid verification link.');
       }
     };
 

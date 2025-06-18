@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,12 +12,28 @@ import { useToast } from '@/hooks/use-toast';
 const ResetPasswordForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Check if we have the required tokens from the URL
+  useEffect(() => {
+    const accessToken = searchParams.get('access_token');
+    const refreshToken = searchParams.get('refresh_token');
+    
+    if (!accessToken || !refreshToken) {
+      toast({
+        title: "Invalid reset link",
+        description: "This password reset link is invalid or has expired.",
+        variant: "destructive"
+      });
+      navigate('/forgot-password');
+    }
+  }, [searchParams, toast, navigate]);
 
   // Password validation
   const hasPasswordRequirements = password.length >= 6;
