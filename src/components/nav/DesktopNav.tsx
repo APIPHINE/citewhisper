@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PlusCircle, Shield } from 'lucide-react';
+import { PlusCircle, Shield, Newspaper } from 'lucide-react';
 import { useUserRoles } from '@/hooks/useUserRoles';
 
 const routePaths = [
   { name: 'Home', path: '/' },
+  { name: 'Research', path: '/research', icon: Newspaper }, // New link
   { name: 'Quotes', path: '/quotes' },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Favorites', path: '/favorites' },

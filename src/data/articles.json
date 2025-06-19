@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "getting-started-with-react",
+    "title": "Getting Started with React",
+    "previewImage": "/placeholder.svg",
+    "excerpt": "A beginner-friendly guide to understanding the basics of React.",
+    "categoryTags": ["JavaScript", "React", "Web Development"],
+    "fullContent": "This is the full content for 'Getting Started with React'. It would contain detailed explanations, code examples, and more. For now, this is placeholder text. Imagine a comprehensive tutorial here."
+  },
+  {
+    "slug": "advanced-typescript-tricks",
+    "title": "Advanced TypeScript Tricks",
+    "previewImage": "/placeholder.svg",
+    "excerpt": "Discover some powerful and lesser-known features of TypeScript.",
+    "categoryTags": ["TypeScript", "JavaScript", "Programming"],
+    "fullContent": "Full content for 'Advanced TypeScript Tricks'. This article would dive deep into generics, decorators, conditional types, and other advanced topics. This placeholder will suffice for now."
+  },
+  {
+    "slug": "styling-in-modern-web-apps",
+    "title": "Styling in Modern Web Apps",
+    "previewImage": "/placeholder.svg",
+    "excerpt": "An overview of different approaches to styling, from CSS-in-JS to utility classes.",
+    "categoryTags": ["CSS", "Web Design", "Frontend"],
+    "fullContent": "The complete text for 'Styling in Modern Web Apps'. It would discuss various libraries, pros and cons, and best practices. For demonstration purposes, this text is a placeholder."
+  }
+]
