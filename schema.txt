@@ -1,6 +1,6 @@
 
 # CiteQuotes Database Schema Documentation
-# Generated: 2025-01-19 (Updated with Security Enhancements)
+# Generated: 2025-01-19 (Updated with Current Implementation)
 # Database: Supabase PostgreSQL
 # Project: yrafjktkkspcptkcaowj
 
@@ -19,17 +19,28 @@ historical attribution and evidence-based sourcing. The database is designed to:
 - Store original source documents and references
 - Generate content variations and paraphrases
 - Integrate with IIIF viewers for manuscript examination
+- Handle evidence image uploads with proper attribution
 
-**SECURITY UPDATE**: All tables now have comprehensive Row Level Security (RLS)
+**SECURITY STATUS**: All tables have comprehensive Row Level Security (RLS)
 policies implemented to ensure proper data access control and prevent unauthorized
 modifications.
+
+================================================================================
+STORAGE CONFIGURATION
+================================================================================
+
+**Storage Buckets:**
+- `quote_evidence` - Stores evidence images for quote submissions with attribution metadata
+  - Public access enabled for reading uploaded evidence
+  - Authenticated users can upload files
+  - Files include metadata for fair use and attribution
 
 ================================================================================
 SECURITY IMPLEMENTATION
 ================================================================================
 
 **Row Level Security (RLS) Status:**
-- ALL tables now have RLS enabled
+- ALL tables have RLS enabled
 - Write operations require authentication for all content tables
 - Admin-only operations are protected by privilege checking functions
 - Audit logging implemented for all administrative actions
@@ -37,7 +48,7 @@ SECURITY IMPLEMENTATION
 **Authentication Requirements:**
 - All write operations require authenticated users
 - Admin operations require verified admin/super_admin privileges
-- Rate limiting implemented on sensitive operations
+- Rate limiting implemented on sensitive operations (5 quote submissions/min)
 - Input validation and sanitization on all user inputs
 
 **Privilege Hierarchy:**
@@ -78,9 +89,9 @@ Constraints:
 
 RLS Status: ENABLED
 Policies:
-- "Users can view all profiles" (SELECT) - USING (true)
-- "Users can update their own profile" (UPDATE) - USING (auth.uid() = id)
-- "Users can insert their own profile" (INSERT) - WITH CHECK (auth.uid() = id)
+- "Users can view all profiles" (SELECT) - Public read access
+- "Users can update their own profile" (UPDATE) - Self-modification only
+- "Users can insert their own profile" (INSERT) - Self-creation only
 
 2. USER_ROLES TABLE
 ------------------
@@ -89,7 +100,7 @@ Purpose: User privilege management and role assignment
 
 Columns:
 - id              | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT gen_random_uuid()
-- user_id         | uuid                     | NOT NULL
+- user_id         | uuid                     | NOT NULL, UNIQUE
 - privilege       | user_privilege           | NOT NULL, DEFAULT 'user'::user_privilege
 - assigned_by     | uuid                     | NULLABLE
 - assigned_at     | timestamp with time zone | NOT NULL, DEFAULT now()
@@ -104,13 +115,13 @@ Constraints:
 
 RLS Status: ENABLED
 Policies:
-- "Users can view their own role" (SELECT) - USING (auth.uid() = user_id)
-- "Admins can view all roles" (SELECT) - USING (public.has_privilege_level(auth.uid(), 'admin'))
-- "Super admins can manage all roles" (ALL) - USING/WITH CHECK (public.has_privilege_level(auth.uid(), 'super_admin'))
-- "Admins can manage lower roles" (UPDATE) - Complex policy for admin role management
+- "Users can view their own role" (SELECT) - Self-access only
+- "Admins can view all roles" (SELECT) - Admin privilege required
+- "Super admins can manage all roles" (ALL) - Super admin privilege required
+- "Admins can manage lower roles" (UPDATE) - Complex hierarchy enforcement
 
-3. ADMIN_AUDIT_LOG TABLE (NEW)
------------------------------
+3. ADMIN_AUDIT_LOG TABLE
+-----------------------
 Table: public.admin_audit_log
 Purpose: Security audit logging for administrative actions
 
@@ -130,8 +141,8 @@ Constraints:
 
 RLS Status: ENABLED
 Policies:
-- "Admins can view audit logs" (SELECT) - USING (public.has_privilege_level(auth.uid(), 'admin'))
-- "System can insert audit logs" (INSERT) - WITH CHECK (true)
+- "Admins can view audit logs" (SELECT) - Admin privilege required
+- "System can insert audit logs" (INSERT) - System-level logging
 
 4. QUOTES TABLE
 --------------
@@ -155,11 +166,11 @@ Constraints:
 - PRIMARY KEY (id)
 - FOREIGN KEY (source_id) REFERENCES original_sources(id)
 
-RLS Status: ENABLED (Updated)
+RLS Status: ENABLED
 Policies:
-- Public read access for all quotes
-- "Authenticated users can create quotes" (INSERT) - TO authenticated WITH CHECK (true)
-- "Authenticated users can update quotes" (UPDATE) - TO authenticated USING (true)
+- "Enable read access for all users" (SELECT) - Public read access
+- "Authenticated users can create quotes" (INSERT) - Requires authentication
+- "Authenticated users can update quotes" (UPDATE) - Requires authentication
 
 5. ORIGINAL_SOURCES TABLE
 ------------------------
@@ -184,11 +195,11 @@ Columns:
 Constraints:
 - PRIMARY KEY (id)
 
-RLS Status: ENABLED (New)
+RLS Status: ENABLED
 Policies:
-- "Anyone can view original sources" (SELECT) - USING (true)
-- "Authenticated users can create original sources" (INSERT) - TO authenticated WITH CHECK (true)
-- "Authenticated users can update original sources" (UPDATE) - TO authenticated USING (true)
+- "Anyone can view original sources" (SELECT) - Public read access
+- "Authenticated users can create original sources" (INSERT) - Requires authentication
+- "Authenticated users can update original sources" (UPDATE) - Requires authentication
 
 6. TOPICS TABLE
 --------------
@@ -203,10 +214,10 @@ Columns:
 Constraints:
 - PRIMARY KEY (id)
 
-RLS Status: ENABLED (New)
+RLS Status: ENABLED
 Policies:
-- "Anyone can view topics" (SELECT) - USING (true)
-- "Admins can manage topics" (ALL) - TO authenticated USING/WITH CHECK (public.has_privilege_level(auth.uid(), 'admin'))
+- "Anyone can view topics" (SELECT) - Public read access
+- "Admins can manage topics" (ALL) - Admin privilege required for modifications
 
 7. IIIF_MANIFESTS TABLE
 -----------------------
@@ -223,42 +234,60 @@ Columns:
 Constraints:
 - PRIMARY KEY (id)
 
-RLS Status: ENABLED (New)
+RLS Status: ENABLED
 Policies:
-- "Anyone can view IIIF manifests" (SELECT) - USING (true)
-- "Admins can manage IIIF manifests" (ALL) - TO authenticated USING/WITH CHECK (public.has_privilege_level(auth.uid(), 'admin'))
+- "Anyone can view IIIF manifests" (SELECT) - Public read access
+- "Admins can manage IIIF manifests" (ALL) - Admin privilege required for modifications
 
-[Additional tables continue with similar RLS policy implementations...]
+8. ADDITIONAL TABLES
+-------------------
+
+**quote_genconten** - Generated content variations
+RLS: Public read, authenticated write
+
+**quote_paraphrases** - Quote paraphrases and variations
+RLS: Public read, authenticated write
+
+**cited_by** - Citation tracking across websites
+RLS: Public read, authenticated write
+
+**quote_topics** - Many-to-many relationship between quotes and topics
+RLS: Public read, authenticated write
+
+**translations** - Multi-language quote translations
+RLS: Public read, authenticated write
 
 ================================================================================
-SECURITY FUNCTIONS (NEW)
+SECURITY FUNCTIONS
 ================================================================================
 
-1. secure_update_user_privilege(target_user_id uuid, new_privilege user_privilege, admin_user_id uuid)
-   Purpose: Securely update user privileges with proper authorization and audit logging
-   Security: DEFINER, validates privilege hierarchy, logs all actions
-   
-2. get_users_for_admin(requesting_user_id uuid)
-   Purpose: Safely retrieve user list for admin interface without exposing sensitive auth data
-   Security: DEFINER, requires admin privileges, joins with profiles table
+1. **secure_update_user_privilege**(target_user_id, new_privilege, admin_user_id)
+   - Purpose: Securely update user privileges with proper authorization
+   - Security: DEFINER, validates privilege hierarchy, logs all actions
+   - Returns: boolean indicating success/failure
 
-3. get_user_privilege(user_id uuid) RETURNS user_privilege
-   Purpose: Get the privilege level for a specific user
-   Security: DEFINER, STABLE
-   
-4. has_privilege_level(user_id uuid, required_level user_privilege) RETURNS boolean
-   Purpose: Check if user has specified privilege level or higher
-   Security: DEFINER, STABLE
+2. **get_users_for_admin**(requesting_user_id)
+   - Purpose: Safely retrieve user list for admin interface
+   - Security: DEFINER, requires admin privileges
+   - Returns: Table of user data with privileges
+
+3. **get_user_privilege**(user_id) RETURNS user_privilege
+   - Purpose: Get the privilege level for a specific user
+   - Security: DEFINER, STABLE
+
+4. **has_privilege_level**(user_id, required_level) RETURNS boolean
+   - Purpose: Check if user has specified privilege level or higher
+   - Security: DEFINER, STABLE
 
 ================================================================================
 SECURITY BEST PRACTICES IMPLEMENTED
 ================================================================================
 
 1. **Input Validation & Sanitization:**
-   - Server-side validation for all user inputs
-   - XSS prevention through HTML encoding
+   - Server-side validation using Zod schemas
+   - XSS prevention through content sanitization
    - SQL injection prevention through parameterized queries
-   - URL validation and protocol restrictions
+   - URL validation and protocol restrictions (HTTP/HTTPS only)
 
 2. **Rate Limiting:**
    - Quote submission: 5 per minute per user
@@ -280,14 +309,25 @@ SECURITY BEST PRACTICES IMPLEMENTED
    - Session validation on sensitive operations
    - Proper error handling without information disclosure
 
+6. **File Upload Security:**
+   - Evidence images stored with attribution metadata
+   - Fair use justification included
+   - Controlled access through storage policies
+
 ================================================================================
-MIGRATION HISTORY
+API INTEGRATION
 ================================================================================
 
-Initial migrations:
-- 20250615053803: User profiles and authentication setup
-- 20250615104009: User roles and privilege system
-- 20250119: Security enhancement migration (RLS policies, audit logging, secure functions)
+**Secure Quote Creation:**
+- Uses `createQuote()` function with comprehensive validation
+- Rate limiting and authentication checks
+- Input sanitization and XSS prevention
+- Attribution metadata for uploaded images
+
+**User Role Management:**
+- Secure functions for privilege updates
+- Audit logging for all admin actions
+- Proper hierarchy enforcement
 
 ================================================================================
 END OF SCHEMA DOCUMENTATION
