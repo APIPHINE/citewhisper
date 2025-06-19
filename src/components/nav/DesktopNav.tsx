@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PlusCircle, Shield, Search, Users } from 'lucide-react';
+import { PlusCircle, Shield, Search, Users, BookOpen } from 'lucide-react';
 import { useUserRoles } from '@/hooks/useUserRoles';
 
 const routePaths = [
@@ -9,7 +9,7 @@ const routePaths = [
   { name: 'Quotes', path: '/quotes' },
   { name: 'Research', path: '/research', icon: Search },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
-  { name: 'Friends', path: '/friends', icon: Users },
+  { name: 'Resources', path: '/resources', icon: BookOpen },
   { name: 'Favorites', path: '/favorites' },
   { name: 'Tools', path: '/tools' }
 ];

@@ -22,7 +22,7 @@ const FairUsePolicy = lazy(() => import("./pages/FairUsePolicy"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const Research = lazy(() => import("./pages/Research"));
-const Friends = lazy(() => import("./pages/Friends"));
+const Resources = lazy(() => import("./pages/Resources"));
 const WhySourcingMatters = lazy(() => import("./pages/blog/WhySourcingMatters"));
 const EvidenceAndOpenMindedness = lazy(() => import("./pages/blog/EvidenceAndOpenMindedness"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -57,7 +57,7 @@ const App = () => (
                       <Route path="/tools" element={<Tools />} />
                       <Route path="/tools/iiif-viewer" element={<IIIFViewer />} />
                       <Route path="/research" element={<Research />} />
-                      <Route path="/friends" element={<Friends />} />
+                      <Route path="/resources" element={<Resources />} />
                       <Route path="/fair-use" element={<FairUsePolicy />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfService />} />
