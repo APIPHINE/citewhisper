@@ -12,6 +12,7 @@ import NavBar from "./components/NavBar";
 import { Footer } from "./components/Footer";
 
 // Lazy load components
+const Home = lazy(() => import("./pages/Home"));
 const Index = lazy(() => import("./pages/Index"));
 const AddQuote = lazy(() => import("./pages/AddQuote"));
 const Favorites = lazy(() => import("./pages/Favorites"));
@@ -20,6 +21,8 @@ const IIIFViewer = lazy(() => import("./pages/tools/IIIFViewer"));
 const FairUsePolicy = lazy(() => import("./pages/FairUsePolicy"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Research = lazy(() => import("./pages/Research"));
+const Friends = lazy(() => import("./pages/Friends"));
 const WhySourcingMatters = lazy(() => import("./pages/blog/WhySourcingMatters"));
 const EvidenceAndOpenMindedness = lazy(() => import("./pages/blog/EvidenceAndOpenMindedness"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -47,12 +50,14 @@ const App = () => (
                 <main className="flex-1">
                   <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
                     <Routes>
-                      <Route path="/" element={<Index />} />
+                      <Route path="/" element={<Home />} />
                       <Route path="/quotes" element={<Index />} />
                       <Route path="/add-quote" element={<AddQuote />} />
                       <Route path="/favorites" element={<Favorites />} />
                       <Route path="/tools" element={<Tools />} />
                       <Route path="/tools/iiif-viewer" element={<IIIFViewer />} />
+                      <Route path="/research" element={<Research />} />
+                      <Route path="/friends" element={<Friends />} />
                       <Route path="/fair-use" element={<FairUsePolicy />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfService />} />

@@ -1,5 +1,5 @@
 
-import { ArrowRight, BookOpen, Search, Shield } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,113 +25,118 @@ const Home = () => {
             />
           </motion.div>
 
-          {/* Hero Section */}
+          {/* Mission Statement */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center justify-center mb-4 bg-secondary/80 text-foreground px-4 py-2 rounded-full text-sm">
-              <Shield size={16} className="mr-2" /> Reliable Quotations
-            </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">CiteQuotes</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Find, verify, and share accurate quotations with proper attribution. 
-              Because words matter, and so does who said them.
-            </p>
-            <Link to="/quotes">
-              <Button size="lg" className="group">
-                Find the perfect quote
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+            <div className="max-w-3xl mx-auto mb-8">
+              <p className="text-xl font-medium mb-4">
+                Our mission is to quote history accurately.
+              </p>
+              <p className="text-lg text-muted-foreground">
+                At CiteQuotes, we believe that honesty, reputation, and evidence matter in the elusive pursuit of truth. 
+                If that matters to you — this site is for you.
+              </p>
+            </div>
           </motion.div>
 
-          {/* Facts Section */}
+          {/* Development Notice */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-16"
           >
-            <h2 className="text-3xl font-bold mb-8 text-center">Did you know?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-secondary/30">
+            <Card className="bg-secondary/30 border-dashed">
+              <CardContent className="pt-6 text-center">
+                <h2 className="text-2xl font-bold mb-4">Welcome to CiteQuotes</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  CiteQuotes is in active development. We're currently refining how quotes are sourced, verified, and contextualized. 
+                  The quote library is intentionally minimal while we finalize our system. We welcome your feedback and suggestions.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Call to Action */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mb-16"
+          >
+            <h2 className="text-3xl font-bold mb-8 text-center">Get Involved</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              <Card className="text-center hover:shadow-md transition-shadow">
                 <CardContent className="pt-6">
-                  <h3 className="text-xl font-semibold mb-3">Misattributed Quotes</h3>
-                  <p className="text-muted-foreground">
-                    Research suggests that over 65% of popular quotations online are misattributed 
-                    or significantly altered from their original form.
+                  <Users className="h-12 w-12 mx-auto mb-4 text-accent" />
+                  <h3 className="text-xl font-semibold mb-3">Register</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Join our community of truth-seekers and quote enthusiasts.
                   </p>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
                 </CardContent>
               </Card>
-              <Card className="bg-secondary/30">
+              
+              <Card className="text-center hover:shadow-md transition-shadow">
                 <CardContent className="pt-6">
-                  <h3 className="text-xl font-semibold mb-3">Digital Distortion</h3>
-                  <p className="text-muted-foreground">
-                    In the age of social media, quotations can transform and lose attribution 
-                    within just 48 hours of becoming popular.
+                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-accent" />
+                  <h3 className="text-xl font-semibold mb-3">Follow the Project</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Stay updated on our research, investigations, and new features.
                   </p>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/research">View Research</Link>
+                  </Button>
                 </CardContent>
               </Card>
-              <Card className="bg-secondary/30">
+              
+              <Card className="text-center hover:shadow-md transition-shadow">
                 <CardContent className="pt-6">
-                  <h3 className="text-xl font-semibold mb-3">Citation Impact</h3>
-                  <p className="text-muted-foreground">
-                    Properly cited quotes increase content credibility by 83% according to 
-                    reader trust studies.
+                  <PlusCircle className="h-12 w-12 mx-auto mb-4 text-accent" />
+                  <h3 className="text-xl font-semibold mb-3">Suggest a Quote</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Help us build the library with verified quotes or corrections.
                   </p>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/add-quote">Add Quote</Link>
+                  </Button>
                 </CardContent>
               </Card>
             </div>
           </motion.div>
 
-          {/* Articles Section */}
+          {/* Section Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="text-center"
           >
-            <h2 className="text-3xl font-bold mb-8 text-center">Learn More</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="overflow-hidden hover:shadow-md transition-shadow group">
-                <CardContent className="p-6">
-                  <BookOpen className="h-10 w-10 mb-4 text-accent" />
-                  <h3 className="text-xl font-semibold mb-2">Why Sourcing Matters</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Explore how proper attribution strengthens arguments, honors intellectual property, 
-                    and builds a foundation for meaningful discourse.
-                  </p>
-                  <Link 
-                    to="/blog/why-sourcing-matters"
-                    className="inline-flex items-center text-accent hover:underline"
-                  >
-                    Read article <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </CardContent>
-              </Card>
-              <Card className="overflow-hidden hover:shadow-md transition-shadow group">
-                <CardContent className="p-6">
-                  <Search className="h-10 w-10 mb-4 text-accent" />
-                  <h3 className="text-xl font-semibold mb-2">Balancing Evidence and Open-mindedness</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Learn about the delicate balance between evidence-based reasoning and maintaining 
-                    an open mind to new possibilities and interpretations.
-                  </p>
-                  <Link 
-                    to="/blog/evidence-and-open-mindedness"
-                    className="inline-flex items-center text-accent hover:underline"
-                  >
-                    Read article <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </CardContent>
-              </Card>
+            <h2 className="text-3xl font-bold mb-8">Explore CiteQuotes</h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
+              <Button asChild size="lg" className="group flex-1">
+                <Link to="/quotes">
+                  Explore All Quotes
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="group flex-1">
+                <Link to="/research">
+                  Quote Research & Investigations
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
             </div>
           </motion.div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
