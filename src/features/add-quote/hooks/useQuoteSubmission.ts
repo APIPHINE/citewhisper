@@ -1,12 +1,14 @@
 
 import { useToast } from '@/hooks/use-toast';
-import type { Quote } from '@/utils/quotesData';
+import { useAuth } from '@/context/AuthContext';
 import type { QuoteFormValues } from '@/utils/formSchemas';
 import { createQuote, uploadEvidenceImage } from '@/services/quoteService';
+import type { QuoteSubmissionData } from '@/services/quotesApi/createQuote';
 import { useState } from 'react';
 
 export function useQuoteSubmission() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (data: QuoteFormValues, evidenceImage?: File) => {
@@ -14,10 +16,19 @@ export function useQuoteSubmission() {
     try {
       console.log('Submitting quote with form data:', data);
       
+      // Check authentication
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to submit quotes.",
+          variant: "destructive"
+        });
+        return null;
+      }
+
       // Upload evidence image if provided
       let evidenceImageUrl = data.sourceUrl || '';
       if (evidenceImage) {
-        // Prepare attribution metadata for the image
         const attributionMetadata: Record<string, any> = {
           quoteAuthor: data.author,
           quoteSource: data.source,
@@ -38,75 +49,38 @@ export function useQuoteSubmission() {
         }
       }
 
-      const quoteData: Partial<Quote> = {
-        text: data.text,
-        author: data.author,
-        date: data.date || new Date().toISOString().split('T')[0],
-        topics: data.topics || [],
-        theme: data.theme || '',
-        source: data.source,
-        sourceUrl: data.sourceUrl,
-        evidenceImage: evidenceImageUrl,
-        sourcePublicationDate: data.sourcePublicationDate,
-        originalLanguage: data.originalLanguage,
-        originalText: data.originalText,
-        context: data.context,
-        historicalContext: data.historicalContext,
-        keywords: data.keywords,
-        emotionalTone: data.emotionalTone,
-        exportFormats: {
-          json: true,
-          csv: true,
-          cff: true
-        },
-        shareCount: 0
+      // Map form data to QuoteSubmissionData format
+      const quoteData: QuoteSubmissionData = {
+        quote_text: data.text,
+        author_name: data.author,
+        date_original: data.date || undefined,
+        quote_context: data.context || undefined,
+        source_title: data.source || undefined,
+        source_url: evidenceImageUrl || data.sourceUrl || undefined,
+        topics: data.topics || undefined
       };
 
-      // Map original source if provided
-      if (data.originalSource) {
-        quoteData.originalSource = {
-          title: data.originalSource.title || '',
-          publisher: data.originalSource.publisher || '',
-          publicationDate: data.originalSource.publicationDate || '',
-          location: data.originalSource.location || '',
-          isbn: data.originalSource.isbn || '',
-          sourceUrl: data.originalSource.sourceUrl || ''
-        };
-      }
-
-      // Map translations if provided
-      if (data.translations && data.translations.length > 0) {
-        quoteData.translations = data.translations.map(trans => ({
-          language: trans.language,
-          text: trans.text,
-          source: trans.source,
-          translator: trans.translator,
-          publication: trans.publication,
-          publicationDate: trans.publicationDate,
-          sourceUrl: trans.sourceUrl
-        }));
-      }
-
-      console.log('Sending quote data to Supabase:', quoteData);
-      // Send to Supabase
-      const newQuote = await createQuote(quoteData);
+      console.log('Sending quote data to secure createQuote:', quoteData);
       
-      if (!newQuote) {
-        throw new Error('Failed to create quote');
+      // Call the secure createQuote function
+      const result = await createQuote(quoteData, user.id);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create quote');
       }
 
-      console.log('Quote created successfully:', newQuote);
+      console.log('Quote created successfully with ID:', result.quoteId);
       toast({
         title: "Quote Submitted",
         description: "Your quote has been submitted successfully.",
       });
 
-      return newQuote;
+      return { id: result.quoteId };
     } catch (error) {
       console.error('Error submitting quote:', error);
       toast({
         title: "Submission Failed",
-        description: "There was an error submitting your quote. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error submitting your quote. Please try again.",
         variant: "destructive"
       });
       return null;
