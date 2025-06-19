@@ -1,0 +1,429 @@
+
+# CiteQuotes Database Schema Documentation
+# Generated: 2025-01-19
+# Database: Supabase PostgreSQL
+# Project: yrafjktkkspcptkcaowj
+
+================================================================================
+DATABASE OVERVIEW
+================================================================================
+
+CiteQuotes is a quote verification and research platform that focuses on accurate
+historical attribution and evidence-based sourcing. The database is designed to:
+
+- Store verified quotes with proper attribution and context
+- Manage user roles and privileges for content moderation
+- Support multi-language translations of quotes
+- Track quote usage and citations across the web
+- Organize quotes by topics and themes
+- Store original source documents and references
+- Generate content variations and paraphrases
+- Integrate with IIIF viewers for manuscript examination
+
+================================================================================
+ENUMS
+================================================================================
+
+user_privilege:
+  Values: 'user', 'moderator', 'admin', 'super_admin'
+  Purpose: Hierarchical privilege system for access control
+
+================================================================================
+TABLES STRUCTURE
+================================================================================
+
+1. PROFILES TABLE
+----------------
+Table: public.profiles
+Purpose: User profile information and metadata
+
+Columns:
+- id              | uuid                     | NOT NULL, PRIMARY KEY
+- username        | text                     | NULLABLE, UNIQUE
+- full_name       | text                     | NULLABLE
+- avatar_url      | text                     | NULLABLE
+- created_at      | timestamp with time zone | NOT NULL, DEFAULT now()
+- updated_at      | timestamp with time zone | NOT NULL, DEFAULT now()
+
+Constraints:
+- PRIMARY KEY (id)
+- UNIQUE (username)
+- FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+
+RLS Status: ENABLED
+Policies:
+- "Users can view all profiles" (SELECT) - USING (true)
+- "Users can update their own profile" (UPDATE) - USING (auth.uid() = id)
+- "Users can insert their own profile" (INSERT) - WITH CHECK (auth.uid() = id)
+
+2. USER_ROLES TABLE
+------------------
+Table: public.user_roles
+Purpose: User privilege management and role assignment
+
+Columns:
+- id              | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT gen_random_uuid()
+- user_id         | uuid                     | NOT NULL
+- privilege       | user_privilege           | NOT NULL, DEFAULT 'user'::user_privilege
+- assigned_by     | uuid                     | NULLABLE
+- assigned_at     | timestamp with time zone | NOT NULL, DEFAULT now()
+- updated_at      | timestamp with time zone | NOT NULL, DEFAULT now()
+- display_name    | text                     | NULLABLE
+
+Constraints:
+- PRIMARY KEY (id)
+- UNIQUE (user_id)
+- FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+- FOREIGN KEY (assigned_by) REFERENCES auth.users(id)
+
+RLS Status: ENABLED
+Policies:
+- "Users can view their own role" (SELECT) - USING (auth.uid() = user_id)
+- "Admins can view all roles" (SELECT) - USING (public.has_privilege_level(auth.uid(), 'admin'))
+- "Super admins can manage all roles" (ALL) - USING/WITH CHECK (public.has_privilege_level(auth.uid(), 'super_admin'))
+- "Admins can manage lower roles" (UPDATE) - Complex policy for admin role management
+
+3. QUOTES TABLE
+--------------
+Table: public.quotes
+Purpose: Main quotes storage with metadata and context
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT gen_random_uuid()
+- quote_text            | text                     | NOT NULL
+- author_name           | text                     | NULLABLE
+- date_original         | date                     | NULLABLE
+- quote_context         | text                     | NULLABLE
+- quote_image_url       | text                     | NULLABLE
+- source_id             | uuid                     | NULLABLE
+- seo_keywords          | text[]                   | NULLABLE
+- seo_slug              | text                     | NULLABLE
+- inserted_at           | timestamp with time zone | NULLABLE, DEFAULT now()
+- updated_at            | timestamp with time zone | NULLABLE, DEFAULT now()
+
+Constraints:
+- PRIMARY KEY (id)
+- FOREIGN KEY (source_id) REFERENCES original_sources(id)
+
+RLS Status: DISABLED (Public read access)
+
+4. ORIGINAL_SOURCES TABLE
+------------------------
+Table: public.original_sources
+Purpose: Source documents and attribution information
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT extensions.uuid_generate_v4()
+- title                 | text                     | NULLABLE
+- author                | text                     | NULLABLE
+- publisher             | text                     | NULLABLE
+- publication_year      | text                     | NULLABLE
+- edition               | text                     | NULLABLE
+- source_type           | text                     | NULLABLE
+- archive_url           | text                     | NULLABLE
+- page_reference        | text                     | NULLABLE
+- language              | text                     | NULLABLE
+- notes                 | text                     | NULLABLE
+- verified_by           | text                     | NULLABLE
+- created_at            | timestamp with time zone | NULLABLE, DEFAULT now()
+
+Constraints:
+- PRIMARY KEY (id)
+
+RLS Status: DISABLED (Public read access)
+
+5. TRANSLATIONS TABLE
+--------------------
+Table: public.translations
+Purpose: Multi-language translations of quotes
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT gen_random_uuid()
+- quote_id              | uuid                     | NULLABLE
+- language              | text                     | NOT NULL
+- translated_text       | text                     | NOT NULL
+- translator            | text                     | NULLABLE
+- translator_name       | text                     | NULLABLE
+- source                | text                     | NULLABLE
+- source_reference      | text                     | NULLABLE
+- source_url            | text                     | NULLABLE
+- publication           | text                     | NULLABLE
+- publication_date      | date                     | NULLABLE
+- translation_notes     | text                     | NULLABLE
+
+Constraints:
+- PRIMARY KEY (id)
+- FOREIGN KEY (quote_id) REFERENCES quotes(id)
+
+RLS Status: DISABLED (Public read access)
+
+6. TOPICS TABLE
+--------------
+Table: public.topics
+Purpose: Topic/theme categorization system
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT extensions.uuid_generate_v4()
+- topic_name            | text                     | NULLABLE
+- seo_slug              | text                     | NULLABLE
+
+Constraints:
+- PRIMARY KEY (id)
+
+RLS Status: DISABLED (Public read access)
+
+7. QUOTE_TOPICS TABLE
+--------------------
+Table: public.quote_topics
+Purpose: Many-to-many relationship between quotes and topics
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT extensions.uuid_generate_v4()
+- quote_id              | uuid                     | NOT NULL
+- topic_id              | uuid                     | NOT NULL
+
+Constraints:
+- PRIMARY KEY (id)
+- FOREIGN KEY (quote_id) REFERENCES quotes(id)
+- FOREIGN KEY (topic_id) REFERENCES topics(id)
+
+RLS Status: DISABLED (Public read access)
+
+8. QUOTE_GENCONTEN TABLE
+-----------------------
+Table: public.quote_genconten
+Purpose: Generated content and media for quotes
+
+Columns:
+- id                         | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT extensions.uuid_generate_v4()
+- quote_id                   | uuid                     | NOT NULL
+- language                   | text                     | NULLABLE
+- style_description          | text                     | NULLABLE
+- image_url                  | text                     | NULLABLE
+- audio_url                  | text                     | NULLABLE
+- transcript_or_caption_url  | text                     | NULLABLE
+- alt_text                   | text                     | NULLABLE
+- seo_keywords               | text[]                   | NULLABLE
+- seo_slug                   | text                     | NULLABLE
+- audio_voice_style          | text                     | NULLABLE
+- academic_citation_style    | text                     | NULLABLE
+- created_at                 | timestamp with time zone | NULLABLE, DEFAULT now()
+
+Constraints:
+- PRIMARY KEY (id)
+- FOREIGN KEY (quote_id) REFERENCES quotes(id)
+
+RLS Status: DISABLED (Public read access)
+
+9. QUOTE_PARAPHRASES TABLE
+-------------------------
+Table: public.quote_paraphrases
+Purpose: Alternative phrasings and paraphrases of quotes
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT extensions.uuid_generate_v4()
+- quote_id              | uuid                     | NOT NULL
+- paraphrase_text       | text                     | NOT NULL
+- paraphrase_type       | text                     | NULLABLE
+- language              | text                     | NOT NULL
+- audience_context      | text                     | NULLABLE
+- creator_name          | text                     | NULLABLE
+- created_at            | timestamp with time zone | NULLABLE, DEFAULT now()
+
+Constraints:
+- PRIMARY KEY (id)
+- FOREIGN KEY (quote_id) REFERENCES quotes(id)
+
+RLS Status: DISABLED (Public read access)
+
+10. CITED_BY TABLE
+-----------------
+Table: public.cited_by
+Purpose: Track where quotes are cited or embedded across the web
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT gen_random_uuid()
+- quote_id              | uuid                     | NULLABLE
+- site_name             | text                     | NOT NULL
+- site_url              | text                     | NOT NULL
+- embed_date            | date                     | NOT NULL
+
+Constraints:
+- PRIMARY KEY (id)
+- FOREIGN KEY (quote_id) REFERENCES quotes(id)
+
+RLS Status: DISABLED (Public read access)
+
+11. IIIF_MANIFESTS TABLE
+-----------------------
+Table: public.iiif_manifests
+Purpose: IIIF manifest URLs for manuscript viewing
+
+Columns:
+- id                    | uuid                     | NOT NULL, PRIMARY KEY, DEFAULT gen_random_uuid()
+- title                 | text                     | NOT NULL
+- manifest_url          | text                     | NOT NULL
+- host_name             | text                     | NOT NULL
+- created_at            | timestamp with time zone | NOT NULL, DEFAULT now()
+
+Constraints:
+- PRIMARY KEY (id)
+
+RLS Status: DISABLED (Public read access)
+
+================================================================================
+DATABASE FUNCTIONS
+================================================================================
+
+1. get_user_privilege(user_id uuid) RETURNS user_privilege
+   Purpose: Get the privilege level for a specific user
+   Security: DEFINER, STABLE
+   
+2. has_privilege_level(user_id uuid, required_level user_privilege) RETURNS boolean
+   Purpose: Check if user has specified privilege level or higher
+   Security: DEFINER, STABLE
+   
+3. handle_new_user() RETURNS trigger
+   Purpose: Automatically create profile when new user signs up
+   Security: DEFINER
+   
+4. handle_new_user_role() RETURNS trigger
+   Purpose: Automatically assign default 'user' role to new users
+   Security: DEFINER
+   
+5. handle_updated_at() RETURNS trigger
+   Purpose: Update the updated_at timestamp on row changes
+   
+6. increment_quote_share_count(quote_id uuid) RETURNS void
+   Purpose: Increment share count for quotes (currently decrements - needs fix)
+   Security: DEFINER
+
+================================================================================
+TRIGGERS
+================================================================================
+
+1. on_auth_user_created
+   Table: auth.users
+   Event: AFTER INSERT
+   Function: handle_new_user()
+   Purpose: Create profile for new users
+
+2. on_auth_user_created_role
+   Table: auth.users
+   Event: AFTER INSERT
+   Function: handle_new_user_role()
+   Purpose: Assign default role to new users
+
+3. handle_profiles_updated_at
+   Table: profiles
+   Event: BEFORE UPDATE
+   Function: handle_updated_at()
+   Purpose: Update timestamp on profile changes
+
+4. handle_user_roles_updated_at
+   Table: user_roles
+   Event: BEFORE UPDATE
+   Function: handle_updated_at()
+   Purpose: Update timestamp on role changes
+
+================================================================================
+PRIVILEGE HIERARCHY
+================================================================================
+
+USER ROLES (Hierarchical):
+1. user (default)
+   - Basic read access to public content
+   - Can view own profile and role
+   - Can update own profile
+
+2. moderator
+   - All user privileges
+   - Content moderation capabilities (to be implemented)
+
+3. admin
+   - All moderator privileges
+   - Can view all user roles
+   - Can manage roles for users, moderators, and other admins
+   - Cannot assign super_admin role
+   - Cannot modify super_admin users
+
+4. super_admin
+   - All admin privileges
+   - Can manage all roles including super_admin
+   - Full system access
+   - Can assign/revoke any privilege level
+
+ROLE MANAGEMENT RULES:
+- Users can only view their own role
+- Admins can view all roles but manage only lower-privilege roles
+- Super admins have unrestricted role management
+- Role assignments are tracked with assigned_by and assigned_at fields
+
+================================================================================
+SECURITY CONSIDERATIONS
+================================================================================
+
+ROW LEVEL SECURITY (RLS):
+- Enabled on: profiles, user_roles
+- Disabled on: All quote-related tables (public content)
+- All quote content is publicly readable
+- User management follows strict privilege hierarchy
+
+AUTHENTICATION:
+- Uses Supabase Auth with auth.users table
+- User profiles automatically created via triggers
+- Default role assignment on signup
+
+PRIVILEGE CHECKING:
+- Security definer functions prevent RLS recursion
+- Stable functions for performance optimization
+- Hierarchical privilege checking with has_privilege_level()
+
+================================================================================
+RELATIONSHIPS DIAGRAM
+================================================================================
+
+auth.users (Supabase managed)
+    ↓ (1:1, CASCADE DELETE)
+profiles
+    ↓ (1:1, user_id)
+user_roles
+
+quotes
+    ↓ (1:many)
+    ├── translations
+    ├── quote_topics → topics
+    ├── quote_genconten
+    ├── quote_paraphrases
+    └── cited_by
+    
+quotes → original_sources (many:1, optional)
+
+iiif_manifests (standalone)
+
+================================================================================
+USAGE NOTES
+================================================================================
+
+1. All quote content is publicly accessible (no RLS)
+2. User management requires authentication
+3. Role hierarchy must be respected in application logic
+4. Automatic profile/role creation on user signup
+5. Use security definer functions for privilege checking
+6. Translation system supports multiple languages per quote
+7. Topic system allows many-to-many categorization
+8. Source attribution is optional but recommended
+9. Generated content and paraphrases extend quote functionality
+10. IIIF integration for manuscript viewing
+
+================================================================================
+MIGRATION HISTORY
+================================================================================
+
+Initial migrations:
+- 20250615053803: User profiles and authentication setup
+- 20250615104009: User roles and privilege system
+
+================================================================================
+END OF SCHEMA DOCUMENTATION
+================================================================================
