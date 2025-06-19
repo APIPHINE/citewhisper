@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+          target_user_id: string | null
+          timestamp: string
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          target_user_id?: string | null
+          timestamp?: string
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          target_user_id?: string | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
       cited_by: {
         Row: {
           embed_date: string
@@ -430,6 +460,16 @@ export type Database = {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_privilege"]
       }
+      get_users_for_admin: {
+        Args: { requesting_user_id?: string }
+        Returns: {
+          user_id: string
+          email: string
+          full_name: string
+          privilege: Database["public"]["Enums"]["user_privilege"]
+          created_at: string
+        }[]
+      }
       has_privilege_level: {
         Args: {
           user_id: string
@@ -440,6 +480,14 @@ export type Database = {
       increment_quote_share_count: {
         Args: Record<PropertyKey, never> | { quote_id: string }
         Returns: undefined
+      }
+      secure_update_user_privilege: {
+        Args: {
+          target_user_id: string
+          new_privilege: Database["public"]["Enums"]["user_privilege"]
+          admin_user_id?: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

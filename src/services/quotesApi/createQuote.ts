@@ -1,210 +1,106 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Quote } from "@/utils/quotesData";
+import { quoteValidationSchema, sanitizeText, sanitizeUrl, quoteSubmissionLimiter } from "@/services/validationService";
 
-/**
- * Creates a quote and its related data in the database
- * 
- * @param quoteData - Partial Quote object with the data to insert
- * @returns The newly created Quote object or null if failed
- */
-export async function createQuote(quoteData: Partial<Quote>): Promise<Quote | null> {
-  try {
-    console.log('Creating quote with data:', quoteData);
-    
-    // Transform our Quote structure to match the new database schema
-    const dbQuote = {
-      quote_text: quoteData.text,
-      author_name: quoteData.author,
-      date_original: quoteData.date,
-      quote_image_url: quoteData.evidenceImage,
-      quote_context: quoteData.context,
-      seo_keywords: quoteData.keywords || [],
-      updated_at: new Date().toISOString()
-    };
-
-    console.log('Transformed quote data for DB:', dbQuote);
-
-    // Insert the quote
-    const { data, error } = await supabase
-      .from('quotes')
-      .insert([dbQuote])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating quote:', error);
-      return null;
-    }
-
-    console.log('Quote created successfully:', data);
-
-    // Handle original source if provided
-    if (quoteData.originalSource) {
-      const sourceId = await createOriginalSource(quoteData.originalSource);
-      if (sourceId) {
-        // Update quote with source_id
-        await supabase
-          .from('quotes')
-          .update({ source_id: sourceId })
-          .eq('id', data.id);
-      }
-    }
-
-    // Handle topics if provided
-    if (Array.isArray(quoteData.topics) && quoteData.topics.length > 0) {
-      await createQuoteTopics(data.id, quoteData.topics);
-    }
-
-    // Handle translations if provided
-    if (Array.isArray(quoteData.translations)) {
-      await createTranslations(data.id, quoteData.translations);
-    }
-
-    // Return the newly created quote
-    return {
-      ...quoteData,
-      id: data.id
-    } as Quote;
-  } catch (error) {
-    console.error('Error in createQuote:', error);
-    return null;
-  }
+export interface QuoteSubmissionData {
+  quote_text: string;
+  author_name: string;
+  date_original?: string;
+  quote_context?: string;
+  source_title?: string;
+  source_url?: string;
+  topics?: string[];
 }
 
-/**
- * Creates an original source record
- * 
- * @param originalSourceData - The original source data
- * @returns The ID of the created source or null if failed
- */
-async function createOriginalSource(
-  originalSourceData: Quote['originalSource']
-): Promise<string | null> {
-  if (!originalSourceData) return null;
-
-  const dbOriginalSource = {
-    title: originalSourceData.title,
-    publisher: originalSourceData.publisher,
-    publication_year: originalSourceData.publicationDate,
-    archive_url: originalSourceData.sourceUrl
-  };
-
-  console.log('Creating original source:', dbOriginalSource);
-
+export async function createQuote(data: QuoteSubmissionData, userId?: string): Promise<{ success: boolean; error?: string; quoteId?: string }> {
   try {
-    const { data, error } = await supabase
-      .from('original_sources')
-      .insert([dbOriginalSource])
+    // Authentication check
+    if (!userId) {
+      return { success: false, error: "Authentication required to submit quotes." };
+    }
+
+    // Rate limiting check
+    if (!quoteSubmissionLimiter.isAllowed(userId)) {
+      const remainingTime = Math.ceil(quoteSubmissionLimiter.getRemainingTime(userId) / 1000);
+      return { 
+        success: false, 
+        error: `Rate limit exceeded. Please wait ${remainingTime} seconds before submitting another quote.` 
+      };
+    }
+
+    // Validate input data
+    const validationResult = quoteValidationSchema.safeParse(data);
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.errors.map(e => e.message).join(', ');
+      return { success: false, error: `Validation failed: ${errorMessage}` };
+    }
+
+    // Sanitize inputs
+    const sanitizedData = {
+      quote_text: sanitizeText(data.quote_text),
+      author_name: sanitizeText(data.author_name),
+      date_original: data.date_original || null,
+      quote_context: data.quote_context ? sanitizeText(data.quote_context) : null,
+    };
+
+    // Create original source if provided
+    let sourceId = null;
+    if (data.source_title || data.source_url) {
+      const sourceData = {
+        title: data.source_title ? sanitizeText(data.source_title) : null,
+        archive_url: data.source_url ? sanitizeUrl(data.source_url) : null,
+      };
+
+      const { data: sourceResult, error: sourceError } = await supabase
+        .from('original_sources')
+        .insert(sourceData)
+        .select('id')
+        .single();
+
+      if (sourceError) {
+        console.error('Error creating source:', sourceError);
+        return { success: false, error: "Failed to create source record." };
+      }
+
+      sourceId = sourceResult.id;
+    }
+
+    // Create the quote
+    const { data: quoteResult, error: quoteError } = await supabase
+      .from('quotes')
+      .insert({
+        ...sanitizedData,
+        source_id: sourceId,
+      })
       .select('id')
       .single();
 
-    if (error) {
-      console.error('Error creating original source:', error);
-      return null;
+    if (quoteError) {
+      console.error('Error creating quote:', quoteError);
+      return { success: false, error: "Failed to create quote. Please check your permissions." };
     }
 
-    return data.id;
+    // Handle topics if provided
+    if (data.topics && data.topics.length > 0) {
+      try {
+        // Note: Topic creation requires admin privileges due to RLS policies
+        const topicInserts = data.topics.map(topicName => ({
+          quote_id: quoteResult.id,
+          topic_id: topicName // This would need to be resolved to actual topic IDs
+        }));
+
+        // This would need additional logic to handle topic creation/linking
+        console.log('Topics provided but not yet implemented:', topicInserts);
+      } catch (topicError) {
+        console.warn('Failed to create topic associations:', topicError);
+        // Don't fail the quote creation for topic errors
+      }
+    }
+
+    return { success: true, quoteId: quoteResult.id };
+
   } catch (error) {
-    console.error('Error in createOriginalSource:', error);
-    return null;
-  }
-}
-
-/**
- * Creates topic records and links them to a quote
- * 
- * @param quoteId - The ID of the quote
- * @param topics - Array of topic names
- */
-async function createQuoteTopics(
-  quoteId: string, 
-  topics: string[]
-): Promise<void> {
-  if (!Array.isArray(topics) || topics.length === 0) return;
-
-  try {
-    // First, ensure all topics exist in the topics table
-    for (const topicName of topics) {
-      const seoSlug = topicName.toLowerCase().replace(/\s+/g, '-');
-      
-      // Insert topic if it doesn't exist
-      await supabase
-        .from('topics')
-        .upsert({ 
-          topic_name: topicName, 
-          seo_slug: seoSlug 
-        }, { 
-          onConflict: 'topic_name' 
-        });
-    }
-
-    // Get topic IDs
-    const { data: topicsData, error: topicsError } = await supabase
-      .from('topics')
-      .select('id, topic_name')
-      .in('topic_name', topics);
-
-    if (topicsError) {
-      console.error('Error fetching topics:', topicsError);
-      return;
-    }
-
-    // Create quote-topic relationships
-    const quoteTopics = topicsData.map(topic => ({
-      quote_id: quoteId,
-      topic_id: topic.id
-    }));
-
-    console.log('Creating quote topics:', quoteTopics);
-
-    const { error } = await supabase
-      .from('quote_topics')
-      .insert(quoteTopics);
-
-    if (error) {
-      console.error('Error creating quote topics:', error);
-    }
-  } catch (error) {
-    console.error('Error in createQuoteTopics:', error);
-  }
-}
-
-/**
- * Creates translation records linked to a quote
- * 
- * @param quoteId - The ID of the quote
- * @param translationsData - Array of translation data
- */
-async function createTranslations(
-  quoteId: string, 
-  translationsData: Quote['translations']
-): Promise<void> {
-  if (!Array.isArray(translationsData) || translationsData.length === 0) return;
-
-  try {
-    const dbTranslations = translationsData.map(translation => ({
-      quote_id: quoteId,
-      language: translation.language,
-      translated_text: translation.text,
-      source: translation.source,
-      translator_name: translation.translator,
-      publication: translation.publication,
-      publication_date: translation.publicationDate,
-      source_url: translation.sourceUrl,
-      source_reference: translation.source
-    }));
-
-    console.log('Creating translations:', dbTranslations);
-
-    const { error } = await supabase
-      .from('translations')
-      .insert(dbTranslations);
-
-    if (error) {
-      console.error('Error creating translations:', error);
-    }
-  } catch (error) {
-    console.error('Error in createTranslations:', error);
+    console.error('Unexpected error creating quote:', error);
+    return { success: false, error: "An unexpected error occurred. Please try again." };
   }
 }

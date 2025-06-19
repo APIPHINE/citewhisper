@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserRoles } from '@/hooks/useUserRoles';
-import { Shield, User, Users, Crown } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { Shield, User, Users, Crown, AlertTriangle } from 'lucide-react';
+import { adminActionLimiter } from '@/services/validationService';
 import type { UserPrivilege } from '@/types/userRoles';
 
 const privilegeIcons = {
@@ -19,7 +22,7 @@ const privilegeColors = {
   user: 'bg-gray-100 text-gray-800',
   moderator: 'bg-blue-100 text-blue-800',
   admin: 'bg-purple-100 text-purple-800',
-  super_admin: 'bg-gold-100 text-gold-800'
+  super_admin: 'bg-yellow-100 text-yellow-800'
 };
 
 export const UserRoleManager = () => {
@@ -30,8 +33,81 @@ export const UserRoleManager = () => {
     canManageRoles,
     canManageUser,
     getPrivilegeOptions,
-    updateUserPrivilege
+    updateUserPrivilege,
+    loadAllUsers
   } = useUserRoles();
+  
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    if (canManageRoles()) {
+      loadAllUsers();
+    }
+  }, [canManageRoles, loadAllUsers]);
+
+  const handleRoleUpdate = async (userId: string, newPrivilege: UserPrivilege) => {
+    if (!user?.id) {
+      toast({
+        title: "Authentication Error",
+        description: "You must be logged in to perform this action.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Rate limiting check
+    if (!adminActionLimiter.isAllowed(user.id)) {
+      const remainingTime = Math.ceil(adminActionLimiter.getRemainingTime(user.id) / 1000);
+      toast({
+        title: "Rate Limit Exceeded",
+        description: `Please wait ${remainingTime} seconds before performing another admin action.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Prevent self-privilege modification
+    if (userId === user.id) {
+      toast({
+        title: "Action Not Allowed",
+        description: "You cannot modify your own privileges.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsUpdating(true);
+    
+    try {
+      const success = await updateUserPrivilege(userId, newPrivilege, user.id);
+      
+      if (success) {
+        toast({
+          title: "Role Updated",
+          description: `User privilege has been updated to ${newPrivilege}.`,
+        });
+        // Reload users to reflect changes
+        await loadAllUsers();
+      } else {
+        toast({
+          title: "Update Failed",
+          description: "Failed to update user role. You may not have sufficient privileges.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Role update error:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred while updating the user role.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -51,21 +127,22 @@ export const UserRoleManager = () => {
 
   if (!canManageRoles()) {
     return (
-      <Card>
+      <Card className="border-destructive">
         <CardContent className="p-6">
           <div className="text-center text-muted-foreground">
-            <Shield className="mx-auto mb-2" size={48} />
-            <p>You don't have permission to manage user roles.</p>
-            <p className="text-sm mt-1">Your current role: <Badge className={privilegeColors[userRole]}>{userRole}</Badge></p>
+            <AlertTriangle className="mx-auto mb-2 text-destructive" size={48} />
+            <p className="font-medium">Insufficient Privileges</p>
+            <p className="text-sm mt-1">
+              Your current role: <Badge className={privilegeColors[userRole]}>{userRole}</Badge>
+            </p>
+            <p className="text-sm mt-2">
+              Admin or Super Admin privileges required to manage user roles.
+            </p>
           </div>
         </CardContent>
       </Card>
     );
   }
-
-  const handleRoleUpdate = async (userId: string, newPrivilege: UserPrivilege) => {
-    await updateUserPrivilege(userId, newPrivilege);
-  };
 
   return (
     <Card>
@@ -76,6 +153,8 @@ export const UserRoleManager = () => {
         </CardTitle>
         <CardDescription>
           Manage user privileges and access levels. Your role: <Badge className={privilegeColors[userRole]}>{userRole}</Badge>
+          <br />
+          <span className="text-xs text-muted-foreground">All actions are logged for security audit purposes.</span>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -83,24 +162,28 @@ export const UserRoleManager = () => {
           {allUsers.length === 0 ? (
             <p className="text-muted-foreground text-center py-4">No users found.</p>
           ) : (
-            allUsers.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+            allUsers.map((targetUser) => (
+              <div key={targetUser.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium">{user.full_name || 'Unknown User'}</h4>
-                    <Badge className={privilegeColors[user.privilege]} variant="secondary">
-                      {privilegeIcons[user.privilege]}
-                      <span className="ml-1">{user.privilege}</span>
+                    <h4 className="font-medium">{targetUser.full_name || 'Unknown User'}</h4>
+                    <Badge className={privilegeColors[targetUser.privilege]} variant="secondary">
+                      {privilegeIcons[targetUser.privilege]}
+                      <span className="ml-1">{targetUser.privilege}</span>
                     </Badge>
+                    {targetUser.id === user?.id && (
+                      <Badge variant="outline" className="text-xs">You</Badge>
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground">{targetUser.email}</p>
                 </div>
                 
-                {canManageUser(user.privilege) && (
+                {canManageUser(targetUser.privilege) && targetUser.id !== user?.id && (
                   <div className="flex items-center gap-2">
                     <Select
-                      value={user.privilege}
-                      onValueChange={(value: UserPrivilege) => handleRoleUpdate(user.id, value)}
+                      value={targetUser.privilege}
+                      onValueChange={(value: UserPrivilege) => handleRoleUpdate(targetUser.id, value)}
+                      disabled={isUpdating}
                     >
                       <SelectTrigger className="w-32">
                         <SelectValue />
