@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PlusCircle, Shield, Search, Users, BookOpen } from 'lucide-react';
+import { PlusCircle, Shield, Search, Users, BookOpen, FileText, Settings } from 'lucide-react';
 import { useUserRoles } from '@/hooks/useUserRoles';
 
 const routePaths = [
   { name: 'Home', path: '/' },
   { name: 'Quotes', path: '/quotes' },
+  { name: 'Articles', path: '/articles', icon: FileText },
   { name: 'Research', path: '/research', icon: Search },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Resources', path: '/resources', icon: BookOpen },
@@ -18,9 +19,13 @@ export const DesktopNav = () => {
   const location = useLocation();
   const { canManageRoles } = useUserRoles();
 
-  // Add admin route if user has admin privileges
+  // Add admin routes if user has admin privileges
   const allRoutes = canManageRoles() 
-    ? [...routePaths, { name: 'Admin', path: '/admin', icon: Shield }]
+    ? [
+        ...routePaths, 
+        { name: 'CMS', path: '/admin/cms', icon: Settings },
+        { name: 'Admin', path: '/admin', icon: Shield }
+      ]
     : routePaths;
 
   return (

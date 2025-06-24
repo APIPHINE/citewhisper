@@ -2,13 +2,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PlusCircle, Settings, LogOut, Search, BookOpen } from 'lucide-react';
+import { PlusCircle, Settings, LogOut, Search, BookOpen, FileText, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 const routePaths = [
   { name: 'Home', path: '/' },
   { name: 'Quotes', path: '/quotes' },
+  { name: 'Articles', path: '/articles', icon: FileText },
   { name: 'Research', path: '/research', icon: Search },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Resources', path: '/resources', icon: BookOpen },
@@ -24,10 +26,20 @@ interface MobileNavProps {
 export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => {
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { canManageRoles } = useUserRoles();
 
   const handleSignOut = async () => {
     await signOut();
   };
+
+  // Add admin routes if user has admin privileges
+  const allRoutes = canManageRoles() 
+    ? [
+        ...routePaths, 
+        { name: 'CMS', path: '/admin/cms', icon: Settings },
+        { name: 'Admin', path: '/admin', icon: Shield }
+      ]
+    : routePaths;
 
   return (
     <motion.div
@@ -37,7 +49,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => 
       className="overflow-hidden"
     >
       <div className="page-padding py-4 flex flex-col gap-4">
-        {routePaths.map((route) => (
+        {allRoutes.map((route) => (
           <Link
             key={route.path}
             to={route.path}

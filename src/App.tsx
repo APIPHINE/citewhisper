@@ -34,6 +34,14 @@ const EmailVerification = lazy(() => import("./pages/EmailVerification"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Admin = lazy(() => import("./pages/Admin"));
 
+// CMS Pages
+const CMSDashboard = lazy(() => import("./pages/cms/CMSDashboard"));
+const ArticleEditor = lazy(() => import("./pages/cms/ArticleEditor"));
+const PageEditor = lazy(() => import("./pages/cms/PageEditor"));
+const MediaManager = lazy(() => import("./pages/cms/MediaManager"));
+const ArticlesList = lazy(() => import("./pages/cms/ArticlesList"));
+const PublicArticle = lazy(() => import("./pages/cms/PublicArticle"));
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -70,6 +78,19 @@ const App = () => (
                       <Route path="/email-verification" element={<EmailVerification />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/admin" element={<Admin />} />
+                      
+                      {/* CMS Routes */}
+                      <Route path="/admin/cms" element={<CMSDashboard />} />
+                      <Route path="/admin/cms/articles/new" element={<ArticleEditor />} />
+                      <Route path="/admin/cms/articles/:slug/edit" element={<ArticleEditor />} />
+                      <Route path="/admin/cms/pages/new" element={<PageEditor />} />
+                      <Route path="/admin/cms/pages/:slug/edit" element={<PageEditor />} />
+                      <Route path="/admin/cms/media" element={<MediaManager />} />
+                      
+                      {/* Public CMS Routes */}
+                      <Route path="/articles" element={<ArticlesList />} />
+                      <Route path="/articles/:slug" element={<PublicArticle />} />
+                      
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Suspense>
