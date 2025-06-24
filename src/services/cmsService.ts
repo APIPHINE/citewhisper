@@ -20,7 +20,7 @@ export const fetchArticles = async (status?: ContentStatus): Promise<CMSArticle[
       .from('cms_articles')
       .select(`
         *,
-        profiles!cms_articles_author_id_fkey(full_name)
+        author:profiles!cms_articles_author_id_fkey(full_name)
       `)
       .order('created_at', { ascending: false });
 
@@ -34,7 +34,7 @@ export const fetchArticles = async (status?: ContentStatus): Promise<CMSArticle[
     return (data || []).map(article => ({
       ...article,
       author: {
-        full_name: article.profiles?.full_name || undefined,
+        full_name: (article as any).author?.full_name || undefined,
         email: undefined
       }
     }));
@@ -50,7 +50,7 @@ export const fetchArticleBySlug = async (slug: string): Promise<CMSArticle | nul
       .from('cms_articles')
       .select(`
         *,
-        profiles!cms_articles_author_id_fkey(full_name)
+        author:profiles!cms_articles_author_id_fkey(full_name)
       `)
       .eq('slug', slug)
       .single();
@@ -62,7 +62,7 @@ export const fetchArticleBySlug = async (slug: string): Promise<CMSArticle | nul
     return {
       ...data,
       author: {
-        full_name: data.profiles?.full_name || undefined,
+        full_name: (data as any).author?.full_name || undefined,
         email: undefined
       }
     };
@@ -73,9 +73,23 @@ export const fetchArticleBySlug = async (slug: string): Promise<CMSArticle | nul
 };
 
 export const createArticle = async (article: Partial<CMSArticle>): Promise<CMSArticle> => {
+  const articleData = {
+    title: article.title || '',
+    slug: article.slug || '',
+    content: article.content || '',
+    author_id: article.author_id || '',
+    status: article.status || 'draft' as ContentStatus,
+    excerpt: article.excerpt,
+    featured_image_url: article.featured_image_url,
+    seo_title: article.seo_title,
+    seo_description: article.seo_description,
+    seo_keywords: article.seo_keywords,
+    published_at: article.published_at
+  };
+
   const { data, error } = await supabase
     .from('cms_articles')
-    .insert(article)
+    .insert(articleData)
     .select()
     .single();
 
@@ -111,7 +125,7 @@ export const fetchPages = async (status?: ContentStatus): Promise<CMSPage[]> => 
       .from('cms_pages')
       .select(`
         *,
-        profiles!cms_pages_author_id_fkey(full_name)
+        author:profiles!cms_pages_author_id_fkey(full_name)
       `)
       .order('sort_order', { ascending: true });
 
@@ -125,7 +139,7 @@ export const fetchPages = async (status?: ContentStatus): Promise<CMSPage[]> => 
     return (data || []).map(page => ({
       ...page,
       author: {
-        full_name: page.profiles?.full_name || undefined,
+        full_name: (page as any).author?.full_name || undefined,
         email: undefined
       }
     }));
@@ -141,7 +155,7 @@ export const fetchPageBySlug = async (slug: string): Promise<CMSPage | null> => 
       .from('cms_pages')
       .select(`
         *,
-        profiles!cms_pages_author_id_fkey(full_name)
+        author:profiles!cms_pages_author_id_fkey(full_name)
       `)
       .eq('slug', slug)
       .single();
@@ -153,7 +167,7 @@ export const fetchPageBySlug = async (slug: string): Promise<CMSPage | null> => 
     return {
       ...data,
       author: {
-        full_name: data.profiles?.full_name || undefined,
+        full_name: (data as any).author?.full_name || undefined,
         email: undefined
       }
     };
@@ -164,9 +178,24 @@ export const fetchPageBySlug = async (slug: string): Promise<CMSPage | null> => 
 };
 
 export const createPage = async (page: Partial<CMSPage>): Promise<CMSPage> => {
+  const pageData = {
+    title: page.title || '',
+    slug: page.slug || '',
+    content: page.content || '',
+    author_id: page.author_id || '',
+    status: page.status || 'draft' as ContentStatus,
+    template: page.template || 'default',
+    seo_title: page.seo_title,
+    seo_description: page.seo_description,
+    seo_keywords: page.seo_keywords,
+    is_homepage: page.is_homepage || false,
+    sort_order: page.sort_order || 0,
+    published_at: page.published_at
+  };
+
   const { data, error } = await supabase
     .from('cms_pages')
-    .insert(page)
+    .insert(pageData)
     .select()
     .single();
 
@@ -193,7 +222,7 @@ export const fetchMedia = async (approvalStatus?: string): Promise<CMSMedia[]> =
       .from('cms_media')
       .select(`
         *,
-        profiles!cms_media_uploaded_by_fkey(full_name)
+        uploader:profiles!cms_media_uploaded_by_fkey(full_name)
       `)
       .order('created_at', { ascending: false });
 
@@ -207,7 +236,7 @@ export const fetchMedia = async (approvalStatus?: string): Promise<CMSMedia[]> =
     return (data || []).map(media => ({
       ...media,
       uploader: {
-        full_name: media.profiles?.full_name || undefined,
+        full_name: (media as any).uploader?.full_name || undefined,
         email: undefined
       }
     }));
@@ -254,9 +283,17 @@ export const fetchCategories = async (): Promise<CMSCategory[]> => {
 };
 
 export const createCategory = async (category: Partial<CMSCategory>): Promise<CMSCategory> => {
+  const categoryData = {
+    name: category.name || '',
+    slug: category.slug || '',
+    description: category.description,
+    parent_id: category.parent_id,
+    sort_order: category.sort_order || 0
+  };
+
   const { data, error } = await supabase
     .from('cms_categories')
-    .insert(category)
+    .insert(categoryData)
     .select()
     .single();
 
@@ -281,9 +318,15 @@ export const fetchTags = async (): Promise<CMSTag[]> => {
 };
 
 export const createTag = async (tag: Partial<CMSTag>): Promise<CMSTag> => {
+  const tagData = {
+    name: tag.name || '',
+    slug: tag.slug || '',
+    description: tag.description
+  };
+
   const { data, error } = await supabase
     .from('cms_tags')
-    .insert(tag)
+    .insert(tagData)
     .select()
     .single();
 
@@ -313,11 +356,11 @@ export const fetchEditSuggestions = async (status?: SuggestionStatus): Promise<E
     return (data || []).map(suggestion => ({
       ...suggestion,
       suggester: {
-        full_name: suggestion.suggester?.full_name || undefined,
+        full_name: (suggestion as any).suggester?.full_name || undefined,
         email: undefined
       },
       reviewer: {
-        full_name: suggestion.reviewer?.full_name || undefined,
+        full_name: (suggestion as any).reviewer?.full_name || undefined,
         email: undefined
       }
     }));
@@ -328,9 +371,17 @@ export const fetchEditSuggestions = async (status?: SuggestionStatus): Promise<E
 };
 
 export const createEditSuggestion = async (suggestion: Partial<EditSuggestion>): Promise<EditSuggestion> => {
+  const suggestionData = {
+    content_type: suggestion.content_type || '',
+    suggested_changes: suggestion.suggested_changes || {},
+    content_id: suggestion.content_id,
+    reason: suggestion.reason,
+    suggested_by: suggestion.suggested_by
+  };
+
   const { data, error } = await supabase
     .from('edit_suggestions')
-    .insert(suggestion)
+    .insert(suggestionData)
     .select()
     .single();
 
@@ -386,6 +437,7 @@ export const updateSetting = async (
     .upsert({
       setting_key: key,
       setting_value: value,
+      setting_type: typeof value,
       updated_by: userId,
       updated_at: new Date().toISOString()
     })

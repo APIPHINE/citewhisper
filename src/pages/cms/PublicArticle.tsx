@@ -10,6 +10,7 @@ import { Calendar, User, ArrowLeft, Share2, Edit } from 'lucide-react';
 import { fetchArticleBySlug } from '@/services/cmsService';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { CommentSystem } from '@/components/cms/CommentSystem';
 import type { CMSArticle } from '@/types/cms';
 
 const PublicArticle = () => {
@@ -124,7 +125,7 @@ const PublicArticle = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-4xl mx-auto space-y-8"
         >
           {/* Article Header */}
           <div className="mb-8">
@@ -204,7 +205,7 @@ const PublicArticle = () => {
           </Card>
 
           {/* Article Footer */}
-          <div className="mt-8 pt-8 border-t">
+          <div className="pt-8 border-t">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {article.tags && article.tags.length > 0 && (
@@ -224,6 +225,9 @@ const PublicArticle = () => {
               </div>
             </div>
           </div>
+
+          {/* Comment System */}
+          <CommentSystem contentType="article" contentId={article.id} />
         </motion.article>
       </div>
     </div>
