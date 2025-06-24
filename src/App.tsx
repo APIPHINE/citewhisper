@@ -1,13 +1,14 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SearchProvider } from './context/SearchContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import NavBar from './components/NavBar';
-import Footer from './components/Footer';
+import { Footer } from './components/Footer';
 import Index from './pages/Index';
 import Profile from './pages/Profile';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import Admin from './pages/Admin';
 import CMSDashboard from './pages/cms/CMSDashboard';
 import AccountSettings from './pages/AccountSettings';
 import PublicArticle from './pages/cms/PublicArticle';
@@ -28,7 +29,7 @@ function App() {
                 <Route path="/account-settings" element={<AccountSettings />} />
                 
                 {/* Admin Routes */}
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/cms" element={<CMSDashboard />} />
                 
                 {/* Public Articles Routes */}

@@ -40,10 +40,7 @@ export const CommentSystem: React.FC<CommentSystemProps> = ({ contentType, conte
       setLoading(true);
       const { data, error } = await supabase
         .from('cms_comments')
-        .select(`
-          *,
-          author:profiles!cms_comments_author_id_fkey(full_name)
-        `)
+        .select('*')
         .eq('content_type', contentType)
         .eq('content_id', contentId)
         .eq('status', 'approved')
@@ -51,7 +48,13 @@ export const CommentSystem: React.FC<CommentSystemProps> = ({ contentType, conte
 
       if (error) throw error;
       
-      setComments(data || []);
+      // Transform the data to match our expected format
+      const transformedComments = (data || []).map(comment => ({
+        ...comment,
+        author: comment.author_id ? { full_name: undefined, email: undefined } : undefined
+      }));
+      
+      setComments(transformedComments);
     } catch (error) {
       console.error('Error loading comments:', error);
     } finally {
