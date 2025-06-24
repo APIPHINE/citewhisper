@@ -15,47 +15,45 @@ import type {
 
 // Article Management
 export const fetchArticles = async (status?: ContentStatus): Promise<CMSArticle[]> => {
-  let query = supabase
-    .from('cms_articles')
-    .select(`
-      *,
-      author:profiles!author_id(full_name, email),
-      categories:cms_article_categories(
-        category:cms_categories(*)
-      ),
-      tags:cms_article_tags(
-        tag:cms_tags(*)
-      )
-    `)
-    .order('created_at', { ascending: false });
+  try {
+    let query = supabase
+      .from('cms_articles')
+      .select(`
+        *,
+        author:profiles!author_id(full_name, email)
+      `)
+      .order('created_at', { ascending: false });
 
-  if (status) {
-    query = query.eq('status', status);
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching articles:', error);
+    return [];
   }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
 };
 
 export const fetchArticleBySlug = async (slug: string): Promise<CMSArticle | null> => {
-  const { data, error } = await supabase
-    .from('cms_articles')
-    .select(`
-      *,
-      author:profiles!author_id(full_name, email),
-      categories:cms_article_categories(
-        category:cms_categories(*)
-      ),
-      tags:cms_article_tags(
-        tag:cms_tags(*)
-      )
-    `)
-    .eq('slug', slug)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('cms_articles')
+      .select(`
+        *,
+        author:profiles!author_id(full_name, email)
+      `)
+      .eq('slug', slug)
+      .single();
 
-  if (error && error.code !== 'PGRST116') throw error;
-  return data;
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching article by slug:', error);
+    return null;
+  }
 };
 
 export const createArticle = async (article: Partial<CMSArticle>): Promise<CMSArticle> => {
@@ -92,35 +90,45 @@ export const deleteArticle = async (id: string): Promise<void> => {
 
 // Page Management
 export const fetchPages = async (status?: ContentStatus): Promise<CMSPage[]> => {
-  let query = supabase
-    .from('cms_pages')
-    .select(`
-      *,
-      author:profiles!author_id(full_name, email)
-    `)
-    .order('sort_order', { ascending: true });
+  try {
+    let query = supabase
+      .from('cms_pages')
+      .select(`
+        *,
+        author:profiles!author_id(full_name, email)
+      `)
+      .order('sort_order', { ascending: true });
 
-  if (status) {
-    query = query.eq('status', status);
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching pages:', error);
+    return [];
   }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
 };
 
 export const fetchPageBySlug = async (slug: string): Promise<CMSPage | null> => {
-  const { data, error } = await supabase
-    .from('cms_pages')
-    .select(`
-      *,
-      author:profiles!author_id(full_name, email)
-    `)
-    .eq('slug', slug)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('cms_pages')
+      .select(`
+        *,
+        author:profiles!author_id(full_name, email)
+      `)
+      .eq('slug', slug)
+      .single();
 
-  if (error && error.code !== 'PGRST116') throw error;
-  return data;
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching page by slug:', error);
+    return null;
+  }
 };
 
 export const createPage = async (page: Partial<CMSPage>): Promise<CMSPage> => {
@@ -148,21 +156,26 @@ export const updatePage = async (id: string, updates: Partial<CMSPage>): Promise
 
 // Media Management
 export const fetchMedia = async (approvalStatus?: string): Promise<CMSMedia[]> => {
-  let query = supabase
-    .from('cms_media')
-    .select(`
-      *,
-      uploader:profiles!uploaded_by(full_name, email)
-    `)
-    .order('created_at', { ascending: false });
+  try {
+    let query = supabase
+      .from('cms_media')
+      .select(`
+        *,
+        uploader:profiles!uploaded_by(full_name, email)
+      `)
+      .order('created_at', { ascending: false });
 
-  if (approvalStatus) {
-    query = query.eq('approval_status', approvalStatus);
+    if (approvalStatus) {
+      query = query.eq('approval_status', approvalStatus);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching media:', error);
+    return [];
   }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
 };
 
 export const updateMediaApproval = async (
@@ -187,13 +200,18 @@ export const updateMediaApproval = async (
 
 // Category Management
 export const fetchCategories = async (): Promise<CMSCategory[]> => {
-  const { data, error } = await supabase
-    .from('cms_categories')
-    .select('*')
-    .order('sort_order', { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from('cms_categories')
+      .select('*')
+      .order('sort_order', { ascending: true });
 
-  if (error) throw error;
-  return data || [];
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
 };
 
 export const createCategory = async (category: Partial<CMSCategory>): Promise<CMSCategory> => {
@@ -209,13 +227,18 @@ export const createCategory = async (category: Partial<CMSCategory>): Promise<CM
 
 // Tag Management
 export const fetchTags = async (): Promise<CMSTag[]> => {
-  const { data, error } = await supabase
-    .from('cms_tags')
-    .select('*')
-    .order('name', { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from('cms_tags')
+      .select('*')
+      .order('name', { ascending: true });
 
-  if (error) throw error;
-  return data || [];
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    return [];
+  }
 };
 
 export const createTag = async (tag: Partial<CMSTag>): Promise<CMSTag> => {
@@ -231,22 +254,27 @@ export const createTag = async (tag: Partial<CMSTag>): Promise<CMSTag> => {
 
 // Edit Suggestions
 export const fetchEditSuggestions = async (status?: SuggestionStatus): Promise<EditSuggestion[]> => {
-  let query = supabase
-    .from('edit_suggestions')
-    .select(`
-      *,
-      suggester:profiles!suggested_by(full_name, email),
-      reviewer:profiles!reviewer_id(full_name, email)
-    `)
-    .order('created_at', { ascending: false });
+  try {
+    let query = supabase
+      .from('edit_suggestions')
+      .select(`
+        *,
+        suggester:profiles!suggested_by(full_name, email),
+        reviewer:profiles!reviewer_id(full_name, email)
+      `)
+      .order('created_at', { ascending: false });
 
-  if (status) {
-    query = query.eq('status', status);
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching edit suggestions:', error);
+    return [];
   }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
 };
 
 export const createEditSuggestion = async (suggestion: Partial<EditSuggestion>): Promise<EditSuggestion> => {
@@ -284,13 +312,18 @@ export const updateSuggestionStatus = async (
 
 // Settings Management
 export const fetchSettings = async (): Promise<CMSSetting[]> => {
-  const { data, error } = await supabase
-    .from('cms_settings')
-    .select('*')
-    .order('setting_key', { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from('cms_settings')
+      .select('*')
+      .order('setting_key', { ascending: true });
 
-  if (error) throw error;
-  return data || [];
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    return [];
+  }
 };
 
 export const updateSetting = async (

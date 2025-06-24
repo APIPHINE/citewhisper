@@ -71,6 +71,409 @@ export type Database = {
           },
         ]
       }
+      cms_article_categories: {
+        Row: {
+          article_id: string | null
+          category_id: string | null
+          id: string
+        }
+        Insert: {
+          article_id?: string | null
+          category_id?: string | null
+          id?: string
+        }
+        Update: {
+          article_id?: string | null
+          category_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_article_categories_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "cms_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_article_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "cms_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_article_tags: {
+        Row: {
+          article_id: string | null
+          id: string
+          tag_id: string | null
+        }
+        Insert: {
+          article_id?: string | null
+          id?: string
+          tag_id?: string | null
+        }
+        Update: {
+          article_id?: string | null
+          id?: string
+          tag_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "cms_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_article_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "cms_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_articles: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          featured_image_url: string | null
+          id: string
+          published_at: string | null
+          seo_description: string | null
+          seo_keywords: string[] | null
+          seo_title: string | null
+          slug: string
+          status: Database["public"]["Enums"]["content_status"] | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          published_at?: string | null
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"] | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          published_at?: string | null
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"] | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      cms_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cms_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_comments: {
+        Row: {
+          author_email: string | null
+          author_id: string | null
+          author_name: string | null
+          content: string
+          content_id: string
+          content_type: string
+          created_at: string | null
+          id: string
+          parent_id: string | null
+          status: string | null
+        }
+        Insert: {
+          author_email?: string | null
+          author_id?: string | null
+          author_name?: string | null
+          content: string
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          author_email?: string | null
+          author_id?: string | null
+          author_name?: string | null
+          content?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cms_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_media: {
+        Row: {
+          alt_text: string | null
+          approval_status: string | null
+          caption: string | null
+          created_at: string | null
+          file_path: string
+          file_size: number
+          filename: string
+          id: string
+          media_type: Database["public"]["Enums"]["media_type"]
+          mime_type: string
+          original_filename: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          uploaded_by: string
+        }
+        Insert: {
+          alt_text?: string | null
+          approval_status?: string | null
+          caption?: string | null
+          created_at?: string | null
+          file_path: string
+          file_size: number
+          filename: string
+          id?: string
+          media_type: Database["public"]["Enums"]["media_type"]
+          mime_type: string
+          original_filename: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          uploaded_by: string
+        }
+        Update: {
+          alt_text?: string | null
+          approval_status?: string | null
+          caption?: string | null
+          created_at?: string | null
+          file_path?: string
+          file_size?: number
+          filename?: string
+          id?: string
+          media_type?: Database["public"]["Enums"]["media_type"]
+          mime_type?: string
+          original_filename?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
+      cms_pages: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          is_homepage: boolean | null
+          published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          sort_order: number | null
+          status: Database["public"]["Enums"]["content_status"] | null
+          template: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_homepage?: boolean | null
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          template?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_homepage?: boolean | null
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          template?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cms_settings: {
+        Row: {
+          description: string | null
+          id: string
+          setting_key: string
+          setting_type: string
+          setting_value: Json
+          updated_at: string | null
+          updated_by: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_type: string
+          setting_value: Json
+          updated_at?: string | null
+          updated_by: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_type?: string
+          setting_value?: Json
+          updated_at?: string | null
+          updated_by?: string
+        }
+        Relationships: []
+      }
+      cms_tags: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      edit_suggestions: {
+        Row: {
+          admin_notes: string | null
+          content_id: string | null
+          content_type: string
+          created_at: string | null
+          id: string
+          reason: string | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: Database["public"]["Enums"]["suggestion_status"] | null
+          suggested_by: string | null
+          suggested_changes: Json
+        }
+        Insert: {
+          admin_notes?: string | null
+          content_id?: string | null
+          content_type: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["suggestion_status"] | null
+          suggested_by?: string | null
+          suggested_changes: Json
+        }
+        Update: {
+          admin_notes?: string | null
+          content_id?: string | null
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["suggestion_status"] | null
+          suggested_by?: string | null
+          suggested_changes?: Json
+        }
+        Relationships: []
+      }
       iiif_manifests: {
         Row: {
           created_at: string
@@ -491,6 +894,9 @@ export type Database = {
       }
     }
     Enums: {
+      content_status: "draft" | "review" | "published" | "archived"
+      media_type: "image" | "video" | "audio" | "document" | "other"
+      suggestion_status: "pending" | "approved" | "rejected" | "implemented"
       user_privilege: "user" | "moderator" | "admin" | "super_admin"
     }
     CompositeTypes: {
@@ -607,6 +1013,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      content_status: ["draft", "review", "published", "archived"],
+      media_type: ["image", "video", "audio", "document", "other"],
+      suggestion_status: ["pending", "approved", "rejected", "implemented"],
       user_privilege: ["user", "moderator", "admin", "super_admin"],
     },
   },

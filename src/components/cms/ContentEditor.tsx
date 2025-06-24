@@ -174,6 +174,15 @@ export const ContentEditor: React.FC<ContentEditorProps> = ({ contentType }) => 
     }
   };
 
+  // Handle SEO keywords specifically to avoid type errors
+  const handleSeoKeywordsChange = (keywords: string) => {
+    const keywordArray = keywords.split(',').map(k => k.trim()).filter(Boolean);
+    setContent(prev => ({
+      ...prev,
+      seo_keywords: keywordArray
+    }));
+  };
+
   if (loading) {
     return <div className="p-8 text-center">Loading...</div>;
   }
@@ -300,10 +309,7 @@ export const ContentEditor: React.FC<ContentEditorProps> = ({ contentType }) => 
                 <Input
                   id="seo-keywords"
                   value={content.seo_keywords?.join(', ') || ''}
-                  onChange={(e) => setContent(prev => ({ 
-                    ...prev, 
-                    seo_keywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean)
-                  }))}
+                  onChange={(e) => handleSeoKeywordsChange(e.target.value)}
                   placeholder="keyword1, keyword2, keyword3"
                 />
               </div>

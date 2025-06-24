@@ -40,6 +40,7 @@ export interface CMSPage {
   published_at?: string;
   seo_title?: string;
   seo_description?: string;
+  seo_keywords?: string[]; // Add this property to CMSPage
   is_homepage: boolean;
   sort_order: number;
   created_at: string;
