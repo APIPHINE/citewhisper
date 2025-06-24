@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PlusCircle, Settings, LogOut, Search, BookOpen, FileText, Shield } from 'lucide-react';
+import { PlusCircle, Settings, LogOut, BookOpen, FileText, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
@@ -11,7 +11,6 @@ const routePaths = [
   { name: 'Home', path: '/' },
   { name: 'Quotes', path: '/quotes' },
   { name: 'Articles', path: '/articles', icon: FileText },
-  { name: 'Research', path: '/research', icon: Search },
   { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
   { name: 'Resources', path: '/resources', icon: BookOpen },
   { name: 'Favorites', path: '/favorites' },
