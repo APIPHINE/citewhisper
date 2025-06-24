@@ -20,7 +20,7 @@ export const fetchArticles = async (status?: ContentStatus): Promise<CMSArticle[
       .from('cms_articles')
       .select(`
         *,
-        author:profiles!author_id(full_name, email)
+        profiles!cms_articles_author_id_fkey(full_name)
       `)
       .order('created_at', { ascending: false });
 
@@ -30,7 +30,14 @@ export const fetchArticles = async (status?: ContentStatus): Promise<CMSArticle[
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    
+    return (data || []).map(article => ({
+      ...article,
+      author: {
+        full_name: article.profiles?.full_name || undefined,
+        email: undefined
+      }
+    }));
   } catch (error) {
     console.error('Error fetching articles:', error);
     return [];
@@ -43,13 +50,22 @@ export const fetchArticleBySlug = async (slug: string): Promise<CMSArticle | nul
       .from('cms_articles')
       .select(`
         *,
-        author:profiles!author_id(full_name, email)
+        profiles!cms_articles_author_id_fkey(full_name)
       `)
       .eq('slug', slug)
       .single();
 
     if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    
+    if (!data) return null;
+    
+    return {
+      ...data,
+      author: {
+        full_name: data.profiles?.full_name || undefined,
+        email: undefined
+      }
+    };
   } catch (error) {
     console.error('Error fetching article by slug:', error);
     return null;
@@ -59,7 +75,7 @@ export const fetchArticleBySlug = async (slug: string): Promise<CMSArticle | nul
 export const createArticle = async (article: Partial<CMSArticle>): Promise<CMSArticle> => {
   const { data, error } = await supabase
     .from('cms_articles')
-    .insert([article])
+    .insert(article)
     .select()
     .single();
 
@@ -95,7 +111,7 @@ export const fetchPages = async (status?: ContentStatus): Promise<CMSPage[]> => 
       .from('cms_pages')
       .select(`
         *,
-        author:profiles!author_id(full_name, email)
+        profiles!cms_pages_author_id_fkey(full_name)
       `)
       .order('sort_order', { ascending: true });
 
@@ -105,7 +121,14 @@ export const fetchPages = async (status?: ContentStatus): Promise<CMSPage[]> => 
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    
+    return (data || []).map(page => ({
+      ...page,
+      author: {
+        full_name: page.profiles?.full_name || undefined,
+        email: undefined
+      }
+    }));
   } catch (error) {
     console.error('Error fetching pages:', error);
     return [];
@@ -118,13 +141,22 @@ export const fetchPageBySlug = async (slug: string): Promise<CMSPage | null> => 
       .from('cms_pages')
       .select(`
         *,
-        author:profiles!author_id(full_name, email)
+        profiles!cms_pages_author_id_fkey(full_name)
       `)
       .eq('slug', slug)
       .single();
 
     if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    
+    if (!data) return null;
+    
+    return {
+      ...data,
+      author: {
+        full_name: data.profiles?.full_name || undefined,
+        email: undefined
+      }
+    };
   } catch (error) {
     console.error('Error fetching page by slug:', error);
     return null;
@@ -134,7 +166,7 @@ export const fetchPageBySlug = async (slug: string): Promise<CMSPage | null> => 
 export const createPage = async (page: Partial<CMSPage>): Promise<CMSPage> => {
   const { data, error } = await supabase
     .from('cms_pages')
-    .insert([page])
+    .insert(page)
     .select()
     .single();
 
@@ -161,7 +193,7 @@ export const fetchMedia = async (approvalStatus?: string): Promise<CMSMedia[]> =
       .from('cms_media')
       .select(`
         *,
-        uploader:profiles!uploaded_by(full_name, email)
+        profiles!cms_media_uploaded_by_fkey(full_name)
       `)
       .order('created_at', { ascending: false });
 
@@ -171,7 +203,14 @@ export const fetchMedia = async (approvalStatus?: string): Promise<CMSMedia[]> =
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    
+    return (data || []).map(media => ({
+      ...media,
+      uploader: {
+        full_name: media.profiles?.full_name || undefined,
+        email: undefined
+      }
+    }));
   } catch (error) {
     console.error('Error fetching media:', error);
     return [];
@@ -217,7 +256,7 @@ export const fetchCategories = async (): Promise<CMSCategory[]> => {
 export const createCategory = async (category: Partial<CMSCategory>): Promise<CMSCategory> => {
   const { data, error } = await supabase
     .from('cms_categories')
-    .insert([category])
+    .insert(category)
     .select()
     .single();
 
@@ -244,7 +283,7 @@ export const fetchTags = async (): Promise<CMSTag[]> => {
 export const createTag = async (tag: Partial<CMSTag>): Promise<CMSTag> => {
   const { data, error } = await supabase
     .from('cms_tags')
-    .insert([tag])
+    .insert(tag)
     .select()
     .single();
 
@@ -259,8 +298,8 @@ export const fetchEditSuggestions = async (status?: SuggestionStatus): Promise<E
       .from('edit_suggestions')
       .select(`
         *,
-        suggester:profiles!suggested_by(full_name, email),
-        reviewer:profiles!reviewer_id(full_name, email)
+        suggester:profiles!edit_suggestions_suggested_by_fkey(full_name),
+        reviewer:profiles!edit_suggestions_reviewer_id_fkey(full_name)
       `)
       .order('created_at', { ascending: false });
 
@@ -270,7 +309,18 @@ export const fetchEditSuggestions = async (status?: SuggestionStatus): Promise<E
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    
+    return (data || []).map(suggestion => ({
+      ...suggestion,
+      suggester: {
+        full_name: suggestion.suggester?.full_name || undefined,
+        email: undefined
+      },
+      reviewer: {
+        full_name: suggestion.reviewer?.full_name || undefined,
+        email: undefined
+      }
+    }));
   } catch (error) {
     console.error('Error fetching edit suggestions:', error);
     return [];
@@ -280,7 +330,7 @@ export const fetchEditSuggestions = async (status?: SuggestionStatus): Promise<E
 export const createEditSuggestion = async (suggestion: Partial<EditSuggestion>): Promise<EditSuggestion> => {
   const { data, error } = await supabase
     .from('edit_suggestions')
-    .insert([suggestion])
+    .insert(suggestion)
     .select()
     .single();
 

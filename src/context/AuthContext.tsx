@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AUTH_REDIRECT_URLS } from '@/utils/authConfig';
 
 interface AuthContextType {
   user: User | null;
@@ -62,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName?: string, displayName?: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = AUTH_REDIRECT_URLS.home();
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -77,9 +78,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        let errorMessage = error.message;
+        if (error.message.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Please try signing in instead.';
+        } else if (error.message.includes('Password should be at least')) {
+          errorMessage = 'Password must be at least 6 characters long.';
+        } else if (error.message.includes('Signup requires a valid password')) {
+          errorMessage = 'Please enter a valid password.';
+        }
+
         toast({
           title: "Sign up failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
       } else {
@@ -110,14 +120,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         let errorMessage = error.message;
-        if (error.message.includes('Invalid login credentials')) {
-          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        
+        // More specific error handling
+        if (error.message.includes('Invalid login credentials') || 
+            error.message.includes('invalid_credentials') ||
+            error.message.includes('Invalid email or password')) {
+          errorMessage = 'The email or password you entered is incorrect. Please check your credentials and try again.';
         } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'Please check your email and click the verification link to activate your account.';
+          errorMessage = 'Please check your email and click the verification link to activate your account before signing in.';
         } else if (error.message.includes('Too many requests')) {
           errorMessage = 'Too many login attempts. Please wait a moment before trying again.';
+        } else if (error.message.includes('User not found')) {
+          errorMessage = 'No account found with this email address. Please check your email or sign up for a new account.';
+        } else if (error.message.includes('Signups not allowed')) {
+          errorMessage = 'Account registration is currently disabled. Please contact support.';
         }
 
+        console.error('Sign in error:', error);
         toast({
           title: "Sign in failed",
           description: errorMessage,
@@ -127,7 +146,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error };
     } catch (error: any) {
-      const errorMessage = error?.message || 'An unexpected error occurred';
+      console.error('Unexpected sign in error:', error);
+      const errorMessage = error?.message || 'An unexpected error occurred during sign in';
       toast({
         title: "Sign in failed",
         description: errorMessage,
@@ -142,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/`
+          emailRedirectTo: AUTH_REDIRECT_URLS.home()
         }
       });
 
