@@ -1,21 +1,11 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PlusCircle, Settings, LogOut, BookOpen, FileText, Shield } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { useUserRoles } from '@/hooks/useUserRoles';
-
-const routePaths = [
-  { name: 'Home', path: '/' },
-  { name: 'Quotes', path: '/quotes' },
-  { name: 'Articles', path: '/articles', icon: FileText },
-  { name: 'Add Quote', path: '/add-quote', icon: PlusCircle },
-  { name: 'Resources', path: '/resources', icon: BookOpen },
-  { name: 'Favorites', path: '/favorites' },
-  { name: 'Tools', path: '/tools' }
-];
+import MobileDropdownNav from './MobileDropdownNav';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -23,22 +13,12 @@ interface MobileNavProps {
 }
 
 export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => {
-  const location = useLocation();
   const { user, signOut } = useAuth();
-  const { canManageRoles } = useUserRoles();
 
   const handleSignOut = async () => {
     await signOut();
+    onLinkClick();
   };
-
-  // Add admin routes if user has admin privileges
-  const allRoutes = canManageRoles() 
-    ? [
-        ...routePaths, 
-        { name: 'CMS', path: '/admin/cms', icon: Settings },
-        { name: 'Admin', path: '/admin', icon: Shield }
-      ]
-    : routePaths;
 
   return (
     <motion.div
@@ -48,19 +28,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => 
       className="overflow-hidden"
     >
       <div className="page-padding py-4 flex flex-col gap-4">
-        {allRoutes.map((route) => (
-          <Link
-            key={route.path}
-            to={route.path}
-            className={`text-lg font-medium transition-colors hover:text-primary flex items-center gap-1 ${
-              location.pathname === route.path ? 'text-primary' : 'text-foreground'
-            }`}
-            onClick={onLinkClick}
-          >
-            {route.name}
-            {route.icon && <route.icon size={14} />}
-          </Link>
-        ))}
+        <MobileDropdownNav onLinkClick={onLinkClick} />
         
         {/* Mobile Authentication */}
         {user ? (

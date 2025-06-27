@@ -18,6 +18,7 @@ import AddQuote from './pages/AddQuote';
 import Resources from './pages/Resources';
 import Favorites from './pages/Favorites';
 import Tools from './pages/Tools';
+import About from './pages/About';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import EmailVerification from './pages/EmailVerification';
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/tools" element={<Tools />} />
+                <Route path="/about" element={<About />} />
                 
                 {/* Authentication Routes */}
                 <Route path="/login" element={<Login />} />
