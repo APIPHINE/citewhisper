@@ -69,13 +69,13 @@ export function useQuoteSubmission() {
         throw new Error(result.error || 'Failed to create quote');
       }
 
-      console.log('Quote created successfully with ID:', result.quoteId);
+      console.log('Quote created successfully with ID:', result.quote_id);
       toast({
         title: "Quote Submitted",
         description: "Your quote has been submitted successfully.",
       });
 
-      return { id: result.quoteId };
+      return { id: result.quote_id };
     } catch (error) {
       console.error('Error submitting quote:', error);
       toast({
