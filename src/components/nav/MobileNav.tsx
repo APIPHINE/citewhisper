@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import MobileDropdownNav from './MobileDropdownNav';
+import { MainNavDropdown } from './MainNavDropdown';
+import { Link } from 'react-router-dom';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -25,10 +25,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => 
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: isOpen ? 1 : 0, height: isOpen ? 'auto' : 0 }}
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      className="overflow-hidden"
+      className="overflow-hidden md:hidden"
     >
       <div className="page-padding py-4 flex flex-col gap-4">
-        <MobileDropdownNav onLinkClick={onLinkClick} />
+        <MainNavDropdown onLinkClick={onLinkClick} />
         
         {/* Mobile Authentication */}
         {user ? (
