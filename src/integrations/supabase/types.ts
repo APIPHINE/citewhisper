@@ -474,6 +474,59 @@ export type Database = {
         }
         Relationships: []
       }
+      evidence_submissions: {
+        Row: {
+          approval_status: string | null
+          attribution_metadata: Json | null
+          created_at: string
+          file_name: string | null
+          file_size: number | null
+          file_url: string
+          id: string
+          quote_id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          submitted_by: string
+        }
+        Insert: {
+          approval_status?: string | null
+          attribution_metadata?: Json | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url: string
+          id?: string
+          quote_id: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          submitted_by: string
+        }
+        Update: {
+          approval_status?: string | null
+          attribution_metadata?: Json | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          quote_id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          submitted_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_submissions_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       iiif_manifests: {
         Row: {
           created_at: string
@@ -706,6 +759,7 @@ export type Database = {
       quotes: {
         Row: {
           author_name: string | null
+          created_by: string | null
           date_original: string | null
           id: string
           inserted_at: string | null
@@ -716,9 +770,11 @@ export type Database = {
           seo_slug: string | null
           source_id: string | null
           updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
           author_name?: string | null
+          created_by?: string | null
           date_original?: string | null
           id?: string
           inserted_at?: string | null
@@ -729,9 +785,11 @@ export type Database = {
           seo_slug?: string | null
           source_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
           author_name?: string | null
+          created_by?: string | null
           date_original?: string | null
           id?: string
           inserted_at?: string | null
@@ -742,6 +800,7 @@ export type Database = {
           seo_slug?: string | null
           source_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -752,6 +811,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rate_limit_log: {
+        Row: {
+          action: string
+          attempt_count: number | null
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          user_id: string | null
+          window_start: string
+        }
+        Insert: {
+          action: string
+          attempt_count?: number | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          user_id?: string | null
+          window_start?: string
+        }
+        Update: {
+          action?: string
+          attempt_count?: number | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          user_id?: string | null
+          window_start?: string
+        }
+        Relationships: []
       }
       topics: {
         Row: {
@@ -824,6 +913,86 @@ export type Database = {
           },
         ]
       }
+      user_activity_log: {
+        Row: {
+          action_details: Json | null
+          action_type: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_details?: Json | null
+          action_type: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_details?: Json | null
+          action_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_contributions: {
+        Row: {
+          contribution_type: string
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          points_earned: number | null
+          quote_id: string | null
+          user_id: string
+        }
+        Insert: {
+          contribution_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          points_earned?: number | null
+          quote_id?: string | null
+          user_id: string
+        }
+        Update: {
+          contribution_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          points_earned?: number | null
+          quote_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_contributions_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           assigned_at: string
@@ -883,6 +1052,30 @@ export type Database = {
       increment_quote_share_count: {
         Args: Record<PropertyKey, never> | { quote_id: string }
         Returns: undefined
+      }
+      log_user_activity: {
+        Args: {
+          p_user_id: string
+          p_action_type: string
+          p_resource_type: string
+          p_resource_id?: string
+          p_ip_address?: unknown
+          p_user_agent?: string
+          p_action_details?: Json
+          p_session_id?: string
+        }
+        Returns: string
+      }
+      log_user_contribution: {
+        Args: {
+          p_user_id: string
+          p_contribution_type: string
+          p_quote_id?: string
+          p_points?: number
+          p_description?: string
+          p_metadata?: Json
+        }
+        Returns: string
       }
       secure_update_user_privilege: {
         Args: {
