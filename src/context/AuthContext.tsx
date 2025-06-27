@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,9 +32,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
@@ -46,6 +45,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           toast({
             title: "Welcome!",
             description: "You've successfully signed in."
+          });
+          
+          // Ensure profile exists - use setTimeout to avoid potential deadlock
+          setTimeout(async () => {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+              
+              if (!profile) {
+                // Create profile if it doesn't exist
+                await supabase
+                  .from('profiles')
+                  .insert({
+                    id: session.user.id,
+                    full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.display_name,
+                    username: session.user.user_metadata?.username || session.user.email?.split('@')[0]
+                  });
+              }
+            } catch (error) {
+              console.error('Error ensuring profile exists:', error);
+            }
+          }, 0);
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You've been successfully signed out."
           });
         }
       }
@@ -63,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName?: string, displayName?: string) => {
     try {
-      const redirectUrl = AUTH_REDIRECT_URLS.home();
+      const redirectUrl = AUTH_REDIRECT_URLS.emailVerification();
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -72,7 +102,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           emailRedirectTo: redirectUrl,
           data: { 
             full_name: fullName,
-            display_name: displayName || fullName
+            display_name: displayName || fullName,
+            username: email.split('@')[0]
           }
         }
       });
@@ -199,11 +230,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Sign out failed",
           description: error.message,
           variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Signed out",
-          description: "You've been successfully signed out."
         });
       }
     } catch (error: any) {
