@@ -119,7 +119,7 @@ export class ActivityTrackingService {
         action_type: item.action_type as UserActivityLog['action_type'],
         resource_type: item.resource_type as UserActivityLog['resource_type'],
         resource_id: item.resource_id,
-        ip_address: item.ip_address,
+        ip_address: item.ip_address ? String(item.ip_address) : undefined,
         user_agent: item.user_agent,
         action_details: item.action_details as Record<string, any> || {},
         session_id: item.session_id,
