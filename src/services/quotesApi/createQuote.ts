@@ -17,6 +17,17 @@ export interface CreateQuoteRequest {
   evidence_files?: File[];
 }
 
+// Add the missing QuoteSubmissionData interface
+export interface QuoteSubmissionData {
+  quote_text: string;
+  author_name?: string;
+  date_original?: string;
+  quote_context?: string;
+  source_title?: string;
+  source_url?: string;
+  topics?: string[];
+}
+
 export interface CreateQuoteResponse {
   success: boolean;
   quote_id?: string;

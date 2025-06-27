@@ -66,7 +66,7 @@ export class ActivityTrackingService {
     }
   }
 
-  // Get user contributions
+  // Get user contributions with proper type casting
   static async getUserContributions(userId: string): Promise<UserContribution[]> {
     try {
       const { data, error } = await supabase
@@ -80,14 +80,24 @@ export class ActivityTrackingService {
         return [];
       }
 
-      return data || [];
+      // Type cast the database results to match our interface
+      return (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        contribution_type: item.contribution_type as UserContribution['contribution_type'],
+        quote_id: item.quote_id,
+        points_earned: item.points_earned || 0,
+        description: item.description,
+        metadata: item.metadata as Record<string, any> || {},
+        created_at: item.created_at
+      }));
     } catch (error) {
       console.error('Error fetching contributions:', error);
       return [];
     }
   }
 
-  // Get user activity log
+  // Get user activity log with proper type casting
   static async getUserActivity(userId: string): Promise<UserActivityLog[]> {
     try {
       const { data, error } = await supabase
@@ -102,7 +112,19 @@ export class ActivityTrackingService {
         return [];
       }
 
-      return data || [];
+      // Type cast the database results to match our interface
+      return (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        action_type: item.action_type as UserActivityLog['action_type'],
+        resource_type: item.resource_type as UserActivityLog['resource_type'],
+        resource_id: item.resource_id,
+        ip_address: item.ip_address,
+        user_agent: item.user_agent,
+        action_details: item.action_details as Record<string, any> || {},
+        session_id: item.session_id,
+        created_at: item.created_at
+      }));
     } catch (error) {
       console.error('Error fetching activity:', error);
       return [];
@@ -147,14 +169,28 @@ export class ActivityTrackingService {
         { file_url: fileUrl, file_size: fileSize }
       );
 
-      return data;
+      // Type cast the result to match our interface
+      return {
+        id: data.id,
+        quote_id: data.quote_id,
+        submitted_by: data.submitted_by,
+        file_url: data.file_url,
+        file_name: data.file_name,
+        file_size: data.file_size,
+        attribution_metadata: data.attribution_metadata as Record<string, any> || {},
+        approval_status: data.approval_status as EvidenceSubmission['approval_status'],
+        reviewed_by: data.reviewed_by,
+        reviewed_at: data.reviewed_at,
+        review_notes: data.review_notes,
+        created_at: data.created_at
+      };
     } catch (error) {
       console.error('Error submitting evidence:', error);
       return null;
     }
   }
 
-  // Get evidence submissions for a quote
+  // Get evidence submissions for a quote with proper type casting
   static async getEvidenceSubmissions(quoteId: string): Promise<EvidenceSubmission[]> {
     try {
       const { data, error } = await supabase
@@ -168,7 +204,21 @@ export class ActivityTrackingService {
         return [];
       }
 
-      return data || [];
+      // Type cast the database results to match our interface
+      return (data || []).map(item => ({
+        id: item.id,
+        quote_id: item.quote_id,
+        submitted_by: item.submitted_by,
+        file_url: item.file_url,
+        file_name: item.file_name,
+        file_size: item.file_size,
+        attribution_metadata: item.attribution_metadata as Record<string, any> || {},
+        approval_status: item.approval_status as EvidenceSubmission['approval_status'],
+        reviewed_by: item.reviewed_by,
+        reviewed_at: item.reviewed_at,
+        review_notes: item.review_notes,
+        created_at: item.created_at
+      }));
     } catch (error) {
       console.error('Error fetching evidence submissions:', error);
       return [];
