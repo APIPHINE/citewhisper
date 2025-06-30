@@ -9,6 +9,7 @@ import { Footer } from './components/Footer';
 import Home from './pages/Home';
 import Index from './pages/Index';
 import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
 import Admin from './pages/Admin';
 import CMSDashboard from './pages/cms/CMSDashboard';
 import AccountSettings from './pages/AccountSettings';
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/quotes" element={<Index />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/user-profile" element={<UserProfile />} />
                 <Route path="/account-settings" element={<AccountSettings />} />
                 <Route path="/add-quote" element={<AddQuote />} />
                 <Route path="/resources" element={<Resources />} />

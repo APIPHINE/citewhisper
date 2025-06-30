@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { PrivilegeDisplay } from '@/components/auth/PrivilegeDisplay';
@@ -38,6 +38,12 @@ export const AuthSection = () => {
               {user.email}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/user-profile" className="flex items-center">
+                <Activity size={16} className="mr-2" />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/profile" className="flex items-center">
                 <Settings size={16} className="mr-2" />
