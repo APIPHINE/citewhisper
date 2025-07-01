@@ -3,3 +3,6 @@ project_id = "yrafjktkkspcptkcaowj"
 
 [functions.quotes-api]
 verify_jwt = false
+
+[functions.external-quote-submissions]
+verify_jwt = false
