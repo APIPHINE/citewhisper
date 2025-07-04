@@ -7,9 +7,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData?: any) => Promise<{ error: AuthError | null }>;
+  isAuthenticated: boolean;
+  signUp: (email: string, password: string, fullName?: string, displayName?: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>;
   requestPasswordReset: (email: string) => Promise<{ error: AuthError | null; message?: string }>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<{ error: AuthError | null; message?: string }>;
   resetPassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
@@ -29,6 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const isAuthenticated = !!user && !!session;
 
   useEffect(() => {
     console.log('Auth state changed: INITIAL_SESSION', { user: typeof user, session: typeof session });
@@ -53,12 +57,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, userData?: any) => {
+  const signUp = async (email: string, password: string, fullName?: string, displayName?: string) => {
+    const userData = {
+      ...(fullName && { full_name: fullName }),
+      ...(displayName && { display_name: displayName })
+    };
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: userData
+        data: userData,
+        emailRedirectTo: `${window.location.origin}/`
       }
     });
     return { error };
@@ -75,6 +85,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     return { error };
+  };
+
+  const signInWithMagicLink = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+      
+      if (error) {
+        return { error };
+      }
+      
+      return { error: null };
+    } catch (err) {
+      return { 
+        error: { message: 'Failed to send magic link' } as AuthError 
+      };
+    }
   };
 
   const requestPasswordReset = async (email: string) => {
@@ -145,9 +176,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    isAuthenticated,
     signUp,
     signIn,
     signOut,
+    signInWithMagicLink,
     requestPasswordReset,
     changePassword,
     resetPassword

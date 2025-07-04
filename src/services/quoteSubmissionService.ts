@@ -47,7 +47,7 @@ export class QuoteSubmissionService {
   static async getAllSubmissions(): Promise<QuoteSubmission[]> {
     try {
       const { data, error } = await supabase
-        .from('quote_submissions' as any)
+        .from('quote_submissions')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -56,7 +56,7 @@ export class QuoteSubmissionService {
         return [];
       }
 
-      return (data || []) as QuoteSubmission[];
+      return data as QuoteSubmission[];
     } catch (error) {
       console.error('Error fetching submissions:', error);
       return [];
@@ -67,7 +67,7 @@ export class QuoteSubmissionService {
   static async getSubmissionsByStatus(status: QuoteSubmission['status']): Promise<QuoteSubmission[]> {
     try {
       const { data, error } = await supabase
-        .from('quote_submissions' as any)
+        .from('quote_submissions')
         .select('*')
         .eq('status', status)
         .order('created_at', { ascending: false });
@@ -77,7 +77,7 @@ export class QuoteSubmissionService {
         return [];
       }
 
-      return (data || []) as QuoteSubmission[];
+      return data as QuoteSubmission[];
     } catch (error) {
       console.error('Error fetching submissions by status:', error);
       return [];
@@ -94,16 +94,16 @@ export class QuoteSubmissionService {
       // Update processing notes if provided
       if (notes) {
         await supabase
-          .from('quote_submissions' as any)
-          .update({ processing_notes: notes } as any)
+          .from('quote_submissions')
+          .update({ processing_notes: notes })
           .eq('id', submissionId);
       }
 
       // Call the processing function
-      const { data, error } = await supabase.rpc('process_quote_submission' as any, {
+      const { data, error } = await supabase.rpc('process_quote_submission', {
         submission_id: submissionId,
         approve: approve
-      } as any);
+      });
 
       if (error) {
         console.error('Error processing submission:', error);
@@ -120,16 +120,16 @@ export class QuoteSubmissionService {
   // Check for duplicates
   static async checkDuplicates(submissionId: string): Promise<string[]> {
     try {
-      const { data, error } = await supabase.rpc('check_submission_duplicates' as any, {
+      const { data, error } = await supabase.rpc('check_submission_duplicates', {
         submission_id: submissionId
-      } as any);
+      });
 
       if (error) {
         console.error('Error checking duplicates:', error);
         return [];
       }
 
-      return (data || []) as string[];
+      return data as string[];
     } catch (error) {
       console.error('Error checking duplicates:', error);
       return [];
