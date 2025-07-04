@@ -1,18 +1,18 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { AUTH_REDIRECT_URLS } from '@/utils/authConfig';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName?: string, displayName?: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithMagicLink: (email: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
-  isAuthenticated: boolean;
+  signUp: (email: string, password: string, userData?: any) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signOut: () => Promise<{ error: AuthError | null }>;
+  requestPasswordReset: (email: string) => Promise<{ error: AuthError | null; message?: string }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ error: AuthError | null; message?: string }>;
+  resetPassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,216 +29,116 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-        
-        // Handle successful sign-in events
-        if (event === 'SIGNED_IN' && session?.user) {
-          toast({
-            title: "Welcome!",
-            description: "You've successfully signed in."
-          });
-          
-          // Ensure profile exists - use setTimeout to avoid potential deadlock
-          setTimeout(async () => {
-            try {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              
-              if (!profile) {
-                // Create profile if it doesn't exist
-                await supabase
-                  .from('profiles')
-                  .insert({
-                    id: session.user.id,
-                    full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.display_name,
-                    username: session.user.user_metadata?.username || session.user.email?.split('@')[0]
-                  });
-              }
-            } catch (error) {
-              console.error('Error ensuring profile exists:', error);
-            }
-          }, 0);
-        }
-        
-        if (event === 'SIGNED_OUT') {
-          toast({
-            title: "Signed out",
-            description: "You've been successfully signed out."
-          });
-        }
-      }
-    );
-
-    // Check for existing session
+    console.log('Auth state changed: INITIAL_SESSION', { user: typeof user, session: typeof session });
+    
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, [toast]);
-
-  const signUp = async (email: string, password: string, fullName?: string, displayName?: string) => {
-    try {
-      const redirectUrl = AUTH_REDIRECT_URLS.emailVerification();
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: { 
-            full_name: fullName,
-            display_name: displayName || fullName,
-            username: email.split('@')[0]
-          }
-        }
-      });
-
-      if (error) {
-        let errorMessage = error.message;
-        if (error.message.includes('User already registered')) {
-          errorMessage = 'An account with this email already exists. Please try signing in instead.';
-        } else if (error.message.includes('Password should be at least')) {
-          errorMessage = 'Password must be at least 6 characters long.';
-        } else if (error.message.includes('Signup requires a valid password')) {
-          errorMessage = 'Please enter a valid password.';
-        }
-
-        toast({
-          title: "Sign up failed",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Check your email",
-          description: "We've sent you a confirmation link to complete your registration."
-        });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
       }
+    );
 
-      return { error };
-    } catch (error: any) {
-      const errorMessage = error?.message || 'An unexpected error occurred';
-      toast({
-        title: "Sign up failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return { error };
-    }
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signUp = async (email: string, password: string, userData?: any) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: userData
+      }
+    });
+    return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error, data } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        let errorMessage = error.message;
-        
-        // More specific error handling
-        if (error.message.includes('Invalid login credentials') || 
-            error.message.includes('invalid_credentials') ||
-            error.message.includes('Invalid email or password')) {
-          errorMessage = 'The email or password you entered is incorrect. Please check your credentials and try again.';
-        } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'Please check your email and click the verification link to activate your account before signing in.';
-        } else if (error.message.includes('Too many requests')) {
-          errorMessage = 'Too many login attempts. Please wait a moment before trying again.';
-        } else if (error.message.includes('User not found')) {
-          errorMessage = 'No account found with this email address. Please check your email or sign up for a new account.';
-        } else if (error.message.includes('Signups not allowed')) {
-          errorMessage = 'Account registration is currently disabled. Please contact support.';
-        }
-
-        console.error('Sign in error:', error);
-        toast({
-          title: "Sign in failed",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      }
-
-      return { error };
-    } catch (error: any) {
-      console.error('Unexpected sign in error:', error);
-      const errorMessage = error?.message || 'An unexpected error occurred during sign in';
-      toast({
-        title: "Sign in failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return { error };
-    }
-  };
-
-  const signInWithMagicLink = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: AUTH_REDIRECT_URLS.home()
-        }
-      });
-
-      if (error) {
-        toast({
-          title: "Magic link failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Magic link sent",
-          description: "Check your email for the magic login link."
-        });
-      }
-
-      return { error };
-    } catch (error: any) {
-      const errorMessage = error?.message || 'An unexpected error occurred';
-      toast({
-        title: "Magic link failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return { error };
-    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    return { error };
   };
 
   const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    return { error };
+  };
+
+  const requestPasswordReset = async (email: string) => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        toast({
-          title: "Sign out failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Sign out failed",
-        description: error.message || 'An unexpected error occurred',
-        variant: "destructive"
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
       });
+      
+      if (error) {
+        return { error };
+      }
+      
+      return { 
+        error: null, 
+        message: 'Password reset email sent. Please check your inbox and follow the instructions.' 
+      };
+    } catch (err) {
+      return { 
+        error: { message: 'Failed to send password reset email' } as AuthError 
+      };
     }
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      // First verify current password by attempting to sign in
+      if (user?.email) {
+        const { error: verifyError } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: currentPassword
+        });
+        
+        if (verifyError) {
+          return { 
+            error: { message: 'Current password is incorrect' } as AuthError 
+          };
+        }
+      }
+
+      // Update password
+      const { error } = await supabase.auth.updateUser({ 
+        password: newPassword 
+      });
+      
+      if (error) {
+        return { error };
+      }
+      
+      return { 
+        error: null, 
+        message: 'Password updated successfully' 
+      };
+    } catch (err) {
+      return { 
+        error: { message: 'Failed to change password' } as AuthError 
+      };
+    }
+  };
+
+  const resetPassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ 
+      password: newPassword 
+    });
+    return { error };
   };
 
   const value = {
@@ -247,9 +147,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
-    signInWithMagicLink,
     signOut,
-    isAuthenticated: !!user
+    requestPasswordReset,
+    changePassword,
+    resetPassword
   };
 
   return (

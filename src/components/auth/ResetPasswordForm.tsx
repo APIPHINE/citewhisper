@@ -1,212 +1,258 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Eye, EyeOff, AlertCircle, CheckCircle, Shield } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
-const ResetPasswordForm = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+interface PasswordStrength {
+  score: number;
+  feedback: string[];
+  color: string;
+}
 
-  // Check if we have the required tokens from the URL
-  useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    
-    if (!accessToken || !refreshToken) {
-      toast({
-        title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired.",
-        variant: "destructive"
-      });
-      navigate('/forgot-password');
-    }
-  }, [searchParams, toast, navigate]);
+const PasswordStrengthIndicator: React.FC<{ password: string }> = ({ password }) => {
+  const getPasswordStrength = (password: string): PasswordStrength => {
+    let score = 0;
+    const feedback: string[] = [];
 
-  // Password validation
-  const hasPasswordRequirements = password.length >= 6;
-  const passwordsMatch = password === confirmPassword && confirmPassword !== '';
-  const passwordsDoNotMatch = confirmPassword !== '' && password !== confirmPassword;
+    if (password.length >= 8) score += 1;
+    else feedback.push('At least 8 characters');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!hasPasswordRequirements) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (/[a-z]/.test(password)) score += 1;
+    else feedback.push('One lowercase letter');
 
-    if (!passwordsMatch) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure both passwords are identical.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (/[A-Z]/.test(password)) score += 1;
+    else feedback.push('One uppercase letter');
 
-    setLoading(true);
+    if (/\d/.test(password)) score += 1;
+    else feedback.push('One number');
 
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
+    if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+    else feedback.push('One special character');
 
-      if (error) {
-        toast({
-          title: "Error updating password",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Password updated",
-          description: "Your password has been successfully updated."
-        });
-        navigate('/login');
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+    const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
+    const color = colors[Math.min(score, 4)];
+
+    return { score, feedback, color };
   };
 
+  if (!password) return null;
+
+  const strength = getPasswordStrength(password);
+  
   return (
-    <div className="min-h-screen pt-36 pb-20 page-padding">
-      <div className="page-max-width">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Set New Password</h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Enter your new password below.
-          </p>
-        </motion.div>
-
-        <div className="w-full max-w-md mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-elevation p-8 border border-border"
-          >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* New Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  New Password
-                </Label>
-                <div className="relative">
-                  <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a new password"
-                    className="pl-10 pr-10"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  {hasPasswordRequirements ? (
-                    <Check size={14} className="text-green-600" />
-                  ) : (
-                    <X size={14} className="text-red-500" />
-                  )}
-                  <span className={hasPasswordRequirements ? 'text-green-600' : 'text-muted-foreground'}>
-                    At least 6 characters
-                  </span>
-                </div>
-              </div>
-
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                  Confirm New Password
-                </Label>
-                <div className="relative">
-                  <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your new password"
-                    className={`pl-10 pr-10 ${passwordsDoNotMatch ? 'border-red-500' : passwordsMatch ? 'border-green-500' : ''}`}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                
-                {/* Password Match Indicator */}
-                {confirmPassword && (
-                  <div className="flex items-center gap-2 text-sm">
-                    {passwordsMatch ? (
-                      <>
-                        <Check size={14} className="text-green-600" />
-                        <span className="text-green-600">Passwords match</span>
-                      </>
-                    ) : (
-                      <>
-                        <X size={14} className="text-red-500" />
-                        <span className="text-red-500">Passwords do not match</span>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading || !hasPasswordRequirements || !passwordsMatch}
-              >
-                {loading ? 'Updating Password...' : 'Update Password'}
-              </Button>
-            </form>
-          </motion.div>
-        </div>
+    <div className="mt-2">
+      <div className="flex gap-1 mb-2">
+        {[1, 2, 3, 4, 5].map((level) => (
+          <div
+            key={level}
+            className={`h-1 flex-1 rounded ${
+              level <= strength.score ? strength.color : 'bg-gray-200'
+            }`}
+          />
+        ))}
       </div>
+      {strength.feedback.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          Password needs: {strength.feedback.join(', ')}
+        </p>
+      )}
     </div>
   );
 };
 
-export default ResetPasswordForm;
+export const ResetPasswordForm: React.FC = () => {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isValidSession, setIsValidSession] = useState(false);
+
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { resetPassword, session } = useAuth();
+
+  useEffect(() => {
+    // Check if we have a valid password reset session
+    const accessToken = searchParams.get('access_token');
+    const refreshToken = searchParams.get('refresh_token');
+    const type = searchParams.get('type');
+
+    if (type === 'recovery' && (accessToken || session)) {
+      setIsValidSession(true);
+    } else {
+      setMessage({
+        type: 'error',
+        text: 'Invalid or expired password reset link. Please request a new one.'
+      });
+    }
+  }, [searchParams, session]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+
+    if (newPassword !== confirmPassword) {
+      setMessage({ type: 'error', text: 'Passwords do not match' });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setMessage({ type: 'error', text: 'Password must be at least 8 characters long' });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await resetPassword(newPassword);
+
+      if (error) {
+        setMessage({ type: 'error', text: error.message });
+      } else {
+        setMessage({ 
+          type: 'success', 
+          text: 'Password reset successfully! You can now sign in with your new password.' 
+        });
+        
+        // Redirect to login after successful reset
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: 'An unexpected error occurred' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isValidSession && !message) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Validating reset link...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Reset Your Password
+        </CardTitle>
+        <CardDescription>
+          Enter your new password below
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {!isValidSession ? (
+          <div className="space-y-4">
+            {message && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{message.text}</AlertDescription>
+              </Alert>
+            )}
+            <div className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                This password reset link is invalid or has expired.
+              </p>
+              <Button
+                onClick={() => navigate('/forgot-password')}
+                variant="outline"
+                className="w-full"
+              >
+                Request New Reset Link
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {message && (
+              <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
+                {message.type === 'error' ? (
+                  <AlertCircle className="h-4 w-4" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                <AlertDescription>{message.text}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <div className="relative">
+                <Input
+                  id="newPassword"
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  placeholder="Enter your new password"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </Button>
+              </div>
+              <PasswordStrengthIndicator password={newPassword} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  placeholder="Confirm your new password"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </Button>
+              </div>
+              {confirmPassword && newPassword !== confirmPassword && (
+                <p className="text-xs text-red-500">Passwords do not match</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !newPassword || !confirmPassword || newPassword !== confirmPassword}
+            >
+              {isLoading ? 'Resetting Password...' : 'Reset Password'}
+            </Button>
+          </form>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

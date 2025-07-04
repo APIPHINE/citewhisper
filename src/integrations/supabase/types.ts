@@ -723,6 +723,137 @@ export type Database = {
           },
         ]
       }
+      quote_submissions: {
+        Row: {
+          author_name: string
+          chapter_or_section: string | null
+          citation_style: string | null
+          confidence_score: number | null
+          created_at: string
+          device_type: string | null
+          duplicate_check_performed: boolean | null
+          evidence_type: string | null
+          external_submission_id: string | null
+          final_quote_id: string | null
+          generated_citation: string | null
+          id: string
+          image_crop_coords: Json | null
+          image_language_hint: string | null
+          image_url: string | null
+          is_translation: boolean | null
+          ocr_text: string | null
+          original_language: string | null
+          potential_duplicate_ids: string[] | null
+          processed_at: string | null
+          processed_by: string | null
+          processing_notes: string | null
+          quote_rating: number | null
+          quote_text: string
+          quote_topics: string[] | null
+          seo_keywords: string[] | null
+          seo_slug: string | null
+          source_app: string
+          source_context_text: string | null
+          source_date: string | null
+          source_manifest_url: string | null
+          source_title: string
+          status: string
+          translated_quote: string | null
+          translation_language: string | null
+          translator_name: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          author_name: string
+          chapter_or_section?: string | null
+          citation_style?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          device_type?: string | null
+          duplicate_check_performed?: boolean | null
+          evidence_type?: string | null
+          external_submission_id?: string | null
+          final_quote_id?: string | null
+          generated_citation?: string | null
+          id?: string
+          image_crop_coords?: Json | null
+          image_language_hint?: string | null
+          image_url?: string | null
+          is_translation?: boolean | null
+          ocr_text?: string | null
+          original_language?: string | null
+          potential_duplicate_ids?: string[] | null
+          processed_at?: string | null
+          processed_by?: string | null
+          processing_notes?: string | null
+          quote_rating?: number | null
+          quote_text: string
+          quote_topics?: string[] | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          source_app: string
+          source_context_text?: string | null
+          source_date?: string | null
+          source_manifest_url?: string | null
+          source_title: string
+          status?: string
+          translated_quote?: string | null
+          translation_language?: string | null
+          translator_name?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          author_name?: string
+          chapter_or_section?: string | null
+          citation_style?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          device_type?: string | null
+          duplicate_check_performed?: boolean | null
+          evidence_type?: string | null
+          external_submission_id?: string | null
+          final_quote_id?: string | null
+          generated_citation?: string | null
+          id?: string
+          image_crop_coords?: Json | null
+          image_language_hint?: string | null
+          image_url?: string | null
+          is_translation?: boolean | null
+          ocr_text?: string | null
+          original_language?: string | null
+          potential_duplicate_ids?: string[] | null
+          processed_at?: string | null
+          processed_by?: string | null
+          processing_notes?: string | null
+          quote_rating?: number | null
+          quote_text?: string
+          quote_topics?: string[] | null
+          seo_keywords?: string[] | null
+          seo_slug?: string | null
+          source_app?: string
+          source_context_text?: string | null
+          source_date?: string | null
+          source_manifest_url?: string | null
+          source_title?: string
+          status?: string
+          translated_quote?: string | null
+          translation_language?: string | null
+          translator_name?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_submissions_final_quote_id_fkey"
+            columns: ["final_quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_topics: {
         Row: {
           id: string
@@ -1028,6 +1159,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_submission_duplicates: {
+        Args: { submission_id: string }
+        Returns: string[]
+      }
       get_user_privilege: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_privilege"]
@@ -1075,6 +1210,10 @@ export type Database = {
           p_description?: string
           p_metadata?: Json
         }
+        Returns: string
+      }
+      process_quote_submission: {
+        Args: { submission_id: string; approve: boolean }
         Returns: string
       }
       secure_update_user_privilege: {

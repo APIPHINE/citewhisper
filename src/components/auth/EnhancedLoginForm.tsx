@@ -1,186 +1,187 @@
 
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Eye, EyeOff, AlertCircle, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-const EnhancedLoginForm = () => {
-  const navigate = useNavigate();
-  const { signIn } = useAuth();
-  
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  
+export const EnhancedLoginForm: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [showPasswordResetHelper, setShowPasswordResetHelper] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+  const { signIn, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
     }
-  };
+  }, [user, navigate]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+  useEffect(() => {
+    // Show password reset helper after 3 failed attempts
+    if (failedAttempts >= 3) {
+      setShowPasswordResetHelper(true);
     }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  }, [failedAttempts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
+    setError(null);
+    setIsLoading(true);
 
     try {
-      const { error } = await signIn(formData.email, formData.password);
+      const { error } = await signIn(email, password);
 
-      if (!error) {
-        // Success - redirect will happen via auth state change
+      if (error) {
+        setError(error.message);
+        setFailedAttempts(prev => prev + 1);
+      } else {
+        setFailedAttempts(0);
         navigate('/');
       }
     } catch (err) {
-      setErrors({ submit: 'An unexpected error occurred. Please try again.' });
+      setError('An unexpected error occurred. Please try again.');
+      setFailedAttempts(prev => prev + 1);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-2xl shadow-elevation p-8 border border-border"
-      >
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Field */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">
-              Email Address
-            </Label>
-            <div className="relative">
-              <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+    <div className="w-full max-w-md mx-auto space-y-6">
+      <Card>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+          <CardDescription className="text-center">
+            Enter your credentials to access your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {showPasswordResetHelper && (
+              <Alert>
+                <HelpCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Having trouble logging in? You can{' '}
+                  <Link 
+                    to="/forgot-password" 
+                    className="font-medium text-primary underline underline-offset-4 hover:no-underline"
+                  >
+                    reset your password
+                  </Link>{' '}
+                  or contact support if you continue to experience issues.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                value={formData.email}
-                onChange={handleInputChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 placeholder="Enter your email"
-                className={`pl-10 ${errors.email ? 'border-red-500' : ''}`}
-                disabled={loading}
+                autoComplete="email"
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-red-600 flex items-center gap-1">
-                <X size={14} />
-                {errors.email}
-              </p>
-            )}
-          </div>
 
-          {/* Password Field */}
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">
-              Password
-            </Label>
-            <div className="relative">
-              <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={handleInputChange}
-                placeholder="Enter your password"
-                className={`pl-10 pr-10 ${errors.password ? 'border-red-500' : ''}`}
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </Button>
+              </div>
             </div>
-            {errors.password && (
-              <p className="text-sm text-red-600 flex items-center gap-1">
-                <X size={14} />
-                {errors.password}
-              </p>
-            )}
-          </div>
 
-          {/* Forgot Password Link */}
-          <div className="text-right">
-            <Link 
-              to="/forgot-password" 
-              className="text-sm text-primary hover:underline"
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
             >
-              Forgot your password?
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm">
+            Don't have an account?{' '}
+            <Link
+              to="/signup"
+              className="font-medium text-primary underline underline-offset-4 hover:no-underline"
+            >
+              Sign up
             </Link>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Submit Error */}
-          {errors.submit && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600 flex items-center gap-1">
-                <X size={14} />
-                {errors.submit}
-              </p>
+      {failedAttempts >= 2 && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <HelpCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-amber-800">
+                  Need Help Signing In?
+                </h4>
+                <div className="text-sm text-amber-700 space-y-1">
+                  <p>• Make sure your email and password are correct</p>
+                  <p>• Check if Caps Lock is on</p>
+                  <p>• Try resetting your password if you can't remember it</p>
+                </div>
+                <Link
+                  to="/forgot-password"
+                  className="inline-block text-sm font-medium text-amber-800 underline underline-offset-4 hover:no-underline"
+                >
+                  Reset Password →
+                </Link>
+              </div>
             </div>
-          )}
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? 'Signing In...' : 'Sign In'}
-          </Button>
-
-          {/* Sign Up Link */}
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-primary hover:underline font-medium">
-                Sign up
-              </Link>
-            </p>
-          </div>
-        </form>
-      </motion.div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
-
-export default EnhancedLoginForm;
