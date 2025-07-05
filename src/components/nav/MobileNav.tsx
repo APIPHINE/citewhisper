@@ -34,9 +34,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => 
         {user ? (
           <div className="border-t pt-4 space-y-2">
             <p className="text-sm text-muted-foreground">{user.email}</p>
-            <Button 
+            <Button
               asChild
-              variant="outline" 
+              variant="outline"
               className="w-full justify-start"
             >
               <Link to="/profile" onClick={onLinkClick}>
@@ -44,8 +44,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onLinkClick }) => 
                 Profile Settings
               </Link>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link to="/account-settings" onClick={onLinkClick}>
+                <Settings size={16} className="mr-2" />
+                Account Settings
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleSignOut}
               className="w-full justify-start"
             >
