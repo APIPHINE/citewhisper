@@ -50,6 +50,12 @@ export const AuthSection = () => {
                 Profile Settings
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/account-settings" className="flex items-center">
+                <Settings size={16} className="mr-2" />
+                Account Settings
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut size={16} className="mr-2" />
