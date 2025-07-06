@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -76,24 +76,33 @@ export const ResetPasswordForm: React.FC = () => {
   const [isValidSession, setIsValidSession] = useState(false);
 
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const { resetPassword, session } = useAuth();
+  const { resetPassword, session, user } = useAuth();
+
+  // Check if this is a direct password change (user logged in) or email reset
+  const isDirectPasswordChange = location.pathname === '/change-password' && user;
 
   useEffect(() => {
-    // Check if we have a valid password reset session
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const type = searchParams.get('type');
-
-    if (type === 'recovery' && (accessToken || session)) {
+    if (isDirectPasswordChange) {
+      // User is logged in and wants to change password directly
       setIsValidSession(true);
     } else {
-      setMessage({
-        type: 'error',
-        text: 'Invalid or expired password reset link. Please request a new one.'
-      });
+      // Check if we have a valid password reset session from email
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+      const type = searchParams.get('type');
+
+      if (type === 'recovery' && (accessToken || session)) {
+        setIsValidSession(true);
+      } else {
+        setMessage({
+          type: 'error',
+          text: 'Invalid or expired password reset link. Please request a new one.'
+        });
+      }
     }
-  }, [searchParams, session]);
+  }, [searchParams, session, isDirectPasswordChange]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,13 +128,21 @@ export const ResetPasswordForm: React.FC = () => {
       } else {
         setMessage({ 
           type: 'success', 
-          text: 'Password reset successfully! You can now sign in with your new password.' 
+          text: isDirectPasswordChange 
+            ? 'Password updated successfully!' 
+            : 'Password reset successfully! You can now sign in with your new password.' 
         });
         
-        // Redirect to login after successful reset
-        setTimeout(() => {
-          navigate('/login');
-        }, 3000);
+        // Redirect after successful reset
+        if (!isDirectPasswordChange) {
+          setTimeout(() => {
+            navigate('/login');
+          }, 3000);
+        } else {
+          // Clear form for direct password change
+          setNewPassword('');
+          setConfirmPassword('');
+        }
       }
     } catch (err) {
       setMessage({ type: 'error', text: 'An unexpected error occurred' });
@@ -152,10 +169,10 @@ export const ResetPasswordForm: React.FC = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          Reset Your Password
+          {isDirectPasswordChange ? 'Change Your Password' : 'Reset Your Password'}
         </CardTitle>
         <CardDescription>
-          Enter your new password below
+          {isDirectPasswordChange ? 'Enter your new password below' : 'Enter your new password below'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -248,7 +265,7 @@ export const ResetPasswordForm: React.FC = () => {
               className="w-full"
               disabled={isLoading || !newPassword || !confirmPassword || newPassword !== confirmPassword}
             >
-              {isLoading ? 'Resetting Password...' : 'Reset Password'}
+              {isLoading ? (isDirectPasswordChange ? 'Updating Password...' : 'Resetting Password...') : (isDirectPasswordChange ? 'Update Password' : 'Reset Password')}
             </Button>
           </form>
         )}

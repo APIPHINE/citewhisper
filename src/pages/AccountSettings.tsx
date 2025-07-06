@@ -22,7 +22,7 @@ const AccountSettings = () => {
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
                 <CardDescription>
-                  Update your personal information and preferences
+                  Manage your personal information and preferences. Click the edit button next to any field to modify it.
                 </CardDescription>
               </CardHeader>
               <CardContent>

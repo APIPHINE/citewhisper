@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -25,6 +24,7 @@ import SignUp from './pages/SignUp';
 import EmailVerification from './pages/EmailVerification';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ChangePassword from './pages/ChangePassword';
 import { Toaster } from "@/components/ui/toaster"
 
 function App() {
@@ -53,6 +53,7 @@ function App() {
                 <Route path="/email-verification" element={<EmailVerification />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/change-password" element={<ChangePassword />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<Admin />} />
