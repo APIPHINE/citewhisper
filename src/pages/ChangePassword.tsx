@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
+import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
 import { useAuth } from '@/context/AuthContext';
 import { Navigate } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ const ChangePassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 pt-36">
-      <ResetPasswordForm />
+      <ChangePasswordForm />
     </div>
   );
 };
