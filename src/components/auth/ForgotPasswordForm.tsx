@@ -16,7 +16,7 @@ const ForgotPasswordForm = () => {
   const [sent, setSent] = useState(false);
   const [method, setMethod] = useState<'reset' | 'magic'>('reset');
   const { toast } = useToast();
-  const { signInWithMagicLink } = useAuth();
+  const { signInWithMagicLink, requestPasswordReset } = useAuth();
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +33,7 @@ const ForgotPasswordForm = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
-      });
+      const { error } = await requestPasswordReset(email);
 
       if (error) {
         toast({
