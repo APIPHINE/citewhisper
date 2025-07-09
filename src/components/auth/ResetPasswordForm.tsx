@@ -89,11 +89,13 @@ export const ResetPasswordForm: React.FC = () => {
       setIsValidSession(true);
     } else {
       // Check if we have a valid password reset session from email
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
+      const token = searchParams.get('token');
       const type = searchParams.get('type');
 
-      if (type === 'recovery' && (accessToken || session)) {
+      if (type === 'recovery' && token) {
+        setIsValidSession(true);
+      } else if (session) {
+        // If user has an active session, allow password reset
         setIsValidSession(true);
       } else {
         setMessage({
