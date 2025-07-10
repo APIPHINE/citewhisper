@@ -39,7 +39,23 @@ export function useBatchQuoteSubmission() {
             quote_context: quoteData.context || undefined,
             source_title: quoteData.source || undefined,
             source_url: quoteData.sourceUrl || undefined,
-            topics: quoteData.topics || undefined
+            topics: quoteData.topics || undefined,
+            theme: quoteData.theme || undefined,
+            originalLanguage: quoteData.originalLanguage || undefined,
+            originalText: quoteData.originalText || undefined,
+            historicalContext: quoteData.historicalContext || undefined,
+            emotionalTone: quoteData.emotionalTone || undefined,
+            originalSource: quoteData.originalSource || undefined,
+            translations: quoteData.translations?.filter(t => t.language && t.text).map(t => ({
+              language: t.language!,
+              text: t.text!,
+              source: t.source,
+              translator: t.translator,
+              publication: t.publication,
+              publicationDate: t.publicationDate,
+              sourceUrl: t.sourceUrl
+            })) || undefined,
+            keywords: quoteData.keywords || undefined
           };
 
           const result = await createQuote(submissionData, user.id);

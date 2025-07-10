@@ -52,7 +52,7 @@ export function parseCSV(csvText: string): CsvParseResult {
     throw new Error("CSV must contain at least a header row and one data row");
   }
 
-  const headers = rows[0].split(',').map(h => h.trim().replace(/^"(.*)"$/, '$1'));
+  const headers = parseCSVRow(rows[0]).map(h => h.trim().replace(/^"(.*)"$/, '$1'));
   const dataRows = rows.slice(1).map(row => parseCSVRow(row));
 
   return { headers, rows: dataRows };

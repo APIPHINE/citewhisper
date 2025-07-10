@@ -29,6 +29,36 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
         case 'keywords':
           quoteData[header] = value.split(';').map(item => item.trim()).filter(Boolean);
           break;
+        case 'date':
+          quoteData.date = value;
+          break;
+        case 'theme':
+          quoteData.theme = value;
+          break;
+        case 'source':
+          quoteData.source = value;
+          break;
+        case 'sourceUrl':
+          quoteData.sourceUrl = value;
+          break;
+        case 'sourcePublicationDate':
+          quoteData.sourcePublicationDate = value;
+          break;
+        case 'originalLanguage':
+          quoteData.originalLanguage = value;
+          break;
+        case 'originalText':
+          quoteData.originalText = value;
+          break;
+        case 'context':
+          quoteData.context = value;
+          break;
+        case 'historicalContext':
+          quoteData.historicalContext = value;
+          break;
+        case 'emotionalTone':
+          quoteData.emotionalTone = value;
+          break;
         case 'originalSourceTitle':
           if (!quoteData.originalSource) quoteData.originalSource = {};
           quoteData.originalSource.title = value;
@@ -79,7 +109,7 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
                              translationField === 'sourceurl' ? 'sourceUrl' : translationField;
           
           if (quoteData.translations[0] && mappedField in quoteData.translations[0]) {
-            quoteData.translations[0][mappedField] = value;
+            (quoteData.translations[0] as any)[mappedField] = value;
           }
           break;
         default:

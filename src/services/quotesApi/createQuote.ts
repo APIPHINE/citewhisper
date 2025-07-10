@@ -26,6 +26,29 @@ export interface QuoteSubmissionData {
   source_title?: string;
   source_url?: string;
   topics?: string[];
+  theme?: string;
+  originalLanguage?: string;
+  originalText?: string;
+  historicalContext?: string;
+  emotionalTone?: string;
+  keywords?: string[];
+  originalSource?: {
+    title?: string;
+    publisher?: string;
+    publicationDate?: string;
+    location?: string;
+    isbn?: string;
+    sourceUrl?: string;
+  };
+  translations?: Array<{
+    language: string;
+    text: string;
+    source?: string;
+    translator?: string;
+    publication?: string;
+    publicationDate?: string;
+    sourceUrl?: string;
+  }>;
 }
 
 export interface CreateQuoteResponse {
@@ -36,7 +59,7 @@ export interface CreateQuoteResponse {
 }
 
 export const createQuote = async (
-  quoteData: CreateQuoteRequest,
+  quoteData: CreateQuoteRequest | QuoteSubmissionData,
   userId?: string
 ): Promise<CreateQuoteResponse> => {
   try {
@@ -57,8 +80,8 @@ export const createQuote = async (
         author_name: quoteData.author_name?.trim(),
         date_original: quoteData.date_original || null,
         quote_context: quoteData.quote_context?.trim(),
-        quote_image_url: quoteData.quote_image_url,
-        seo_keywords: quoteData.seo_keywords || [],
+        quote_image_url: (quoteData as CreateQuoteRequest).quote_image_url,
+        seo_keywords: (quoteData as CreateQuoteRequest).seo_keywords || [],
         created_by: userId,
         updated_by: userId
       })
@@ -72,15 +95,19 @@ export const createQuote = async (
 
     // Create source if provided
     let sourceId: string | null = null;
-    if (quoteData.source_title || quoteData.source_author) {
+    const submissionData = quoteData as QuoteSubmissionData;
+    if (quoteData.source_title || (quoteData as CreateQuoteRequest).source_author || submissionData.originalSource?.title) {
       const { data: source, error: sourceError } = await supabase
         .from('original_sources')
         .insert({
-          title: quoteData.source_title?.trim(),
-          author: quoteData.source_author?.trim(),
-          publisher: quoteData.source_publisher?.trim(),
-          publication_year: quoteData.source_year?.trim(),
-          archive_url: quoteData.source_url?.trim()
+          title: submissionData.originalSource?.title || quoteData.source_title?.trim(),
+          author: (quoteData as CreateQuoteRequest).source_author?.trim(),
+          publisher: submissionData.originalSource?.publisher?.trim(),
+          publication_year: submissionData.originalSource?.publicationDate?.trim(),
+          archive_url: submissionData.originalSource?.sourceUrl || quoteData.source_url?.trim(),
+          location: submissionData.originalSource?.location?.trim(),
+          source_type: 'book', // Default type
+          language: submissionData.originalLanguage
         })
         .select()
         .single();
@@ -93,6 +120,26 @@ export const createQuote = async (
           .from('quotes')
           .update({ source_id: sourceId })
           .eq('id', quote.id);
+      }
+    }
+
+    // Create translations if provided
+    if (submissionData.translations && submissionData.translations.length > 0) {
+      for (const translation of submissionData.translations) {
+        if (translation.text && translation.language) {
+          await supabase
+            .from('translations')
+            .insert({
+              quote_id: quote.id,
+              language: translation.language,
+              translated_text: translation.text,
+              translator: translation.translator,
+              source: translation.source,
+              publication: translation.publication,
+              publication_date: translation.publicationDate || null,
+              source_url: translation.sourceUrl
+            });
+        }
       }
     }
 
@@ -124,8 +171,9 @@ export const createQuote = async (
     );
 
     // Handle evidence file uploads if provided
-    if (quoteData.evidence_files && quoteData.evidence_files.length > 0) {
-      for (const file of quoteData.evidence_files) {
+    const createQuoteRequest = quoteData as CreateQuoteRequest;
+    if (createQuoteRequest.evidence_files && createQuoteRequest.evidence_files.length > 0) {
+      for (const file of createQuoteRequest.evidence_files) {
         // This would typically upload to storage and then create evidence submission
         // For now, we'll just log the intent
         console.log(`Evidence file to upload: ${file.name}`);
