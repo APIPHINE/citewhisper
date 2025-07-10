@@ -11,6 +11,10 @@ import Profile from './pages/Profile';
 import UserProfile from './pages/UserProfile';
 import Admin from './pages/Admin';
 import CMSDashboard from './pages/cms/CMSDashboard';
+import ArticleEditor from './pages/cms/ArticleEditor';
+import ArticlesList from './pages/cms/ArticlesList';
+import PageEditor from './pages/cms/PageEditor';
+import MediaManager from './pages/cms/MediaManager';
 import AccountSettings from './pages/AccountSettings';
 import PublicArticle from './pages/cms/PublicArticle';
 import PublicArticlesList from './pages/cms/PublicArticlesList';
@@ -58,6 +62,12 @@ function App() {
                 {/* Admin Routes */}
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/cms" element={<CMSDashboard />} />
+                <Route path="/admin/cms/articles" element={<ArticlesList />} />
+                <Route path="/admin/cms/articles/new" element={<ArticleEditor />} />
+                <Route path="/admin/cms/articles/:id/edit" element={<ArticleEditor />} />
+                <Route path="/admin/cms/pages/new" element={<PageEditor />} />
+                <Route path="/admin/cms/pages/:id/edit" element={<PageEditor />} />
+                <Route path="/admin/cms/media" element={<MediaManager />} />
                 
                 {/* Articles Routes (consolidating research content) */}
                 <Route path="/articles" element={<PublicArticlesList />} />

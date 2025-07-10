@@ -2,6 +2,7 @@
 import React from 'react';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import QuoteSubmissionsManager from '@/components/admin/QuoteSubmissionsManager';
+import CMSDashboard from '@/pages/cms/CMSDashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Admin = () => {
@@ -9,9 +10,10 @@ const Admin = () => {
     <div className="min-h-screen pt-36 pb-20 page-padding">
       <div className="page-max-width">
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="dashboard">Admin Dashboard</TabsTrigger>
             <TabsTrigger value="submissions">Quote Submissions</TabsTrigger>
+            <TabsTrigger value="cms">Content Management</TabsTrigger>
           </TabsList>
           
           <TabsContent value="dashboard">
@@ -20,6 +22,10 @@ const Admin = () => {
           
           <TabsContent value="submissions">
             <QuoteSubmissionsManager />
+          </TabsContent>
+          
+          <TabsContent value="cms">
+            <CMSDashboard />
           </TabsContent>
         </Tabs>
       </div>
