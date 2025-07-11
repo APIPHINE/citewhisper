@@ -20,6 +20,7 @@ import PublicArticle from './pages/cms/PublicArticle';
 import PublicArticlesList from './pages/cms/PublicArticlesList';
 import AddQuote from './pages/AddQuote';
 import Resources from './pages/Resources';
+import Research from './pages/Research';
 import Favorites from './pages/Favorites';
 import Tools from './pages/Tools';
 import About from './pages/About';
@@ -47,6 +48,7 @@ function App() {
                 <Route path="/account-settings" element={<AccountSettings />} />
                 <Route path="/add-quote" element={<AddQuote />} />
                 <Route path="/resources" element={<Resources />} />
+                <Route path="/research" element={<Research />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/about" element={<About />} />
