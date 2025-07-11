@@ -1,26 +1,35 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, User, ArrowLeft, Share2, Edit } from 'lucide-react';
-import { fetchArticleBySlug } from '@/services/cmsService';
+import { Calendar, User, ArrowLeft, Share2, Edit, Save, X, Settings, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { fetchArticleBySlug, updateArticle, deleteArticle } from '@/services/cmsService';
 import { useAuth } from '@/context/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { CommentSystem } from '@/components/cms/CommentSystem';
+import { RichTextEditor } from '@/components/cms/RichTextEditor';
 import type { CMSArticle } from '@/types/cms';
 
 const PublicArticle = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const { canManageRoles } = useUserRoles();
+  const { userRole } = useUserRoles();
   const { toast } = useToast();
   const [article, setArticle] = useState<CMSArticle | null>(null);
+  const [editingArticle, setEditingArticle] = useState<CMSArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const isSuperAdmin = userRole === 'super_admin';
 
   useEffect(() => {
     if (slug) {
@@ -64,6 +73,79 @@ const PublicArticle = () => {
       toast({
         title: "Link Copied",
         description: "Article link copied to clipboard",
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!editingArticle || !article) return;
+
+    try {
+      setSaving(true);
+      await updateArticle(article.id, editingArticle);
+      setArticle(editingArticle);
+      setEditMode(false);
+      setEditingArticle(null);
+      
+      toast({
+        title: "Success",
+        description: "Article updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update article",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTogglePublish = async () => {
+    if (!article) return;
+
+    try {
+      const newStatus = article.status === 'published' ? 'draft' : 'published';
+      await updateArticle(article.id, { 
+        status: newStatus,
+        published_at: newStatus === 'published' ? new Date().toISOString() : undefined
+      });
+      
+      setArticle({ ...article, status: newStatus });
+      
+      toast({
+        title: "Success",
+        description: `Article ${newStatus === 'published' ? 'published' : 'unpublished'}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update article status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteArticle = async () => {
+    if (!article) return;
+
+    if (!confirm(`Are you sure you want to delete "${article.title}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await deleteArticle(article.id);
+      toast({
+        title: "Success",
+        description: "Article deleted successfully",
+      });
+      navigate('/articles');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete article",
+        variant: "destructive",
       });
     }
   };
@@ -136,10 +218,29 @@ const PublicArticle = () => {
               </Link>
             </Button>
 
-            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
-            
-            {article.excerpt && (
-              <p className="text-xl text-muted-foreground mb-6">{article.excerpt}</p>
+            {editMode && editingArticle ? (
+              <div className="space-y-4 mb-6">
+                <Input
+                  value={editingArticle.title}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
+                  className="text-4xl font-bold border-none p-0 text-4xl"
+                  placeholder="Article title..."
+                />
+                <Textarea
+                  value={editingArticle.excerpt || ''}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, excerpt: e.target.value })}
+                  className="text-xl text-muted-foreground border-dashed"
+                  placeholder="Article excerpt..."
+                  rows={2}
+                />
+              </div>
+            ) : (
+              <>
+                <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+                {article.excerpt && (
+                  <p className="text-xl text-muted-foreground mb-6">{article.excerpt}</p>
+                )}
+              </>
             )}
 
             <div className="flex items-center justify-between mb-6">
@@ -160,13 +261,31 @@ const PublicArticle = () => {
                   Share
                 </Button>
                 
-                {canManageRoles() && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/admin/cms/articles/${article.slug}/edit`}>
-                      <Edit size={16} className="mr-2" />
-                      Edit
-                    </Link>
-                  </Button>
+                {isSuperAdmin && (
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={editMode ? "default" : "outline"} 
+                      size="sm" 
+                      onClick={() => {
+                        if (editMode) {
+                          setEditMode(false);
+                          setEditingArticle(null);
+                        } else {
+                          setEditMode(true);
+                          setEditingArticle({ ...article });
+                        }
+                      }}
+                    >
+                      {editMode ? <X size={16} className="mr-2" /> : <Edit size={16} className="mr-2" />}
+                      {editMode ? 'Cancel' : 'Edit'}
+                    </Button>
+                    {editMode && (
+                      <Button size="sm" onClick={handleSave} disabled={saving}>
+                        <Save size={16} className="mr-2" />
+                        Save
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -195,14 +314,49 @@ const PublicArticle = () => {
           {/* Article Content */}
           <Card>
             <CardContent className="p-8">
-              <div 
-                className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ 
-                  __html: `<p class="mb-4">${renderContent(article.content)}</p>` 
-                }}
-              />
+              {editMode && editingArticle ? (
+                <RichTextEditor
+                  value={editingArticle.content}
+                  onChange={(content) => setEditingArticle({ ...editingArticle, content })}
+                  placeholder="Article content..."
+                />
+              ) : (
+                <div 
+                  className="prose prose-lg max-w-none"
+                  dangerouslySetInnerHTML={{ 
+                    __html: `<p class="mb-4">${renderContent(article.content)}</p>` 
+                  }}
+                />
+              )}
             </CardContent>
           </Card>
+
+          {/* Super Admin Controls */}
+          {isSuperAdmin && !editMode && (
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex gap-2 justify-center">
+                  <Button variant="outline" size="sm" onClick={handleTogglePublish}>
+                    {article.status === 'published' ? (
+                      <>
+                        <ToggleRight size={16} className="mr-2" />
+                        Unpublish
+                      </>
+                    ) : (
+                      <>
+                        <ToggleLeft size={16} className="mr-2" />
+                        Publish
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={handleDeleteArticle}>
+                    <Trash2 size={16} className="mr-2" />
+                    Delete Article
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Article Footer */}
           <div className="pt-8 border-t">

@@ -12,6 +12,7 @@ import UserProfile from './pages/UserProfile';
 import Admin from './pages/Admin';
 import CMSDashboard from './pages/cms/CMSDashboard';
 import ArticleEditor from './pages/cms/ArticleEditor';
+import NewArticle from './pages/cms/NewArticle';
 import ArticlesList from './pages/cms/ArticlesList';
 import PageEditor from './pages/cms/PageEditor';
 import MediaManager from './pages/cms/MediaManager';
@@ -65,7 +66,7 @@ function App() {
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/cms" element={<CMSDashboard />} />
                 <Route path="/admin/cms/articles" element={<ArticlesList />} />
-                <Route path="/admin/cms/articles/new" element={<ArticleEditor />} />
+                <Route path="/admin/cms/articles/new" element={<NewArticle />} />
                 <Route path="/admin/cms/articles/:id/edit" element={<ArticleEditor />} />
                 <Route path="/admin/cms/pages/new" element={<PageEditor />} />
                 <Route path="/admin/cms/pages/:id/edit" element={<PageEditor />} />
