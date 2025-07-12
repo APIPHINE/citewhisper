@@ -33,6 +33,7 @@ import ResetPassword from './pages/ResetPassword';
 import ChangePassword from './pages/ChangePassword';
 import { Toaster } from "@/components/ui/toaster"
 import { SecurityAuditLogger } from '@/components/auth/SecurityAuditLogger';
+import { AdminRoute } from '@/components/auth/AdminRoute';
 
 function App() {
   return (
@@ -65,14 +66,14 @@ function App() {
                 <Route path="/change-password" element={<ChangePassword />} />
                 
                 {/* Admin Routes */}
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/cms" element={<CMSDashboard />} />
-                <Route path="/admin/cms/articles" element={<ArticlesList />} />
-                <Route path="/admin/cms/articles/new" element={<NewArticle />} />
-                <Route path="/admin/cms/articles/:id/edit" element={<ArticleEditor />} />
-                <Route path="/admin/cms/pages/new" element={<PageEditor />} />
-                <Route path="/admin/cms/pages/:id/edit" element={<PageEditor />} />
-                <Route path="/admin/cms/media" element={<MediaManager />} />
+                <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path="/admin/cms" element={<AdminRoute><CMSDashboard /></AdminRoute>} />
+                <Route path="/admin/cms/articles" element={<AdminRoute><ArticlesList /></AdminRoute>} />
+                <Route path="/admin/cms/articles/new" element={<AdminRoute requireSuperAdmin><NewArticle /></AdminRoute>} />
+                <Route path="/admin/cms/articles/:id/edit" element={<AdminRoute requireSuperAdmin><ArticleEditor /></AdminRoute>} />
+                <Route path="/admin/cms/pages/new" element={<AdminRoute requireSuperAdmin><PageEditor /></AdminRoute>} />
+                <Route path="/admin/cms/pages/:id/edit" element={<AdminRoute requireSuperAdmin><PageEditor /></AdminRoute>} />
+                <Route path="/admin/cms/media" element={<AdminRoute><MediaManager /></AdminRoute>} />
                 
                 {/* Articles Routes (consolidating research content) */}
                 <Route path="/articles" element={<PublicArticlesList />} />

@@ -38,7 +38,7 @@ const NewArticle = () => {
 
   // Redirect if not super admin
   if (!isSuperAdmin) {
-    navigate('/articles');
+    navigate('/admin');
     return null;
   }
 
@@ -86,7 +86,7 @@ const NewArticle = () => {
         description: `Article ${status === 'published' ? 'published' : 'saved as draft'}`,
       });
       
-      navigate(`/articles/${newArticle.slug}`);
+      navigate(`/admin/cms/articles`);
     } catch (error) {
       console.error('Error creating article:', error);
       toast({
@@ -107,10 +107,10 @@ const NewArticle = () => {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-4">
-                <Button variant="outline" onClick={() => navigate('/articles')}>
-                  <ArrowLeft size={16} className="mr-2" />
-                  Back to Articles
-                </Button>
+              <Button variant="outline" onClick={() => navigate('/admin/cms/articles')}>
+                <ArrowLeft size={16} className="mr-2" />
+                Back to Articles
+              </Button>
                 <h1 className="text-2xl font-bold">Create New Article</h1>
               </div>
             </div>
