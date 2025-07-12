@@ -39,12 +39,26 @@ export const EnhancedLoginForm: React.FC = () => {
     setError(null);
     setIsLoading(true);
 
+    // Basic rate limiting (client-side)
+    if (failedAttempts >= 5) {
+      setError('Too many failed attempts. Please wait before trying again.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { error } = await signIn(email, password);
 
       if (error) {
         setError(error.message);
         setFailedAttempts(prev => prev + 1);
+        
+        // Log failed login attempt
+        console.warn('Failed login attempt:', {
+          email,
+          timestamp: new Date().toISOString(),
+          attempts: failedAttempts + 1
+        });
       } else {
         setFailedAttempts(0);
         navigate('/');

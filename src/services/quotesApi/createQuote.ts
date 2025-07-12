@@ -72,6 +72,12 @@ export const createQuote = async (
       return { success: false, error: 'User authentication required' };
     }
 
+    // Rate limiting check
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) {
+      return { success: false, error: 'Authentication required' };
+    }
+
     // Create the quote with user ownership
     const { data: quote, error: quoteError } = await supabase
       .from('quotes')

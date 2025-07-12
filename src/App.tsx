@@ -32,12 +32,14 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ChangePassword from './pages/ChangePassword';
 import { Toaster } from "@/components/ui/toaster"
+import { SecurityAuditLogger } from '@/components/auth/SecurityAuditLogger';
 
 function App() {
   return (
     <AuthProvider>
       <SearchProvider>
         <FavoritesProvider>
+          <SecurityAuditLogger />
           <Router>
             <div className="min-h-screen bg-white">
               <NavBar />

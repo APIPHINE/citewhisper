@@ -194,7 +194,15 @@ export type Database = {
           updated_at?: string | null
           view_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_cms_articles_author"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cms_categories: {
         Row: {
@@ -1164,6 +1172,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit_db: {
+        Args: {
+          user_id_param: string
+          action_param: string
+          max_attempts?: number
+          window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_submission_duplicates: {
         Args: { submission_id: string }
         Returns: string[]

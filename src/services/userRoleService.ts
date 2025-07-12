@@ -47,6 +47,22 @@ export const updateUserPrivilege = async (
   assignedBy: string
 ): Promise<boolean> => {
   try {
+    // Additional client-side validation
+    const { data: currentUser } = await supabase.auth.getUser();
+    if (!currentUser.user || currentUser.user.id !== assignedBy) {
+      console.error('Authentication mismatch');
+      return false;
+    }
+
+    // Check if trying to modify own super_admin role
+    if (userId === assignedBy && newPrivilege !== 'super_admin') {
+      const currentRole = await fetchCurrentUserRole(userId);
+      if (currentRole === 'super_admin') {
+        console.error('Cannot self-demote from super_admin');
+        return false;
+      }
+    }
+
     // Use the new secure function for privilege updates
     const { data, error } = await supabase.rpc('secure_update_user_privilege', {
       target_user_id: userId,
