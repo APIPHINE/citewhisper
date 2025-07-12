@@ -2,15 +2,8 @@
 import { useState } from 'react';
 import { Quote } from '../../../utils/quotesData';
 import { ShareEmbedButton } from './ShareEmbedButton';
-import { QuoteMainContent } from './QuoteMainContent';
+import { LayeredQuoteDisplay } from './LayeredQuoteDisplay';
 import { EmbedCodeSection } from '../EmbedCodeSection';
-import { SourceSection } from '../SourceSection';
-import { ContextSection } from '../ContextSection';
-import { RelatedContentSection } from '../RelatedContentSection';
-import { TagsSection } from '../TagsSection';
-import { CitationSection } from '../CitationSection';
-import { ExportSection } from '../ExportSection';
-import { CitedBySection } from '../CitedBySection';
 import { QuoteActions } from './QuoteActions';
 import { EmbedStyle, EmbedColor, EmbedSize } from '@/types/embed';
 
@@ -42,32 +35,26 @@ export function ExpandedQuoteContent({
   
   return (
     <div className="overflow-y-auto p-6 max-h-[calc(90vh-80px)]">
-      <QuoteMainContent quote={quote} />
+      <LayeredQuoteDisplay quote={quote} />
       
-      <ShareEmbedButton 
-        handleShareClick={handleShareClick} 
-        showEmbedSection={showEmbedSection} 
-      />
-      
-      {showEmbedSection && (
-        <EmbedCodeSection
-          quote={quote}
-          embedStyle={embedStyle}
-          setEmbedStyle={setEmbedStyle}
-          embedColor={embedColor}
-          setEmbedColor={setEmbedColor}
-          embedSize={embedSize}
-          setEmbedSize={setEmbedSize}
+      <div className="mt-6 pt-6 border-t border-border">
+        <ShareEmbedButton 
+          handleShareClick={handleShareClick} 
+          showEmbedSection={showEmbedSection} 
         />
-      )}
-      
-      <SourceSection quote={quote} />
-      <ContextSection quote={quote} />
-      <RelatedContentSection quote={quote} />
-      <TagsSection quote={quote} />
-      <CitationSection quote={quote} />
-      <ExportSection quote={quote} />
-      <CitedBySection quote={quote} />
+        
+        {showEmbedSection && (
+          <EmbedCodeSection
+            quote={quote}
+            embedStyle={embedStyle}
+            setEmbedStyle={setEmbedStyle}
+            embedColor={embedColor}
+            setEmbedColor={setEmbedColor}
+            embedSize={embedSize}
+            setEmbedSize={setEmbedSize}
+          />
+        )}
+      </div>
       
       <QuoteActions 
         handleShareClick={handleShareClick}
