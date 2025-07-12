@@ -9,24 +9,24 @@ const Admin = () => {
   return (
     <div className="min-h-screen pt-36 pb-20 page-padding">
       <div className="page-max-width">
-        <Tabs defaultValue="dashboard" className="w-full">
+        <Tabs defaultValue="cms" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="cms">Blog & Content</TabsTrigger>
             <TabsTrigger value="dashboard">Admin Dashboard</TabsTrigger>
             <TabsTrigger value="submissions">Quote Submissions</TabsTrigger>
-            <TabsTrigger value="cms">Content Management</TabsTrigger>
             <TabsTrigger value="research">Research & Articles</TabsTrigger>
           </TabsList>
           
+          <TabsContent value="cms">
+            <CMSDashboard />
+          </TabsContent>
+
           <TabsContent value="dashboard">
             <AdminDashboard />
           </TabsContent>
           
           <TabsContent value="submissions">
             <QuoteSubmissionsManager />
-          </TabsContent>
-          
-          <TabsContent value="cms">
-            <CMSDashboard />
           </TabsContent>
           
           <TabsContent value="research">

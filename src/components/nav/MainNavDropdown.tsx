@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, Home, Quote, PlusCircle, Heart, Wrench, BookOpen, FileText, User2 } from 'lucide-react';
+import { ChevronDown, Home, Quote, PlusCircle, Heart, Wrench, BookOpen, FileText, User2, Shield } from 'lucide-react';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,9 @@ interface MainNavDropdownProps {
 
 export const MainNavDropdown: React.FC<MainNavDropdownProps> = ({ onLinkClick }) => {
   const location = useLocation();
+  const { userRole } = useUserRoles();
+
+  const isAdmin = userRole === 'admin' || userRole === 'super_admin';
 
   const navigationItems = [
     { to: '/', label: 'Home', icon: Home },
@@ -52,6 +56,20 @@ export const MainNavDropdown: React.FC<MainNavDropdownProps> = ({ onLinkClick })
             </Link>
           </DropdownMenuItem>
         ))}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link 
+              to="/admin" 
+              className={`flex items-center gap-2 w-full ${
+                location.pathname === '/admin' ? 'bg-accent' : ''
+              }`}
+              onClick={onLinkClick}
+            >
+              <Shield size={16} />
+              Admin Dashboard
+            </Link>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

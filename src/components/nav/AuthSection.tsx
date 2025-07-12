@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Settings, Activity } from 'lucide-react';
+import { User, LogOut, Settings, Activity, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { PrivilegeDisplay } from '@/components/auth/PrivilegeDisplay';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,9 @@ import {
 
 export const AuthSection = () => {
   const { user, signOut } = useAuth();
+  const { userRole } = useUserRoles();
+
+  const isAdmin = userRole === 'admin' || userRole === 'super_admin';
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,6 +48,14 @@ export const AuthSection = () => {
                 Dashboard
               </Link>
             </DropdownMenuItem>
+            {isAdmin && (
+              <DropdownMenuItem asChild>
+                <Link to="/admin" className="flex items-center">
+                  <Shield size={16} className="mr-2" />
+                  Admin Dashboard
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link to="/profile" className="flex items-center">
                 <Settings size={16} className="mr-2" />
