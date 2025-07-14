@@ -8,7 +8,7 @@ interface QuoteMainContentProps {
 }
 
 export function QuoteMainContent({ quote }: QuoteMainContentProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "es" | "fr">("en");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("en");
   
   // Handle translations and original text
   const getTranslation = () => {
@@ -56,7 +56,7 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setCurrentLanguage}
-              hasTranslations={hasTranslation}
+              translations={Array.isArray(quote.translations) ? quote.translations : []}
               originalLanguage={quote.originalLanguage}
             />
           </div>

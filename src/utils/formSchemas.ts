@@ -18,6 +18,12 @@ const translationSchema = z.object({
   publication: z.string().optional(),
   publicationDate: z.string().optional(),
   sourceUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  translationType: z.enum(['human', 'ai', 'machine']).default('human'),
+  translatorType: z.enum(['human', 'ai', 'community']).default('human'),
+  confidenceScore: z.number().min(0).max(1).optional(),
+  verified: z.boolean().default(false),
+  qualityRating: z.number().min(1).max(5).optional(),
+  aiModel: z.string().optional(),
 });
 
 export const quoteSchema = z.object({

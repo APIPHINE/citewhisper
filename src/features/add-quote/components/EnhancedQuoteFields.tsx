@@ -93,6 +93,13 @@ export function EnhancedQuoteFields({ form }: EnhancedQuoteFieldsProps) {
             </FormItem>
           )}
         />
+
+        {/* Translations will be managed separately in a dedicated component */}
+        <div className="p-4 bg-muted/50 rounded-lg">
+          <p className="text-sm text-muted-foreground">
+            💡 <strong>Translations:</strong> After creating the quote, you can add multiple translations with proper attribution, quality ratings, and verification status.
+          </p>
+        </div>
       </div>
 
       {/* Categorization Section */}

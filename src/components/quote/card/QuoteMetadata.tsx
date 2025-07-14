@@ -4,7 +4,7 @@ interface QuoteMetadataProps {
   date: string;
   source: string;
   translator?: string;
-  currentLanguage: "en" | "es" | "fr";
+  currentLanguage: string;
   topics: string[];
   theme?: string;
 }

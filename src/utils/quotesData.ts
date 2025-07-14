@@ -54,10 +54,19 @@ export interface Quote {
     publication?: string;
     publicationDate?: string;
     sourceUrl?: string;
+    translationType?: 'human' | 'ai' | 'machine';
+    translatorType?: 'human' | 'ai' | 'community';
+    confidenceScore?: number;
+    verified?: boolean;
+    qualityRating?: number;
+    aiModel?: string;
   }> | {
     fr?: {
       text: string;
       source?: string;
+      translationType?: 'human' | 'ai' | 'machine';
+      translatorType?: 'human' | 'ai' | 'community';
+      verified?: boolean;
     }
   };
 }

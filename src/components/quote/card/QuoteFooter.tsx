@@ -3,9 +3,14 @@ import { Heart, Share2 } from 'lucide-react';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 
 interface QuoteFooterProps {
-  currentLanguage: "en" | "es" | "fr";
-  setCurrentLanguage: (language: "en" | "es" | "fr") => void;
-  hasTranslation: boolean;
+  currentLanguage: string;
+  setCurrentLanguage: (language: string) => void;
+  translations?: Array<{
+    language: string;
+    text: string;
+    translatorType?: 'human' | 'ai' | 'community';
+    verified?: boolean;
+  }>;
   originalLanguage?: string;
   favoriteCount: number;
   shareCount: number;
@@ -15,7 +20,7 @@ interface QuoteFooterProps {
 export function QuoteFooter({ 
   currentLanguage, 
   setCurrentLanguage,
-  hasTranslation,
+  translations = [],
   originalLanguage,
   favoriteCount,
   shareCount,
@@ -24,11 +29,11 @@ export function QuoteFooter({
   return (
     <div className="mt-6 flex items-center">
       {/* Language Switcher */}
-      {(hasTranslation || originalLanguage === 'es') && (
+      {(translations.length > 0 || originalLanguage === 'es') && (
         <LanguageSwitcher
           currentLanguage={currentLanguage}
           onLanguageChange={setCurrentLanguage}
-          hasTranslations={hasTranslation}
+          translations={translations}
           originalLanguage={originalLanguage}
         />
       )}

@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Shield, BookOpen, GraduationCap } from 'lucide-react';
+import { ChevronDown, ChevronRight, Shield, BookOpen, GraduationCap, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '@/utils/quotesData';
+import { TranslationManager } from '@/components/translation/TranslationManager';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LayeredQuoteDisplayProps {
   quote: Quote;
@@ -13,12 +16,64 @@ interface LayeredQuoteDisplayProps {
 export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
   const [showEnhanced, setShowEnhanced] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showTranslations, setShowTranslations] = useState(false);
+  const { user } = useAuth();
   
   // Simple checks for data availability
   const hasEnhanced = !!(quote.context || quote.historicalContext || quote.originalLanguage || quote.topics?.length);
   const hasAdvanced = !!(quote.citationAPA || quote.citationMLA || quote.attributionStatus || quote.ocrExtractedText);
+  const hasTranslations = Boolean(
+    Array.isArray(quote.translations) ? quote.translations.length > 0 : 
+    quote.translations && Object.keys(quote.translations).length > 0
+  );
   
   const dataLayer = hasAdvanced ? 'advanced' : hasEnhanced ? 'enhanced' : 'core';
+
+  const handleAddTranslation = async (translation: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('translations')
+        .insert({
+          quote_id: quote.id,
+          language: translation.language,
+          translated_text: translation.text,
+          translator: translation.translator,
+          translation_type: translation.translationType,
+          translator_type: translation.translatorType,
+          confidence_score: translation.confidenceScore,
+          ai_model: translation.aiModel,
+          source: translation.source,
+          created_by: user?.id
+        });
+
+      if (error) throw error;
+      
+      // Refresh the page or update state to show new translation
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding translation:', error);
+    }
+  };
+
+  const handleVerifyTranslation = async (translationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('translations')
+        .update({
+          verified: true,
+          verified_by: user?.id,
+          verified_at: new Date().toISOString()
+        })
+        .eq('id', translationId);
+
+      if (error) throw error;
+      
+      // Refresh to show updated verification status
+      window.location.reload();
+    } catch (error) {
+      console.error('Error verifying translation:', error);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -161,6 +216,51 @@ export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
           </Card>
         </Collapsible>
       )}
+
+      {/* Translation Management Layer */}
+      <Collapsible open={showTranslations} onOpenChange={setShowTranslations}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-primary">
+                  <Languages className="h-5 w-5" />
+                  Translations & Multilingual Access
+                  <Badge variant="outline" className="text-xs">
+                    {hasTranslations ? `${Array.isArray(quote.translations) ? quote.translations.length : 1} available` : 'None'}
+                  </Badge>
+                </div>
+                <Button variant="ghost" size="sm">
+                  {showTranslations ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                </Button>
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
+              <TranslationManager
+                translations={Array.isArray(quote.translations) ? quote.translations.map((t, i) => ({
+                  id: `${i}`,
+                  language: t.language,
+                  text: t.text,
+                  translator: t.translator,
+                  translationType: t.translationType || 'human',
+                  translatorType: t.translatorType || 'human',
+                  confidenceScore: t.confidenceScore,
+                  verified: t.verified || false,
+                  qualityRating: t.qualityRating,
+                  aiModel: t.aiModel,
+                  source: t.source
+                })) : []}
+                quoteId={quote.id}
+                onAddTranslation={handleAddTranslation}
+                onVerifyTranslation={handleVerifyTranslation}
+                canVerify={user ? true : false}
+              />
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Advanced Scholarly Data - Collapsible */}
       {hasAdvanced && (

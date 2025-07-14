@@ -1006,53 +1006,97 @@ export type Database = {
       }
       translations: {
         Row: {
+          ai_model: string | null
+          confidence_score: number | null
+          created_by: string | null
           id: string
           language: string
           publication: string | null
           publication_date: string | null
+          quality_rating: number | null
           quote_id: string | null
           source: string | null
           source_reference: string | null
           source_url: string | null
           translated_text: string
           translation_notes: string | null
+          translation_type: string | null
           translator: string | null
           translator_name: string | null
+          translator_type: string | null
+          updated_at: string | null
+          verified: boolean | null
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
+          ai_model?: string | null
+          confidence_score?: number | null
+          created_by?: string | null
           id?: string
           language: string
           publication?: string | null
           publication_date?: string | null
+          quality_rating?: number | null
           quote_id?: string | null
           source?: string | null
           source_reference?: string | null
           source_url?: string | null
           translated_text: string
           translation_notes?: string | null
+          translation_type?: string | null
           translator?: string | null
           translator_name?: string | null
+          translator_type?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
+          ai_model?: string | null
+          confidence_score?: number | null
+          created_by?: string | null
           id?: string
           language?: string
           publication?: string | null
           publication_date?: string | null
+          quality_rating?: number | null
           quote_id?: string | null
           source?: string | null
           source_reference?: string | null
           source_url?: string | null
           translated_text?: string
           translation_notes?: string | null
+          translation_type?: string | null
           translator?: string | null
           translator_name?: string | null
+          translator_type?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "translations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "translations_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "translations_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

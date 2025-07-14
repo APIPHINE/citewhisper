@@ -36,7 +36,7 @@ export function QuoteCardMain({
   isAdmin = false
 }: QuoteCardMainProps) {
   const { formatDate } = useFormatDate();
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "es" | "fr">("en");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("en");
   
   if (expanded) return null;
 
@@ -140,7 +140,7 @@ export function QuoteCardMain({
             <QuoteFooter 
               currentLanguage={currentLanguage}
               setCurrentLanguage={setCurrentLanguage}
-              hasTranslation={hasTranslation}
+              translations={Array.isArray(quote.translations) ? quote.translations : []}
               originalLanguage={quote.originalLanguage}
               favoriteCount={favoriteCount}
               shareCount={shareCount}
