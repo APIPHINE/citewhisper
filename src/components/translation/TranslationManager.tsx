@@ -51,7 +51,7 @@ export function TranslationManager({
       <Star 
         key={i} 
         size={12} 
-        className={i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
+        className={i < rating ? "fill-warning text-warning" : "text-muted-foreground/30"} 
       />
     ));
   };

@@ -30,19 +30,23 @@ export function TranslationIndicator({
         return {
           icon: <Bot size={iconSize} className="text-primary" />,
           label: aiModel ? `${aiModel} Translation` : 'AI Translation',
-          description: `Automatically translated using ${aiModel || 'AI'}`
+          description: aiModel === 'citequotes-ai' 
+            ? 'Automatically translated by CiteQuotes AI system' 
+            : `AI translation using ${aiModel || 'automated system'}`
         };
       case 'community':
         return {
           icon: <User size={iconSize} className="text-secondary" />,
           label: 'Community Translation',
-          description: 'Translated by community members'
+          description: 'Collaboratively translated and reviewed by community members'
         };
       default:
         return {
           icon: <User size={iconSize} className="text-foreground" />,
           label: translator || 'Human Translation',
-          description: `Translated by ${translator || 'human translator'}`
+          description: translator 
+            ? `Professional translation by ${translator}` 
+            : 'Professionally translated by human translator'
         };
     }
   };
@@ -83,7 +87,7 @@ export function TranslationIndicator({
     <Star 
       key={i} 
       size={iconSize - 2} 
-      className={i < qualityRating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
+      className={i < qualityRating ? "fill-warning text-warning" : "text-muted-foreground/30"} 
     />
   )) : null;
 

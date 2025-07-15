@@ -158,10 +158,6 @@ export function TranslationForm({ onSubmit, onCancel }: TranslationFormProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="citequotes-ai">CiteQuotes AI</SelectItem>
-                <SelectItem value="gpt-4">GPT-4</SelectItem>
-                <SelectItem value="claude">Claude</SelectItem>
-                <SelectItem value="google-translate">Google Translate</SelectItem>
-                <SelectItem value="deepl">DeepL</SelectItem>
               </SelectContent>
             </Select>
           </div>
