@@ -3,18 +3,103 @@ import React from 'react';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import QuoteSubmissionsManager from '@/components/admin/QuoteSubmissionsManager';
 import CMSDashboard from '@/pages/cms/CMSDashboard';
+import { SuperAdminBulkActions } from '@/components/admin/SuperAdminBulkActions';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Crown, Zap, Database, Shield } from 'lucide-react';
 
 const Admin = () => {
+  const { userRole } = useUserRoles();
+  const isSuperAdmin = userRole === 'super_admin';
+
+  // Mock data for demonstration
+  const mockQuotes = [
+    { id: '1', type: 'quote', title: 'Quote about wisdom', status: 'pending', author: 'Aristotle', createdAt: '2024-01-15' },
+    { id: '2', type: 'quote', title: 'Quote about courage', status: 'approved', author: 'Winston Churchill', createdAt: '2024-01-14' }
+  ];
+
+  const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
+
+  const handleBulkAction = async (action: string, items: string[]) => {
+    console.log('Executing bulk action:', action, 'on items:', items);
+    // Implement actual bulk action logic here
+  };
+
   return (
     <div className="min-h-screen pt-36 pb-20 page-padding">
       <div className="page-max-width">
+        {/* Super Admin Header */}
+        {isSuperAdmin && (
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Crown className="w-8 h-8 text-primary" />
+              <div>
+                <h1 className="text-3xl font-bold">Super Admin Panel</h1>
+                <p className="text-muted-foreground">Advanced administrative controls and bulk operations</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Quick Actions</p>
+                      <p className="text-2xl font-bold">24</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium">DB Operations</p>
+                      <p className="text-2xl font-bold">156</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium">Security Events</p>
+                      <p className="text-2xl font-bold">3</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-warning" />
+                    <div>
+                      <p className="text-sm font-medium">Super Admin</p>
+                      <Badge variant="outline" className="text-xs">Active</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         <Tabs defaultValue="cms" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <TabsTrigger value="cms">Blog & Content</TabsTrigger>
             <TabsTrigger value="dashboard">Admin Dashboard</TabsTrigger>
             <TabsTrigger value="submissions">Quote Submissions</TabsTrigger>
             <TabsTrigger value="research">Research & Articles</TabsTrigger>
+            {isSuperAdmin && <TabsTrigger value="super-admin">Super Admin</TabsTrigger>}
           </TabsList>
           
           <TabsContent value="cms">
@@ -81,6 +166,86 @@ const Admin = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* Super Admin Tab */}
+          {isSuperAdmin && (
+            <TabsContent value="super-admin">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <Crown className="text-primary" />
+                    Super Admin Tools
+                  </h2>
+                </div>
+                
+                {/* Bulk Actions Component */}
+                <SuperAdminBulkActions
+                  items={mockQuotes}
+                  selectedItems={selectedItems}
+                  onSelectionChange={setSelectedItems}
+                  onBulkAction={handleBulkAction}
+                  contentType="quotes"
+                />
+
+                {/* Advanced Analytics */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>System Analytics</CardTitle>
+                    <CardDescription>Advanced metrics and performance data</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-primary">99.8%</div>
+                        <div className="text-sm text-muted-foreground">System Uptime</div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">2.3s</div>
+                        <div className="text-sm text-muted-foreground">Avg Response Time</div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">15.2k</div>
+                        <div className="text-sm text-muted-foreground">Active Users</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Security Monitoring */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Security Monitoring</CardTitle>
+                    <CardDescription>Real-time security events and alerts</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Shield className="w-5 h-5 text-green-600" />
+                          <div>
+                            <p className="font-medium">System Secure</p>
+                            <p className="text-sm text-muted-foreground">No security issues detected</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-green-600">All Clear</Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Database className="w-5 h-5 text-blue-600" />
+                          <div>
+                            <p className="font-medium">Database Performance</p>
+                            <p className="text-sm text-muted-foreground">Optimal query performance</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-blue-600">Optimal</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
