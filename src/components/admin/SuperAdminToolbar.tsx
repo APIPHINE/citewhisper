@@ -90,7 +90,7 @@ export const SuperAdminToolbar: React.FC<SuperAdminToolbarProps> = ({
 
   const priorityLevels = [
     { value: 0, label: 'Normal', icon: <div className="w-2 h-2 rounded-full bg-muted-foreground" /> },
-    { value: 1, label: 'Low', icon: <div className="w-2 h-2 rounded-full bg-blue-500" /> },
+    { value: 1, label: 'Low', icon: <div className="w-2 h-2 rounded-full bg-primary" /> },
     { value: 2, label: 'Medium', icon: <div className="w-2 h-2 rounded-full bg-warning" /> },
     { value: 3, label: 'High', icon: <div className="w-2 h-2 rounded-full bg-destructive" /> },
     { value: 4, label: 'Critical', icon: <Star className="w-3 h-3 text-destructive" /> }
