@@ -57,7 +57,7 @@ const Admin = () => {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
-                    <Database className="w-5 h-5 text-green-600" />
+                    <Database className="w-5 h-5 text-success" />
                     <div>
                       <p className="text-sm font-medium">DB Operations</p>
                       <p className="text-2xl font-bold">156</p>
@@ -69,7 +69,7 @@ const Admin = () => {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-blue-600" />
+                    <Shield className="w-5 h-5 text-primary" />
                     <div>
                       <p className="text-sm font-medium">Security Events</p>
                       <p className="text-2xl font-bold">3</p>
@@ -200,11 +200,11 @@ const Admin = () => {
                         <div className="text-sm text-muted-foreground">System Uptime</div>
                       </div>
                       <div className="text-center p-4 border rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">2.3s</div>
+                        <div className="text-2xl font-bold text-success">2.3s</div>
                         <div className="text-sm text-muted-foreground">Avg Response Time</div>
                       </div>
                       <div className="text-center p-4 border rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">15.2k</div>
+                        <div className="text-2xl font-bold text-primary">15.2k</div>
                         <div className="text-sm text-muted-foreground">Active Users</div>
                       </div>
                     </div>
@@ -221,24 +221,24 @@ const Admin = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <Shield className="w-5 h-5 text-green-600" />
+                          <Shield className="w-5 h-5 text-success" />
                           <div>
                             <p className="font-medium">System Secure</p>
                             <p className="text-sm text-muted-foreground">No security issues detected</p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-green-600">All Clear</Badge>
+                        <Badge variant="outline" className="text-success">All Clear</Badge>
                       </div>
                       
                       <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <Database className="w-5 h-5 text-blue-600" />
+                          <Database className="w-5 h-5 text-primary" />
                           <div>
                             <p className="font-medium">Database Performance</p>
                             <p className="text-sm text-muted-foreground">Optimal query performance</p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-blue-600">Optimal</Badge>
+                        <Badge variant="outline" className="text-primary">Optimal</Badge>
                       </div>
                     </div>
                   </CardContent>
