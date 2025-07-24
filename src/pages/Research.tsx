@@ -29,12 +29,12 @@ const Research = () => {
   const isSuperAdmin = userRole === 'super_admin';
 
   const categories = [
-    { name: 'All', icon: FileText, count: articles.length || 12 },
-    { name: 'Fake Quotes', icon: AlertTriangle, count: 4 },
-    { name: 'Repeat Offenders', icon: Users, count: 3 },
-    { name: 'Transcription Logs', icon: PenTool, count: 2 },
-    { name: 'Investigations', icon: Search, count: 2 },
-    { name: 'Essays', icon: BookOpen, count: 1 }
+    { name: 'All', icon: FileText, count: articles.length || 0 },
+    { name: 'Fake Quotes', icon: AlertTriangle, count: 0 },
+    { name: 'Repeat Offenders', icon: Users, count: 0 },
+    { name: 'Transcription Logs', icon: PenTool, count: 0 },
+    { name: 'Investigations', icon: Search, count: 0 },
+    { name: 'Essays', icon: BookOpen, count: 0 }
   ];
 
   const defaultContent = {
