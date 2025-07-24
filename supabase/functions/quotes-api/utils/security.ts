@@ -134,11 +134,42 @@ export class SecurityService {
     const headers = req.headers;
     
     return {
+      userId: null, // Will be set after auth validation
       ipAddress: headers.get('x-forwarded-for') || 
                 headers.get('x-real-ip') || 
                 'unknown',
       userAgent: headers.get('user-agent') || 'unknown',
       sessionId: headers.get('x-session-id') || undefined
     };
+  }
+
+  static validateRequestOrigin(req: Request, allowedOrigins: string[]): boolean {
+    const origin = req.headers.get('origin');
+    if (!origin) return false;
+    
+    return allowedOrigins.some(allowed => 
+      origin === allowed || 
+      (allowed.includes('*') && origin.includes(allowed.replace('*', '')))
+    );
+  }
+
+  static detectSuspiciousPatterns(userAgent: string, path: string): string[] {
+    const suspiciousPatterns = [];
+    
+    // Check for common bot patterns
+    const botPatterns = [
+      /curl/i, /wget/i, /python/i, /scrapy/i, /bot/i, /crawler/i
+    ];
+    
+    if (botPatterns.some(pattern => pattern.test(userAgent))) {
+      suspiciousPatterns.push('suspicious_user_agent');
+    }
+    
+    // Check for path injection attempts
+    if (path.includes('..') || path.includes('<script>') || path.includes('SELECT')) {
+      suspiciousPatterns.push('path_injection_attempt');
+    }
+    
+    return suspiciousPatterns;
   }
 }

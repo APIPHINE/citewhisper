@@ -33,6 +33,7 @@ import ResetPassword from './pages/ResetPassword';
 import ChangePassword from './pages/ChangePassword';
 import { Toaster } from "@/components/ui/toaster"
 import { SecurityAuditLogger } from '@/components/auth/SecurityAuditLogger';
+import { SecurityAlertManager } from '@/components/auth/SecurityAlertManager';
 import { AdminRoute } from '@/components/auth/AdminRoute';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
       <SearchProvider>
         <FavoritesProvider>
           <SecurityAuditLogger />
+          <SecurityAlertManager />
           <Router>
             <div className="min-h-screen bg-white">
               <NavBar />

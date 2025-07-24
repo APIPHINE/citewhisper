@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, AlertCircle, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useFailedLoginMonitor } from '@/hooks/useFailedLoginMonitor';
 
 export const EnhancedLoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +21,7 @@ export const EnhancedLoginForm: React.FC = () => {
 
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
+  const { trackFailedLogin, trackSuccessfulLogin, checkAccountLocked } = useFailedLoginMonitor();
 
   useEffect(() => {
     if (user) {
@@ -39,33 +41,35 @@ export const EnhancedLoginForm: React.FC = () => {
     setError(null);
     setIsLoading(true);
 
-    // Basic rate limiting (client-side)
-    if (failedAttempts >= 5) {
-      setError('Too many failed attempts. Please wait before trying again.');
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      // Check if account is locked before attempting login
+      const isLocked = await checkAccountLocked(email);
+      if (isLocked) {
+        setError('Account temporarily locked due to multiple failed login attempts. Please try again in 15 minutes.');
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await signIn(email, password);
 
       if (error) {
         setError(error.message);
         setFailedAttempts(prev => prev + 1);
         
-        // Log failed login attempt
-        console.warn('Failed login attempt:', {
-          email,
-          timestamp: new Date().toISOString(),
-          attempts: failedAttempts + 1
-        });
+        // Track failed login attempt
+        await trackFailedLogin(email);
       } else {
         setFailedAttempts(0);
+        // Track successful login
+        if (user) {
+          await trackSuccessfulLogin(user.id);
+        }
         navigate('/');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       setFailedAttempts(prev => prev + 1);
+      await trackFailedLogin(email);
     } finally {
       setIsLoading(false);
     }
