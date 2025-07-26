@@ -18,7 +18,7 @@ import PageEditor from './pages/cms/PageEditor';
 import MediaManager from './pages/cms/MediaManager';
 import AccountSettings from './pages/AccountSettings';
 import PublicArticle from './pages/cms/PublicArticle';
-import PublicArticlesList from './pages/cms/PublicArticlesList';
+
 import AddQuote from './pages/AddQuote';
 import Resources from './pages/Resources';
 import Research from './pages/Research';
@@ -54,7 +54,6 @@ function App() {
                 <Route path="/account-settings" element={<AccountSettings />} />
                 <Route path="/add-quote" element={<AddQuote />} />
                 <Route path="/resources" element={<Resources />} />
-                <Route path="/research" element={<Research />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/about" element={<About />} />
@@ -77,9 +76,11 @@ function App() {
                 <Route path="/admin/cms/pages/:id/edit" element={<AdminRoute requireSuperAdmin><PageEditor /></AdminRoute>} />
                 <Route path="/admin/cms/media" element={<AdminRoute><MediaManager /></AdminRoute>} />
                 
-                {/* Articles Routes (consolidating research content) */}
-                <Route path="/articles" element={<PublicArticlesList />} />
+                {/* Articles Routes - using Research page with full CMS functionality */}
+                <Route path="/articles" element={<Research />} />
                 <Route path="/articles/:slug" element={<PublicArticle />} />
+                {/* Redirect old research path to articles */}
+                <Route path="/research" element={<Research />} />
               </Routes>
               <Footer />
             </div>
