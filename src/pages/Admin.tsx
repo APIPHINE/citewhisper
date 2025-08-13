@@ -4,6 +4,7 @@ import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import QuoteSubmissionsManager from '@/components/admin/QuoteSubmissionsManager';
 import CMSDashboard from '@/pages/cms/CMSDashboard';
 import { SuperAdminBulkActions } from '@/components/admin/SuperAdminBulkActions';
+import { SuperAdminQuotesManager } from '@/components/admin/SuperAdminQuotesManager';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -94,11 +95,12 @@ const Admin = () => {
         )}
 
         <Tabs defaultValue="cms" className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-6' : 'grid-cols-4'}`}>
             <TabsTrigger value="cms">Blog & Content</TabsTrigger>
             <TabsTrigger value="dashboard">Admin Dashboard</TabsTrigger>
             <TabsTrigger value="submissions">Quote Submissions</TabsTrigger>
             <TabsTrigger value="research">Research & Articles</TabsTrigger>
+            {isSuperAdmin && <TabsTrigger value="quotes">Quotes Manager</TabsTrigger>}
             {isSuperAdmin && <TabsTrigger value="super-admin">Super Admin</TabsTrigger>}
           </TabsList>
           
@@ -166,6 +168,13 @@ const Admin = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* Super Admin Quotes Manager */}
+          {isSuperAdmin && (
+            <TabsContent value="quotes">
+              <SuperAdminQuotesManager />
+            </TabsContent>
+          )}
 
           {/* Super Admin Tab */}
           {isSuperAdmin && (

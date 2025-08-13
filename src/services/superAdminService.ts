@@ -32,6 +32,37 @@ export interface QuoteUpdateData {
 }
 
 export const superAdminService = {
+  // Create new quote
+  async createQuote(quoteData: {
+    quote_text: string;
+    author_name: string;
+    date_original?: string;
+    quote_context?: string;
+    quote_image_url?: string;
+    source_id?: string;
+    seo_keywords?: string[];
+    seo_slug?: string;
+    created_by?: string;
+  }) {
+    try {
+      const { data, error } = await supabase
+        .from('quotes')
+        .insert({
+          ...quoteData,
+          inserted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error creating quote:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
   // Update quote with comprehensive data
   async updateQuote(quoteId: string, updates: QuoteUpdateData) {
     try {
