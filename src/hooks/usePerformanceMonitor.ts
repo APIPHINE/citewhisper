@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { PerformanceService } from '@/services/performanceService';
 
 interface PerformanceMetrics {
   pageLoadTime: number;
@@ -31,11 +32,18 @@ export const usePerformanceMonitor = () => {
       entries.forEach((entry) => {
         if (entry.entryType === 'navigation') {
           const navEntry = entry as PerformanceNavigationTiming;
+          const pageLoadTime = navEntry.loadEventEnd - navEntry.loadEventStart;
+          const timeToFirstByte = navEntry.responseStart - navEntry.requestStart;
+          
           setMetrics(prev => ({
             ...prev!,
-            pageLoadTime: navEntry.loadEventEnd - navEntry.loadEventStart,
-            timeToFirstByte: navEntry.responseStart - navEntry.requestStart,
+            pageLoadTime,
+            timeToFirstByte,
           }));
+
+          // Track in database
+          PerformanceService.trackMetric('page_load_time', pageLoadTime);
+          PerformanceService.trackMetric('time_to_first_byte', timeToFirstByte);
         }
         
         if (entry.entryType === 'paint') {
@@ -45,6 +53,7 @@ export const usePerformanceMonitor = () => {
               ...prev!,
               firstContentfulPaint: paintEntry.startTime,
             }));
+            PerformanceService.trackMetric('first_contentful_paint', paintEntry.startTime);
           }
         }
         
@@ -54,6 +63,7 @@ export const usePerformanceMonitor = () => {
             ...prev!,
             largestContentfulPaint: lcpEntry.startTime,
           }));
+          PerformanceService.trackMetric('largest_contentful_paint', lcpEntry.startTime);
         }
         
         if (entry.entryType === 'layout-shift') {
