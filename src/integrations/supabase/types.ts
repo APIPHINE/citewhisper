@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -609,6 +609,39 @@ export type Database = {
           source_type?: string | null
           title?: string | null
           verified_by?: string | null
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          created_at: string | null
+          id: string
+          metric_type: string
+          metric_value: number
+          page_url: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metric_type: string
+          metric_value: number
+          page_url?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metric_type?: string
+          metric_value?: number
+          page_url?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1218,9 +1251,9 @@ export type Database = {
     Functions: {
       check_rate_limit_db: {
         Args: {
-          user_id_param: string
           action_param: string
           max_attempts?: number
+          user_id_param: string
           window_minutes?: number
         }
         Returns: boolean
@@ -1229,6 +1262,10 @@ export type Database = {
         Args: { submission_id: string }
         Returns: string[]
       }
+      cleanup_old_performance_metrics: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_user_privilege: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_privilege"]
@@ -1236,17 +1273,17 @@ export type Database = {
       get_users_for_admin: {
         Args: { requesting_user_id?: string }
         Returns: {
-          user_id: string
+          created_at: string
           email: string
           full_name: string
           privilege: Database["public"]["Enums"]["user_privilege"]
-          created_at: string
+          user_id: string
         }[]
       }
       has_privilege_level: {
         Args: {
-          user_id: string
           required_level: Database["public"]["Enums"]["user_privilege"]
+          user_id: string
         }
         Returns: boolean
       }
@@ -1256,37 +1293,37 @@ export type Database = {
       }
       log_user_activity: {
         Args: {
-          p_user_id: string
-          p_action_type: string
-          p_resource_type: string
-          p_resource_id?: string
-          p_ip_address?: unknown
-          p_user_agent?: string
           p_action_details?: Json
+          p_action_type: string
+          p_ip_address?: unknown
+          p_resource_id?: string
+          p_resource_type: string
           p_session_id?: string
+          p_user_agent?: string
+          p_user_id: string
         }
         Returns: string
       }
       log_user_contribution: {
         Args: {
-          p_user_id: string
           p_contribution_type: string
-          p_quote_id?: string
-          p_points?: number
           p_description?: string
           p_metadata?: Json
+          p_points?: number
+          p_quote_id?: string
+          p_user_id: string
         }
         Returns: string
       }
       process_quote_submission: {
-        Args: { submission_id: string; approve: boolean }
+        Args: { approve: boolean; submission_id: string }
         Returns: string
       }
       secure_update_user_privilege: {
         Args: {
-          target_user_id: string
-          new_privilege: Database["public"]["Enums"]["user_privilege"]
           admin_user_id?: string
+          new_privilege: Database["public"]["Enums"]["user_privilege"]
+          target_user_id: string
         }
         Returns: boolean
       }
