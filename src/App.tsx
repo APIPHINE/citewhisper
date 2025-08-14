@@ -35,6 +35,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { SecurityAuditLogger } from '@/components/auth/SecurityAuditLogger';
 import { SecurityAlertManager } from '@/components/auth/SecurityAlertManager';
 import { AdminRoute } from '@/components/auth/AdminRoute';
+import { PerformanceMonitor } from '@/components/performance/PerformanceMonitor';
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
               <Footer />
             </div>
             <Toaster />
+            <PerformanceMonitor />
           </Router>
         </FavoritesProvider>
       </SearchProvider>

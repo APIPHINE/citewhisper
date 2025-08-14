@@ -1,36 +1,68 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, X } from 'lucide-react';
 import { useSearch } from '../context/SearchContext';
+import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 
 const SearchBar = () => {
   const { searchQuery, setSearchQuery } = useSearch();
+  const { trackAPICall } = usePerformanceMonitor();
   const [inputValue, setInputValue] = useState(searchQuery);
   const [focused, setFocused] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Pre-computed search suggestions for better UX
+  const searchSuggestions = useMemo(() => [
+    'philosophy', 'wisdom', 'life', 'love', 'truth', 'science',
+    'literature', 'politics', 'ethics', 'freedom', 'justice'
+  ], []);
 
   // Update internal input value when search query changes
   useEffect(() => {
     setInputValue(searchQuery);
   }, [searchQuery]);
 
-  // Debounce the search input to avoid too many re-renders
+  // Generate search suggestions based on input
   useEffect(() => {
+    if (inputValue.length > 0) {
+      const filtered = searchSuggestions.filter(suggestion =>
+        suggestion.toLowerCase().includes(inputValue.toLowerCase())
+      ).slice(0, 5);
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  }, [inputValue, searchSuggestions]);
+
+  // Debounce the search input with performance tracking
+  useEffect(() => {
+    const startTime = performance.now();
     const timeoutId = setTimeout(() => {
       setSearchQuery(inputValue);
+      const duration = performance.now() - startTime;
+      trackAPICall('search', duration, true);
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [inputValue, setSearchQuery]);
+  }, [inputValue, setSearchQuery, trackAPICall]);
 
   const handleClear = () => {
     setInputValue('');
     setSearchQuery('');
+    setSuggestions([]);
     inputRef.current?.focus();
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    setInputValue(suggestion);
+    setSearchQuery(suggestion);
+    setSuggestions([]);
+    inputRef.current?.blur();
+  };
+
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto relative">
       <div 
         className={`relative flex items-center w-full h-14 px-4 rounded-2xl border transition-all duration-250 ease-apple ${
           focused 
@@ -64,6 +96,24 @@ const SearchBar = () => {
           </button>
         )}
       </div>
+      
+      {/* Search Suggestions */}
+      {suggestions.length > 0 && focused && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-xl shadow-lg z-50">
+          {suggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="w-full px-4 py-3 text-left hover:bg-secondary/50 first:rounded-t-xl last:rounded-b-xl transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Search size={16} className="text-muted-foreground" />
+                <span className="text-foreground">{suggestion}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
