@@ -51,7 +51,7 @@ const NavBar = () => {
           )}
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
             <DesktopNav />
             <AuthSection />
           </div>

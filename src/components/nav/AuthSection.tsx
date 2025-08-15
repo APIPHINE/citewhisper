@@ -30,9 +30,9 @@ export const AuthSection = () => {
         <PrivilegeDisplay size="sm" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="flex items-center gap-1 lg:gap-2 max-w-[120px] lg:max-w-none">
               <User size={16} />
-              <span className="hidden lg:inline">
+              <span className="hidden md:inline lg:inline truncate">
                 {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
               </span>
             </Button>

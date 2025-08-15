@@ -291,13 +291,13 @@ export function QuoteDataAnalysisDashboard() {
         </div>
 
         <Tabs defaultValue="structures" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="structures">Data Structures</TabsTrigger>
-            <TabsTrigger value="examples">Example Quotes</TabsTrigger>
-            <TabsTrigger value="capture">Capture Flow</TabsTrigger>
-            <TabsTrigger value="display">Display Modes</TabsTrigger>
-            <TabsTrigger value="database">Database Schema</TabsTrigger>
-            <TabsTrigger value="api">API Reference</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
+            <TabsTrigger value="structures" className="text-xs md:text-sm">Data</TabsTrigger>
+            <TabsTrigger value="examples" className="text-xs md:text-sm">Examples</TabsTrigger>
+            <TabsTrigger value="capture" className="text-xs md:text-sm">Capture</TabsTrigger>
+            <TabsTrigger value="display" className="text-xs md:text-sm">Display</TabsTrigger>
+            <TabsTrigger value="database" className="text-xs md:text-sm">Schema</TabsTrigger>
+            <TabsTrigger value="api" className="text-xs md:text-sm">API</TabsTrigger>
           </TabsList>
 
           {/* Data Structures Tab */}
