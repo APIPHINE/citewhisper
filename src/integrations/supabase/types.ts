@@ -1019,6 +1019,194 @@ export type Database = {
         }
         Relationships: []
       }
+      source_info: {
+        Row: {
+          act_scene: string | null
+          amazon_link: string | null
+          archive_location: string | null
+          arxiv_id: string | null
+          arxiv_link: string | null
+          author: string | null
+          backup_url: string | null
+          call_number: string | null
+          chapter_number: string | null
+          chapter_title: string | null
+          collection_name: string | null
+          confidence_score: number | null
+          created_at: string
+          created_by: string | null
+          doi: string | null
+          doi_url: string | null
+          edition: string | null
+          google_books_link: string | null
+          id: string
+          isbn: string | null
+          isbn_link: string | null
+          issn: string | null
+          issue_number: string | null
+          journal_name: string | null
+          jstor_link: string | null
+          language: string | null
+          line_number: string | null
+          magazine_name: string | null
+          minute_mark: string | null
+          newspaper_name: string | null
+          page_number: string | null
+          page_range: string | null
+          paragraph_number: string | null
+          pmid: string | null
+          primary_url: string | null
+          publication_date: string | null
+          publisher: string | null
+          publisher_url: string | null
+          pubmed_link: string | null
+          quote_id: string | null
+          section_title: string | null
+          series_title: string | null
+          source_type: Database["public"]["Enums"]["source_type"]
+          spotify_link: string | null
+          stanza_number: string | null
+          timestamp_end: string | null
+          timestamp_start: string | null
+          title: string | null
+          translation_info: string | null
+          updated_at: string
+          updated_by: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+          verse_reference: string | null
+          volume_number: string | null
+          youtube_link: string | null
+        }
+        Insert: {
+          act_scene?: string | null
+          amazon_link?: string | null
+          archive_location?: string | null
+          arxiv_id?: string | null
+          arxiv_link?: string | null
+          author?: string | null
+          backup_url?: string | null
+          call_number?: string | null
+          chapter_number?: string | null
+          chapter_title?: string | null
+          collection_name?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          doi?: string | null
+          doi_url?: string | null
+          edition?: string | null
+          google_books_link?: string | null
+          id?: string
+          isbn?: string | null
+          isbn_link?: string | null
+          issn?: string | null
+          issue_number?: string | null
+          journal_name?: string | null
+          jstor_link?: string | null
+          language?: string | null
+          line_number?: string | null
+          magazine_name?: string | null
+          minute_mark?: string | null
+          newspaper_name?: string | null
+          page_number?: string | null
+          page_range?: string | null
+          paragraph_number?: string | null
+          pmid?: string | null
+          primary_url?: string | null
+          publication_date?: string | null
+          publisher?: string | null
+          publisher_url?: string | null
+          pubmed_link?: string | null
+          quote_id?: string | null
+          section_title?: string | null
+          series_title?: string | null
+          source_type: Database["public"]["Enums"]["source_type"]
+          spotify_link?: string | null
+          stanza_number?: string | null
+          timestamp_end?: string | null
+          timestamp_start?: string | null
+          title?: string | null
+          translation_info?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          verse_reference?: string | null
+          volume_number?: string | null
+          youtube_link?: string | null
+        }
+        Update: {
+          act_scene?: string | null
+          amazon_link?: string | null
+          archive_location?: string | null
+          arxiv_id?: string | null
+          arxiv_link?: string | null
+          author?: string | null
+          backup_url?: string | null
+          call_number?: string | null
+          chapter_number?: string | null
+          chapter_title?: string | null
+          collection_name?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          doi?: string | null
+          doi_url?: string | null
+          edition?: string | null
+          google_books_link?: string | null
+          id?: string
+          isbn?: string | null
+          isbn_link?: string | null
+          issn?: string | null
+          issue_number?: string | null
+          journal_name?: string | null
+          jstor_link?: string | null
+          language?: string | null
+          line_number?: string | null
+          magazine_name?: string | null
+          minute_mark?: string | null
+          newspaper_name?: string | null
+          page_number?: string | null
+          page_range?: string | null
+          paragraph_number?: string | null
+          pmid?: string | null
+          primary_url?: string | null
+          publication_date?: string | null
+          publisher?: string | null
+          publisher_url?: string | null
+          pubmed_link?: string | null
+          quote_id?: string | null
+          section_title?: string | null
+          series_title?: string | null
+          source_type?: Database["public"]["Enums"]["source_type"]
+          spotify_link?: string | null
+          stanza_number?: string | null
+          timestamp_end?: string | null
+          timestamp_start?: string | null
+          title?: string | null
+          translation_info?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          verse_reference?: string | null
+          volume_number?: string | null
+          youtube_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_info_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       topics: {
         Row: {
           id: string
@@ -1331,6 +1519,25 @@ export type Database = {
     Enums: {
       content_status: "draft" | "review" | "published" | "archived"
       media_type: "image" | "video" | "audio" | "document" | "other"
+      source_type:
+        | "book"
+        | "journal_article"
+        | "newspaper"
+        | "magazine"
+        | "website"
+        | "speech"
+        | "interview"
+        | "letter"
+        | "diary"
+        | "manuscript"
+        | "documentary"
+        | "podcast"
+        | "social_media"
+        | "government_document"
+        | "legal_document"
+        | "academic_thesis"
+        | "conference_paper"
+        | "other"
       suggestion_status: "pending" | "approved" | "rejected" | "implemented"
       user_privilege: "user" | "moderator" | "admin" | "super_admin"
     }
@@ -1462,6 +1669,26 @@ export const Constants = {
     Enums: {
       content_status: ["draft", "review", "published", "archived"],
       media_type: ["image", "video", "audio", "document", "other"],
+      source_type: [
+        "book",
+        "journal_article",
+        "newspaper",
+        "magazine",
+        "website",
+        "speech",
+        "interview",
+        "letter",
+        "diary",
+        "manuscript",
+        "documentary",
+        "podcast",
+        "social_media",
+        "government_document",
+        "legal_document",
+        "academic_thesis",
+        "conference_paper",
+        "other",
+      ],
       suggestion_status: ["pending", "approved", "rejected", "implemented"],
       user_privilege: ["user", "moderator", "admin", "super_admin"],
     },
