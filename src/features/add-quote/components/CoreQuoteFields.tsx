@@ -60,19 +60,6 @@ export function CoreQuoteFields({ form }: CoreQuoteFieldsProps) {
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="source"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Primary Source</FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="Main source reference" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </div>
   );
 }

@@ -10,70 +10,33 @@ interface ArchiveResult {
 }
 
 export class WaybackService {
-  /**
-   * Submit a URL to the Wayback Machine for archiving
-   */
-  static async archiveUrl(url: string, quoteId?: string): Promise<ArchiveResult> {
+  static async archiveUrl(url: string): Promise<ArchiveResult> {
     try {
-      console.log(`Submitting URL to Wayback Machine: ${url}`);
-      
       const { data, error } = await supabase.functions.invoke('wayback-archive', {
-        body: { 
-          url,
-          quote_id: quoteId 
-        }
+        body: { url }
       });
-
+      
       if (error) {
-        console.error('Wayback archive function error:', error);
-        return {
-          success: false,
-          error: `Archive function error: ${error.message}`
-        };
+        return { success: false, error: error.message };
       }
-
+      
       return data as ArchiveResult;
     } catch (error) {
-      console.error('Error calling Wayback archive function:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
-      };
+      return { success: false, error: 'Archive failed' };
     }
-  }
-
-  /**
-   * Check if a URL is already archived in Wayback Machine
-   */
-  static async checkArchiveStatus(url: string): Promise<{
-    isArchived: boolean;
-    archivedUrl?: string;
-    timestamp?: string;
-  }> {
-    try {
-      const result = await this.archiveUrl(url);
-      return {
-        isArchived: result.success,
-        archivedUrl: result.archived_url,
-        timestamp: result.timestamp
-      };
-    } catch (error) {
-      console.error('Error checking archive status:', error);
-      return { isArchived: false };
-    }
-  }
-
-  /**
-   * Auto-archive URL for future database integration
-   */
-  static async autoArchiveForQuote(quoteId: string, originalUrl: string): Promise<ArchiveResult> {
-    const result = await this.archiveUrl(originalUrl, quoteId);
-    
-    if (result.success && result.archived_url) {
-      console.log(`Successfully archived URL for quote ${quoteId}: ${result.archived_url}`);
-      // TODO: Update database with wayback URL once new schema is implemented
-    }
-
-    return result;
   }
 }
+
+export const waybackService = {
+  archiveUrl: async (url: string): Promise<string | null> => {
+    try {
+      const result = await WaybackService.archiveUrl(url);
+      return result.success ? result.archived_url || null : null;
+    } catch (error) {
+      console.error('Failed to archive URL:', error);
+      return null;
+    }
+  }
+};
+
+export const archiveUrlWithWayback = waybackService.archiveUrl;

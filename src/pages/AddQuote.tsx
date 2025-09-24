@@ -32,26 +32,25 @@ const AddQuote = () => {
     defaultValues: {
       text: '',
       author: '',
-      source: '',
-      sourceUrl: '',
-      sourcePublicationDate: '',
-      originalLanguage: '',
-      originalText: '',
+      date: '',
       context: '',
       historicalContext: '',
       topics: [],
       theme: '',
       keywords: [],
+      originalLanguage: '',
+      originalText: '',
       emotionalTone: '',
-      originalSource: {
+      translations: [],
+      sourceInfo: {
+        source_type: 'book',
         title: '',
+        author: '',
         publisher: '',
-        publicationDate: '',
-        location: '',
-        isbn: '',
-        sourceUrl: ''
-      },
-      translations: []
+        publication_date: '',
+        primary_url: '',
+        language: 'en'
+      }
     },
     mode: "onChange"
   });
