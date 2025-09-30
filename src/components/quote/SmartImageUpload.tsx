@@ -3,6 +3,7 @@ import { FileUploadArea } from '@/components/ui/file-upload-area';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Loader2, Eye, EyeOff, Wand2, Camera, Upload } from 'lucide-react';
 import { extractTextFromImage, ProcessedEvidence } from '@/utils/evidenceProcessor';
 import { cn } from '@/lib/utils';
@@ -23,20 +24,32 @@ export function SmartImageUpload({
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedEvidence, setProcessedEvidence] = useState<ProcessedEvidence | null>(null);
   const [showProcessedImage, setShowProcessedImage] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleFilesSelected = useCallback(async (files: File[]) => {
     onFilesSelected(files);
     
     if (files.length > 0) {
       setIsProcessing(true);
+      setProgress(10);
+      let timer: number | undefined;
       try {
+        // Smooth progress animation up to 90%
+        timer = window.setInterval(() => {
+          setProgress((p) => Math.min(90, p + 5));
+        }, 300);
+
         console.log('Processing evidence image...');
         const evidence = await extractTextFromImage(files[0]);
         setProcessedEvidence(evidence);
+        setProgress(95);
         onEvidenceProcessed(evidence, files[0]);
       } catch (error) {
         console.error('Error processing evidence:', error);
       } finally {
+        if (timer) window.clearInterval(timer);
+        setProgress(100);
+        setTimeout(() => setProgress(0), 800);
         setIsProcessing(false);
       }
     }
@@ -94,10 +107,13 @@ export function SmartImageUpload({
                     className="max-w-full h-auto rounded-md border max-h-64 object-contain"
                   />
                   {isProcessing && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-md">
-                      <div className="bg-white p-4 rounded-lg flex items-center gap-2">
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md gap-3 p-4">
+                      <div className="bg-white p-4 rounded-lg flex items-center gap-2 shadow">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         <span className="text-sm">Processing image...</span>
+                      </div>
+                      <div className="w-3/4 max-w-md">
+                        <Progress value={progress} />
                       </div>
                     </div>
                   )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,7 +37,14 @@ export function EvidenceFirstQuoteForm({
   });
   const [suggestions, setSuggestions] = useState<QualitySuggestion[]>([]);
 
-  const watchedValues = form.watch();
+  // Watch only the fields we need to avoid infinite re-renders
+  const text = useWatch({ control: form.control, name: 'text' });
+  const author = useWatch({ control: form.control, name: 'author' });
+  const context = useWatch({ control: form.control, name: 'context' });
+  const theme = useWatch({ control: form.control, name: 'theme' });
+  const sourceTitle = useWatch({ control: form.control, name: 'sourceInfo.title' as any });
+  const primaryUrl = useWatch({ control: form.control, name: 'sourceInfo.primary_url' as any });
+  const publicationDate = useWatch({ control: form.control, name: 'sourceInfo.publication_date' as any });
 
   // Skip to manual entry
   const handleSkipToManual = useCallback(() => {
@@ -83,40 +90,34 @@ export function EvidenceFirstQuoteForm({
 
   // Memoized quality calculation to prevent infinite loops
   const calculateQuality = useCallback(() => {
-    const values = watchedValues;
     let completeness = 0;
     let accuracy = 0;
     let sourcing = 0;
 
-    // Completeness scoring
-    if (values.text) completeness += 40;
-    if (values.author) completeness += 30;
-    if (values.sourceInfo?.title) completeness += 20;
-    if (values.context) completeness += 10;
+    if (text) completeness += 40;
+    if (author) completeness += 30;
+    if (sourceTitle) completeness += 20;
+    if (context) completeness += 10;
 
-    // Accuracy scoring
     if (processedEvidence) {
       accuracy += processedEvidence.confidence * 50;
     }
-    if (values.text && values.text.length > 20) accuracy += 25;
-    if (values.author && values.author.length > 2) accuracy += 25;
+    if (text && text.length > 20) accuracy += 25;
+    if (author && author.length > 2) accuracy += 25;
 
-    // Sourcing scoring
     if (selectedFiles.length > 0) sourcing += 50;
-    if (values.sourceInfo?.primary_url) sourcing += 30;
-    if (values.sourceInfo?.publication_date) sourcing += 20;
+    if (primaryUrl) sourcing += 30;
+    if (publicationDate) sourcing += 20;
 
     const overall = (completeness + accuracy + sourcing) / 3;
 
     return { overall, completeness, accuracy, sourcing };
-  }, [watchedValues, processedEvidence, selectedFiles]);
+  }, [text, author, context, sourceTitle, primaryUrl, publicationDate, processedEvidence, selectedFiles]);
 
-  // Generate suggestions based on form state
   const generateSuggestions = useCallback(() => {
-    const values = watchedValues;
     const newSuggestions: QualitySuggestion[] = [];
 
-    if (!values.text) {
+    if (!text) {
       newSuggestions.push({
         type: 'missing',
         field: 'Quote Text',
@@ -124,7 +125,7 @@ export function EvidenceFirstQuoteForm({
         priority: 'high'
       });
     }
-    if (!values.author) {
+    if (!author) {
       newSuggestions.push({
         type: 'missing',
         field: 'Author',
@@ -132,7 +133,7 @@ export function EvidenceFirstQuoteForm({
         priority: 'high'
       });
     }
-    if (!values.sourceInfo?.title) {
+    if (!sourceTitle) {
       newSuggestions.push({
         type: 'missing',
         field: 'Source',
@@ -148,7 +149,7 @@ export function EvidenceFirstQuoteForm({
         priority: 'medium'
       });
     }
-    if (!values.context && values.text && values.text.length > 50) {
+    if (!context && text && text.length > 50) {
       newSuggestions.push({
         type: 'enhance',
         field: 'Context',
@@ -158,7 +159,7 @@ export function EvidenceFirstQuoteForm({
     }
 
     return newSuggestions;
-  }, [watchedValues, selectedFiles]);
+  }, [text, author, context, sourceTitle, selectedFiles]);
 
   // Update quality score and suggestions
   useEffect(() => {
@@ -172,8 +173,8 @@ export function EvidenceFirstQuoteForm({
   const steps = [
     { id: 'upload', label: 'Upload', icon: Sparkles, completed: selectedFiles.length > 0 || currentStep !== 'upload' },
     { id: 'ocr', label: 'Select Text', icon: FileText, completed: currentStep !== 'upload' && currentStep !== 'ocr' },
-    { id: 'core', label: 'Details', icon: PenTool, completed: !!(watchedValues.text && watchedValues.author) },
-    { id: 'enhanced', label: 'Context', icon: ArrowRight, completed: !!(watchedValues.context || watchedValues.theme) },
+    { id: 'core', label: 'Details', icon: PenTool, completed: !!(text && author) },
+    { id: 'enhanced', label: 'Context', icon: ArrowRight, completed: !!(context || theme) },
     { id: 'review', label: 'Review', icon: CheckCircle, completed: qualityScore.overall >= 70 }
   ];
 
@@ -183,8 +184,8 @@ export function EvidenceFirstQuoteForm({
   const canAdvanceStep = () => {
     switch (currentStep) {
       case 'upload': return selectedFiles.length > 0;
-      case 'ocr': return !!(watchedValues.text || watchedValues.author);
-      case 'core': return !!(watchedValues.text && watchedValues.author);
+      case 'ocr': return !!(text || author);
+      case 'core': return !!(text && author);
       case 'enhanced': return true; // Optional step
       case 'review': return qualityScore.overall >= 50;
       default: return false;
@@ -326,18 +327,18 @@ export function EvidenceFirstQuoteForm({
                 <div className="space-y-2">
                   <h4 className="font-medium">Quote Preview:</h4>
                   <blockquote className="border-l-4 border-primary pl-4 italic">
-                    {watchedValues.text || 'No quote text provided'}
+                    {text || 'No quote text provided'}
                   </blockquote>
                   <p className="text-sm text-muted-foreground">
-                    — {watchedValues.author || 'Unknown Author'}
-                    {watchedValues.sourceInfo?.title && `, ${watchedValues.sourceInfo.title}`}
+                    — {author || 'Unknown Author'}
+                    {sourceTitle && `, ${sourceTitle}`}
                   </p>
                 </div>
 
-                {watchedValues.context && (
+                {context && (
                   <div className="space-y-2">
                     <h4 className="font-medium">Context:</h4>
-                    <p className="text-sm">{watchedValues.context}</p>
+                    <p className="text-sm">{context}</p>
                   </div>
                 )}
               </CardContent>
