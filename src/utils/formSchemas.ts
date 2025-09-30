@@ -48,6 +48,7 @@ const sourceInfoSchema = z.object({
   
   // URLs
   primary_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  backup_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   publisher_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   doi_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   isbn_link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),

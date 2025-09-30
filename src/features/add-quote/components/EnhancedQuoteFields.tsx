@@ -158,36 +158,11 @@ export function EnhancedQuoteFields({ form }: EnhancedQuoteFieldsProps) {
         </FormItem>
       </div>
 
-      {/* Source Details Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-foreground">Source Details</h3>
-        <FormField
-          control={form.control}
-          name="sourceUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Source URL</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="URL of the source" type="url" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="sourcePublicationDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Publication Date</FormLabel>
-              <FormControl>
-                <Input {...field} type="date" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {/* Note: Source Details moved to SourceInfoFields component */}
+      <div className="p-4 bg-muted/50 rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          💡 <strong>Source Details:</strong> Use the Source Information section below to add comprehensive source details including URLs, publication info, and more.
+        </p>
       </div>
     </div>
   );

@@ -9,13 +9,11 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
     author: '',
     topics: [],
     keywords: [],
-    originalSource: {
+    sourceInfo: {
+      source_type: 'other',
       title: '',
       publisher: '',
-      publicationDate: '',
-      location: '',
-      isbn: '',
-      sourceUrl: ''
+      publication_date: ''
     },
     translations: []
   };
@@ -36,13 +34,19 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
           quoteData.theme = value;
           break;
         case 'source':
-          quoteData.source = value;
+        case 'sourceTitle':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.title = value;
           break;
         case 'sourceUrl':
-          quoteData.sourceUrl = value;
+        case 'primaryUrl':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.primary_url = value;
           break;
         case 'sourcePublicationDate':
-          quoteData.sourcePublicationDate = value;
+        case 'publicationDate':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.publication_date = value;
           break;
         case 'originalLanguage':
           quoteData.originalLanguage = value;
@@ -59,29 +63,22 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
         case 'emotionalTone':
           quoteData.emotionalTone = value;
           break;
-        case 'originalSourceTitle':
-          if (!quoteData.originalSource) quoteData.originalSource = {};
-          quoteData.originalSource.title = value;
+        case 'publisher':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.publisher = value;
           break;
-        case 'originalSourcePublisher':
-          if (!quoteData.originalSource) quoteData.originalSource = {};
-          quoteData.originalSource.publisher = value;
+        case 'isbn':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.isbn = value;
           break;
-        case 'originalSourcePublicationDate':
-          if (!quoteData.originalSource) quoteData.originalSource = {};
-          quoteData.originalSource.publicationDate = value;
+        case 'doi':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.doi = value;
           break;
-        case 'originalSourceLocation':
-          if (!quoteData.originalSource) quoteData.originalSource = {};
-          quoteData.originalSource.location = value;
-          break;
-        case 'originalSourceIsbn':
-          if (!quoteData.originalSource) quoteData.originalSource = {};
-          quoteData.originalSource.isbn = value;
-          break;
-        case 'originalSourceUrl':
-          if (!quoteData.originalSource) quoteData.originalSource = {};
-          quoteData.originalSource.sourceUrl = value;
+        case 'pageNumber':
+        case 'page':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.page_number = value;
           break;
         case 'translationLanguage':
         case 'translationText':
@@ -128,9 +125,14 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
  * Clean up empty nested objects in quote data
  */
 function cleanupQuoteData(quoteData: Partial<QuoteFormValues>): Partial<QuoteFormValues> {
-  // Clean up empty originalSource
-  if (quoteData.originalSource && !Object.values(quoteData.originalSource).some(v => v)) {
-    quoteData.originalSource = undefined;
+  // Clean up empty sourceInfo
+  if (quoteData.sourceInfo) {
+    const hasValues = Object.entries(quoteData.sourceInfo)
+      .filter(([key]) => key !== 'source_type')
+      .some(([, value]) => value);
+    if (!hasValues) {
+      quoteData.sourceInfo = undefined;
+    }
   }
   
   // Clean up empty translations

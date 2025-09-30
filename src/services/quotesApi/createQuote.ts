@@ -32,13 +32,27 @@ export interface QuoteSubmissionData {
   historicalContext?: string;
   emotionalTone?: string;
   keywords?: string[];
-  originalSource?: {
+  sourceInfo?: {
+    source_type?: string;
     title?: string;
+    author?: string;
     publisher?: string;
-    publicationDate?: string;
-    location?: string;
+    publication_date?: string;
+    primary_url?: string;
+    backup_url?: string;
+    page_number?: string;
+    page_range?: string;
+    chapter_number?: string;
+    chapter_title?: string;
+    volume_number?: string;
+    issue_number?: string;
+    edition?: string;
     isbn?: string;
-    sourceUrl?: string;
+    issn?: string;
+    doi?: string;
+    language?: string;
+    confidence_score?: number;
+    [key: string]: any;
   };
   translations?: Array<{
     language: string;
@@ -99,33 +113,55 @@ export const createQuote = async (
       return { success: false, error: 'Failed to create quote' };
     }
 
-    // Create source if provided
-    let sourceId: string | null = null;
+    // Create source_info if provided
     const submissionData = quoteData as QuoteSubmissionData;
-    if (quoteData.source_title || (quoteData as CreateQuoteRequest).source_author || submissionData.originalSource?.title) {
-      const { data: source, error: sourceError } = await supabase
-        .from('original_sources')
-        .insert({
-          title: submissionData.originalSource?.title || quoteData.source_title?.trim(),
-          author: (quoteData as CreateQuoteRequest).source_author?.trim(),
-          publisher: submissionData.originalSource?.publisher?.trim(),
-          publication_year: submissionData.originalSource?.publicationDate?.trim(),
-          archive_url: submissionData.originalSource?.sourceUrl || quoteData.source_url?.trim(),
-          location: submissionData.originalSource?.location?.trim(),
-          source_type: 'book', // Default type
-          language: submissionData.originalLanguage
-        })
-        .select()
-        .single();
+    if (submissionData.sourceInfo) {
+      const { error: sourceInfoError } = await supabase
+        .from('source_info')
+        .insert([{
+          source_type: (submissionData.sourceInfo.source_type || 'other') as any,
+          title: submissionData.sourceInfo.title,
+          author: submissionData.sourceInfo.author,
+          publisher: submissionData.sourceInfo.publisher,
+          publication_date: submissionData.sourceInfo.publication_date,
+          primary_url: submissionData.sourceInfo.primary_url,
+          backup_url: submissionData.sourceInfo.backup_url,
+          page_number: submissionData.sourceInfo.page_number,
+          page_range: submissionData.sourceInfo.page_range,
+          chapter_number: submissionData.sourceInfo.chapter_number,
+          chapter_title: submissionData.sourceInfo.chapter_title,
+          volume_number: submissionData.sourceInfo.volume_number,
+          issue_number: submissionData.sourceInfo.issue_number,
+          edition: submissionData.sourceInfo.edition,
+          isbn: submissionData.sourceInfo.isbn,
+          issn: submissionData.sourceInfo.issn,
+          doi: submissionData.sourceInfo.doi,
+          language: submissionData.sourceInfo.language || submissionData.originalLanguage,
+          confidence_score: submissionData.sourceInfo.confidence_score,
+          created_by: userId,
+          updated_by: userId,
+          quote_id: quote.id
+        }]);
 
-      if (!sourceError && source) {
-        sourceId = source.id;
-        
-        // Update quote with source reference
-        await supabase
-          .from('quotes')
-          .update({ source_id: sourceId })
-          .eq('id', quote.id);
+      if (sourceInfoError) {
+        console.error('Error creating source_info:', sourceInfoError);
+      }
+    }
+    // Fallback for legacy data structure
+    else if (quoteData.source_title) {
+      const { error: sourceInfoError } = await supabase
+        .from('source_info')
+        .insert([{
+          source_type: 'other' as any,
+          title: quoteData.source_title,
+          primary_url: quoteData.source_url,
+          created_by: userId,
+          updated_by: userId,
+          quote_id: quote.id
+        }]);
+
+      if (sourceInfoError) {
+        console.error('Error creating source_info:', sourceInfoError);
       }
     }
 
@@ -143,7 +179,8 @@ export const createQuote = async (
               source: translation.source,
               publication: translation.publication,
               publication_date: translation.publicationDate || null,
-              source_url: translation.sourceUrl
+              source_url: translation.sourceUrl,
+              created_by: userId
             });
         }
       }
@@ -158,7 +195,7 @@ export const createQuote = async (
       {
         quote_text: quoteData.quote_text.substring(0, 100),
         author_name: quoteData.author_name,
-        has_source: !!sourceId
+        has_source: !!submissionData.sourceInfo
       }
     );
 
@@ -172,7 +209,7 @@ export const createQuote = async (
       {
         quote_id: quote.id,
         author_name: quoteData.author_name,
-        has_source: !!sourceId
+        has_source: !!submissionData.sourceInfo
       }
     );
 

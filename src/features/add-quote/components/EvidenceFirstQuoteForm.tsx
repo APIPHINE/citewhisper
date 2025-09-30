@@ -51,8 +51,8 @@ export function EvidenceFirstQuoteForm({
     if (evidence.author && !watchedValues.author) {
       updates.author = evidence.author;
     }
-    if (evidence.title && !watchedValues.source) {
-      updates.source = evidence.title;
+    if (evidence.title && !watchedValues.sourceInfo?.title) {
+      updates.sourceInfo = { ...updates.sourceInfo, title: evidence.title, source_type: 'other' as const };
     }
     if (evidence.context && !watchedValues.context) {
       updates.context = evidence.context;
@@ -80,7 +80,7 @@ export function EvidenceFirstQuoteForm({
       // Completeness scoring
       if (values.text) completeness += 40;
       if (values.author) completeness += 30;
-      if (values.source) completeness += 20;
+      if (values.sourceInfo?.title) completeness += 20;
       if (values.context) completeness += 10;
 
       // Accuracy scoring (based on evidence confidence and field quality)
@@ -92,8 +92,8 @@ export function EvidenceFirstQuoteForm({
 
       // Sourcing scoring
       if (selectedFiles.length > 0) sourcing += 50;
-      if (values.sourceUrl) sourcing += 30;
-      if (values.sourcePublicationDate) sourcing += 20;
+      if (values.sourceInfo?.primary_url) sourcing += 30;
+      if (values.sourceInfo?.publication_date) sourcing += 20;
 
       const overall = (completeness + accuracy + sourcing) / 3;
 
@@ -118,7 +118,7 @@ export function EvidenceFirstQuoteForm({
           priority: 'high'
         });
       }
-      if (!values.source) {
+      if (!values.sourceInfo?.title) {
         newSuggestions.push({
           type: 'missing',
           field: 'Source',
@@ -280,7 +280,7 @@ export function EvidenceFirstQuoteForm({
                   </blockquote>
                   <p className="text-sm text-muted-foreground">
                     — {watchedValues.author || 'Unknown Author'}
-                    {watchedValues.source && `, ${watchedValues.source}`}
+                    {watchedValues.sourceInfo?.title && `, ${watchedValues.sourceInfo.title}`}
                   </p>
                 </div>
 

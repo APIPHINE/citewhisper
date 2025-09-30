@@ -27,12 +27,12 @@ export function useQuoteSubmission() {
       }
 
       // Upload evidence image if provided
-      let evidenceImageUrl = data.sourceUrl || '';
+      let evidenceImageUrl = data.sourceInfo?.primary_url || '';
       if (evidenceImage) {
         const attributionMetadata: Record<string, any> = {
           quoteAuthor: data.author,
-          quoteSource: data.source,
-          originalWork: data.originalSource?.title || data.source,
+          quoteSource: data.sourceInfo?.title || '',
+          originalWork: data.sourceInfo?.title || '',
           submissionDate: new Date().toISOString(),
           copyright: `Attribution to original creator: ${data.author}`,
           fairUseJustification: "Educational and transformative use under 17 U.S.C. § 107",
@@ -55,9 +55,10 @@ export function useQuoteSubmission() {
         author_name: data.author,
         date_original: data.date || undefined,
         quote_context: data.context || undefined,
-        source_title: data.source || undefined,
-        source_url: evidenceImageUrl || data.sourceUrl || undefined,
-        topics: data.topics || undefined
+        source_title: data.sourceInfo?.title || undefined,
+        source_url: evidenceImageUrl || data.sourceInfo?.primary_url || undefined,
+        topics: data.topics || undefined,
+        sourceInfo: data.sourceInfo
       };
 
       console.log('Sending quote data to secure createQuote:', quoteData);
