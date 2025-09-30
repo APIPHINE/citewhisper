@@ -13,7 +13,7 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
   // Handle translations and original text
   const getTranslation = () => {
     if (currentLanguage === 'es' && quote.originalLanguage === 'es') {
-      return { text: quote.originalText, source: quote.originalSource?.title };
+      return { text: quote.originalText, source: quote.sourceInfo?.title };
     }
     
     if (Array.isArray(quote.translations)) {
@@ -36,8 +36,8 @@ export function QuoteMainContent({ quote }: QuoteMainContentProps) {
     (translation?.text || quote.text);
     
   const displaySource = currentLanguage === "en" ? 
-    quote.source : 
-    (translation?.source || quote.source);
+    (quote.sourceInfo?.title || quote.source) : 
+    (translation?.source || quote.sourceInfo?.title || quote.source);
 
   const hasTranslation = (
     !Array.isArray(quote.translations) && quote.translations && !!quote.translations.fr

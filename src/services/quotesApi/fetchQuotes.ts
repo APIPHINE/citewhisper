@@ -8,12 +8,12 @@ import { Quote } from "@/utils/quotesData";
  */
 export async function fetchQuotes(): Promise<Quote[]> {
   try {
-    // Fetch main quotes data with source relationship
+    // Fetch main quotes data with source_info relationship
     const { data: quotesData, error: quotesError } = await supabase
       .from('quotes')
       .select(`
         *,
-        source:original_sources(*)
+        source_info(*)
       `);
     
     if (quotesError) {
@@ -63,6 +63,9 @@ export async function fetchQuotes(): Promise<Quote[]> {
         .map(qt => qt.topic?.topic_name)
         .filter(Boolean) || [];
 
+      // Get source_info - it's an array, take the first one
+      const sourceInfo = quote.source_info?.[0];
+
       // Map DB schema to Quote model
       return {
         id: quote.id,
@@ -71,11 +74,11 @@ export async function fetchQuotes(): Promise<Quote[]> {
         date: quote.date_original || new Date().toISOString().split('T')[0],
         topics: topics,
         theme: '',
-        source: quote.source?.title || '',
+        source: sourceInfo?.title || '',
         evidenceImage: quote.quote_image_url,
-        sourceUrl: quote.source?.archive_url,
-        sourcePublicationDate: quote.source?.publication_year,
-        originalLanguage: '',
+        sourceUrl: sourceInfo?.primary_url || sourceInfo?.backup_url,
+        sourcePublicationDate: sourceInfo?.publication_date,
+        originalLanguage: sourceInfo?.language || 'en',
         originalText: '',
         context: quote.quote_context,
         historicalContext: '',
@@ -93,13 +96,18 @@ export async function fetchQuotes(): Promise<Quote[]> {
         translator: '',
         impact: '',
         citedBy: [],
-        originalSource: quote.source ? {
-          title: quote.source.title || '',
-          publisher: quote.source.publisher || '',
-          publicationDate: quote.source.publication_year || '',
-          location: quote.source.archive_url || '',
-          isbn: '',
-          sourceUrl: quote.source.archive_url || ''
+        sourceInfo: sourceInfo ? {
+          source_type: sourceInfo.source_type,
+          title: sourceInfo.title,
+          author: sourceInfo.author,
+          publisher: sourceInfo.publisher,
+          publication_date: sourceInfo.publication_date,
+          primary_url: sourceInfo.primary_url,
+          backup_url: sourceInfo.backup_url,
+          page_number: sourceInfo.page_number,
+          language: sourceInfo.language,
+          doi: sourceInfo.doi,
+          isbn: sourceInfo.isbn,
         } : undefined,
         translations: translations?.length ? translations : undefined
       };

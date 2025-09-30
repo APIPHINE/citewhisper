@@ -9,7 +9,8 @@ export async function getQuotes(req: Request): Promise<Response> {
       .from('quotes')
       .select(`
         *,
-        source:original_sources(*),
+        source_info(*),
+        translations(*),
         quote_topics(
           topic:topics(topic_name)
         )
@@ -26,6 +27,21 @@ export async function getQuotes(req: Request): Promise<Response> {
     const transformedData = data.map(quote => {
       // Extract topics from the junction table
       const topics = quote.quote_topics?.map(qt => qt.topic?.topic_name).filter(Boolean) || [];
+      
+      // Get source_info - it's an array, take the first one
+      const sourceInfo = quote.source_info?.[0];
+      
+      // Transform translations
+      const translations = quote.translations?.map(t => ({
+        language: t.language,
+        text: t.translated_text,
+        source: t.source,
+        translator: t.translator_name || t.translator,
+        translationType: t.translation_type,
+        translatorType: t.translator_type,
+        verified: t.verified,
+        confidenceScore: t.confidence_score
+      })) || [];
 
       return {
         id: quote.id,
@@ -34,11 +50,11 @@ export async function getQuotes(req: Request): Promise<Response> {
         date: quote.date_original || new Date().toISOString().split('T')[0],
         topics: topics,
         theme: '',
-        source: quote.source?.title || '',
+        source: sourceInfo?.title || '',
         evidenceImage: quote.quote_image_url,
-        sourceUrl: quote.source?.archive_url,
-        sourcePublicationDate: quote.source?.publication_year,
-        originalLanguage: '',
+        sourceUrl: sourceInfo?.primary_url || sourceInfo?.backup_url,
+        sourcePublicationDate: sourceInfo?.publication_date,
+        originalLanguage: sourceInfo?.language || 'en',
         originalText: '',
         context: quote.quote_context,
         historicalContext: '',
@@ -48,6 +64,8 @@ export async function getQuotes(req: Request): Promise<Response> {
         citationChicago: '',
         shareCount: 0,
         attributionStatus: "Pending",
+        sourceInfo: sourceInfo,
+        translations: translations.length > 0 ? translations : undefined,
         fairUseJustification: {
           purpose: "Educational/Transformative",
           natureOfWork: "Factual/Published",

@@ -38,13 +38,19 @@ export interface Quote {
     siteUrl: string,
     embedDate: string
   }[],
-  originalSource?: {
-    title: string;
-    publisher: string;
-    publicationDate: string;
-    location: string;
-    isbn: string;
-    sourceUrl: string;
+  sourceInfo?: {
+    source_type?: string;
+    title?: string;
+    author?: string;
+    publisher?: string;
+    publication_date?: string;
+    primary_url?: string;
+    backup_url?: string;
+    page_number?: string;
+    language?: string;
+    doi?: string;
+    isbn?: string;
+    [key: string]: any;
   };
   translations?: Array<{
     language: string;

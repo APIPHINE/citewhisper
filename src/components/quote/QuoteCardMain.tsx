@@ -43,7 +43,7 @@ export function QuoteCardMain({
   // Handle translations and original text
   const getTranslation = () => {
     if (currentLanguage === 'es' && quote.originalLanguage === 'es') {
-      return { text: quote.originalText, source: quote.originalSource?.title };
+      return { text: quote.originalText, source: quote.sourceInfo?.title };
     }
     if (Array.isArray(quote.translations)) {
       const translation = quote.translations.find(t => t.language === currentLanguage);
@@ -63,8 +63,8 @@ export function QuoteCardMain({
     (translation?.text || quote.text);
     
   const displaySource = currentLanguage === "en" ? 
-    quote.source : 
-    (translation?.source || quote.source);
+    (quote.sourceInfo?.title || quote.source) : 
+    (translation?.source || quote.sourceInfo?.title || quote.source);
     
   const isVerified = Boolean(quote.evidenceImage);
   const hasTranslation = (

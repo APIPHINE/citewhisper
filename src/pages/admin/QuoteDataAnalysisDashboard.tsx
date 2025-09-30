@@ -94,13 +94,14 @@ export function QuoteDataAnalysisDashboard() {
         citationMLA: 'Jobs, Steve. "The Guts of a New Machine." New York Times Magazine, 30 Nov. 2003.',
         citationChicago: 'Jobs, Steve. "The Guts of a New Machine." New York Times Magazine, November 30, 2003.',
         verificationStatus: 'verified',
-        originalSource: {
+        sourceInfo: {
+          source_type: 'article',
           title: 'The Guts of a New Machine',
+          author: 'Steve Jobs',
           publisher: 'New York Times Magazine',
-          publicationDate: '2003-11-30',
-          location: 'New York',
-          isbn: '',
-          sourceUrl: 'https://nytimes.com/2003/11/30/magazine/the-guts-of-a-new-machine.html'
+          publication_date: '2003-11-30',
+          primary_url: 'https://nytimes.com/2003/11/30/magazine/the-guts-of-a-new-machine.html',
+          language: 'en'
         },
         shareCount: 1547,
         layer: 'advanced',
@@ -170,7 +171,7 @@ export function QuoteDataAnalysisDashboard() {
     advanced: {
       name: 'Advanced Scholarly Data (Layer 3)',
       description: 'Citations, verification, and detailed academic information',
-      fields: ['citationAPA', 'citationMLA', 'citationChicago', 'verificationStatus', 'originalSource', 'citedBy', 'crossReferencedQuotes'],
+      fields: ['citationAPA', 'citationMLA', 'citationChicago', 'verificationStatus', 'sourceInfo', 'citedBy', 'crossReferencedQuotes'],
       example: quotes.find(q => q.layer === 'advanced'),
       color: 'bg-purple-500'
     }
@@ -340,7 +341,7 @@ export function QuoteDataAnalysisDashboard() {
   ...(key === 'advanced' && {
     citationAPA: layer.example.citationAPA,
     verificationStatus: layer.example.verificationStatus,
-    originalSource: layer.example.originalSource
+    sourceInfo: layer.example.sourceInfo
   })
 }, null, 2)}
                           </pre>
