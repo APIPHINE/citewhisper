@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { SmartImageUpload } from '@/components/quote/SmartImageUpload';
+import { OcrTextSelector } from './OcrTextSelector';
 import { QuoteQualityIndicator, QualityScore, QualitySuggestion } from '@/components/quote/QuoteQualityIndicator';
 import { CoreQuoteFields } from './CoreQuoteFields';
 import { EnhancedQuoteFields } from './EnhancedQuoteFields';
 import { ProcessedEvidence } from '@/utils/evidenceProcessor';
 import { QuoteFormValues } from '@/utils/formSchemas';
-import { CheckCircle, ArrowRight, PenTool, Sparkles } from 'lucide-react';
+import { CheckCircle, ArrowRight, PenTool, Sparkles, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EvidenceFirstQuoteFormProps {
@@ -19,14 +20,14 @@ interface EvidenceFirstQuoteFormProps {
   selectedFiles?: File[];
 }
 
-type FormStep = 'evidence' | 'core' | 'enhanced' | 'review';
+type FormStep = 'upload' | 'ocr' | 'core' | 'enhanced' | 'review';
 
 export function EvidenceFirstQuoteForm({ 
   form, 
   onFilesSelected, 
   selectedFiles = [] 
 }: EvidenceFirstQuoteFormProps) {
-  const [currentStep, setCurrentStep] = useState<FormStep>('evidence');
+  const [currentStep, setCurrentStep] = useState<FormStep>('upload');
   const [processedEvidence, setProcessedEvidence] = useState<ProcessedEvidence | null>(null);
   const [qualityScore, setQualityScore] = useState<QualityScore>({
     overall: 0,
@@ -38,121 +39,141 @@ export function EvidenceFirstQuoteForm({
 
   const watchedValues = form.watch();
 
-  // Auto-populate form from processed evidence
-  const handleEvidenceProcessed = (evidence: ProcessedEvidence, originalFile: File) => {
+  // Skip to manual entry
+  const handleSkipToManual = useCallback(() => {
+    setCurrentStep('core');
+    onFilesSelected([]);
+  }, [onFilesSelected]);
+
+  // Handle evidence processed from image
+  const handleEvidenceProcessed = useCallback((evidence: ProcessedEvidence, originalFile: File) => {
     setProcessedEvidence(evidence);
     
-    // Auto-populate form fields from extracted data
-    const updates: Partial<QuoteFormValues> = {};
-    
-    if (evidence.extractedText && !watchedValues.text) {
-      updates.text = evidence.extractedText;
-    }
-    if (evidence.author && !watchedValues.author) {
-      updates.author = evidence.author;
-    }
-    if (evidence.title && !watchedValues.sourceInfo?.title) {
-      updates.sourceInfo = { ...updates.sourceInfo, title: evidence.title, source_type: 'other' as const };
-    }
-    if (evidence.context && !watchedValues.context) {
-      updates.context = evidence.context;
-    }
-
-    // Apply updates to form
-    Object.entries(updates).forEach(([field, value]) => {
-      form.setValue(field as keyof QuoteFormValues, value);
-    });
-
-    // Advance to core fields step if evidence was processed successfully
-    if (evidence.confidence > 0.3) {
+    // If we have good OCR text, show the selector
+    if (evidence.extractedText && evidence.extractedText.length > 20) {
+      setCurrentStep('ocr');
+    } else {
+      // Auto-populate and skip to core if OCR is weak
+      if (evidence.extractedText) form.setValue('text', evidence.extractedText);
+      if (evidence.author) form.setValue('author', evidence.author);
+      if (evidence.title) {
+        form.setValue('sourceInfo', { 
+          ...form.getValues('sourceInfo'),
+          title: evidence.title, 
+          source_type: 'other' as const 
+        });
+      }
+      if (evidence.context) form.setValue('context', evidence.context);
       setCurrentStep('core');
     }
-  };
+  }, [form]);
 
-  // Calculate quality score and suggestions
-  useEffect(() => {
-    const calculateQuality = () => {
-      const values = watchedValues;
-      let completeness = 0;
-      let accuracy = 0;
-      let sourcing = 0;
+  // Handle OCR selections
+  const handleOcrQuoteSelected = useCallback((quote: string) => {
+    form.setValue('text', quote);
+  }, [form]);
 
-      // Completeness scoring
-      if (values.text) completeness += 40;
-      if (values.author) completeness += 30;
-      if (values.sourceInfo?.title) completeness += 20;
-      if (values.context) completeness += 10;
+  const handleOcrAuthorSelected = useCallback((author: string) => {
+    form.setValue('author', author);
+  }, [form]);
 
-      // Accuracy scoring (based on evidence confidence and field quality)
-      if (processedEvidence) {
-        accuracy += processedEvidence.confidence * 50;
-      }
-      if (values.text && values.text.length > 20) accuracy += 25;
-      if (values.author && values.author.length > 2) accuracy += 25;
+  const handleOcrConfirm = useCallback(() => {
+    setCurrentStep('core');
+  }, []);
 
-      // Sourcing scoring
-      if (selectedFiles.length > 0) sourcing += 50;
-      if (values.sourceInfo?.primary_url) sourcing += 30;
-      if (values.sourceInfo?.publication_date) sourcing += 20;
+  // Memoized quality calculation to prevent infinite loops
+  const calculateQuality = useCallback(() => {
+    const values = watchedValues;
+    let completeness = 0;
+    let accuracy = 0;
+    let sourcing = 0;
 
-      const overall = (completeness + accuracy + sourcing) / 3;
+    // Completeness scoring
+    if (values.text) completeness += 40;
+    if (values.author) completeness += 30;
+    if (values.sourceInfo?.title) completeness += 20;
+    if (values.context) completeness += 10;
 
-      setQualityScore({ overall, completeness, accuracy, sourcing });
+    // Accuracy scoring
+    if (processedEvidence) {
+      accuracy += processedEvidence.confidence * 50;
+    }
+    if (values.text && values.text.length > 20) accuracy += 25;
+    if (values.author && values.author.length > 2) accuracy += 25;
 
-      // Generate suggestions
-      const newSuggestions: QualitySuggestion[] = [];
+    // Sourcing scoring
+    if (selectedFiles.length > 0) sourcing += 50;
+    if (values.sourceInfo?.primary_url) sourcing += 30;
+    if (values.sourceInfo?.publication_date) sourcing += 20;
 
-      if (!values.text) {
-        newSuggestions.push({
-          type: 'missing',
-          field: 'Quote Text',
-          message: 'Add the main quote text',
-          priority: 'high'
-        });
-      }
-      if (!values.author) {
-        newSuggestions.push({
-          type: 'missing',
-          field: 'Author',
-          message: 'Specify who said or wrote this quote',
-          priority: 'high'
-        });
-      }
-      if (!values.sourceInfo?.title) {
-        newSuggestions.push({
-          type: 'missing',
-          field: 'Source',
-          message: 'Add the source publication or work',
-          priority: 'medium'
-        });
-      }
-      if (selectedFiles.length === 0) {
-        newSuggestions.push({
-          type: 'enhance',
-          field: 'Evidence',
-          message: 'Upload an image of the original source for verification',
-          priority: 'medium'
-        });
-      }
-      if (!values.context && values.text && values.text.length > 50) {
-        newSuggestions.push({
-          type: 'enhance',
-          field: 'Context',
-          message: 'Add context to help readers understand the quote',
-          priority: 'low'
-        });
-      }
+    const overall = (completeness + accuracy + sourcing) / 3;
 
-      setSuggestions(newSuggestions);
-    };
-
-    calculateQuality();
+    return { overall, completeness, accuracy, sourcing };
   }, [watchedValues, processedEvidence, selectedFiles]);
 
+  // Generate suggestions based on form state
+  const generateSuggestions = useCallback(() => {
+    const values = watchedValues;
+    const newSuggestions: QualitySuggestion[] = [];
+
+    if (!values.text) {
+      newSuggestions.push({
+        type: 'missing',
+        field: 'Quote Text',
+        message: 'Add the main quote text',
+        priority: 'high'
+      });
+    }
+    if (!values.author) {
+      newSuggestions.push({
+        type: 'missing',
+        field: 'Author',
+        message: 'Specify who said or wrote this quote',
+        priority: 'high'
+      });
+    }
+    if (!values.sourceInfo?.title) {
+      newSuggestions.push({
+        type: 'missing',
+        field: 'Source',
+        message: 'Add the source publication or work',
+        priority: 'medium'
+      });
+    }
+    if (selectedFiles.length === 0) {
+      newSuggestions.push({
+        type: 'enhance',
+        field: 'Evidence',
+        message: 'Upload an image of the original source for verification',
+        priority: 'medium'
+      });
+    }
+    if (!values.context && values.text && values.text.length > 50) {
+      newSuggestions.push({
+        type: 'enhance',
+        field: 'Context',
+        message: 'Add context to help readers understand the quote',
+        priority: 'low'
+      });
+    }
+
+    return newSuggestions;
+  }, [watchedValues, selectedFiles]);
+
+  // Update quality score and suggestions
+  useEffect(() => {
+    const newScore = calculateQuality();
+    setQualityScore(newScore);
+    
+    const newSuggestions = generateSuggestions();
+    setSuggestions(newSuggestions);
+  }, [calculateQuality, generateSuggestions]);
+
   const steps = [
-    { id: 'evidence', label: 'Evidence', icon: Sparkles, completed: selectedFiles.length > 0 },
-    { id: 'core', label: 'Quote Details', icon: PenTool, completed: watchedValues.text && watchedValues.author },
-    { id: 'enhanced', label: 'Context', icon: ArrowRight, completed: watchedValues.context || watchedValues.theme },
+    { id: 'upload', label: 'Upload', icon: Sparkles, completed: selectedFiles.length > 0 || currentStep !== 'upload' },
+    { id: 'ocr', label: 'Select Text', icon: FileText, completed: currentStep !== 'upload' && currentStep !== 'ocr' },
+    { id: 'core', label: 'Details', icon: PenTool, completed: !!(watchedValues.text && watchedValues.author) },
+    { id: 'enhanced', label: 'Context', icon: ArrowRight, completed: !!(watchedValues.context || watchedValues.theme) },
     { id: 'review', label: 'Review', icon: CheckCircle, completed: qualityScore.overall >= 70 }
   ];
 
@@ -161,8 +182,9 @@ export function EvidenceFirstQuoteForm({
 
   const canAdvanceStep = () => {
     switch (currentStep) {
-      case 'evidence': return selectedFiles.length > 0;
-      case 'core': return watchedValues.text && watchedValues.author;
+      case 'upload': return selectedFiles.length > 0;
+      case 'ocr': return !!(watchedValues.text || watchedValues.author);
+      case 'core': return !!(watchedValues.text && watchedValues.author);
       case 'enhanced': return true; // Optional step
       case 'review': return qualityScore.overall >= 50;
       default: return false;
@@ -202,7 +224,7 @@ export function EvidenceFirstQuoteForm({
                       )}
                     >
                       <StepIcon className="h-3 w-3" />
-                      <span>{step.label}</span>
+                      <span className="hidden sm:inline">{step.label}</span>
                     </div>
                   );
                 })}
@@ -215,25 +237,51 @@ export function EvidenceFirstQuoteForm({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Form Area */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Step Content */}
-          {currentStep === 'evidence' && (
-            <SmartImageUpload
-              onEvidenceProcessed={handleEvidenceProcessed}
-              onFilesSelected={onFilesSelected}
-              selectedFiles={selectedFiles}
+          {/* Step: Upload Evidence */}
+          {currentStep === 'upload' && (
+            <div className="space-y-4">
+              <SmartImageUpload
+                onEvidenceProcessed={handleEvidenceProcessed}
+                onFilesSelected={onFilesSelected}
+                selectedFiles={selectedFiles}
+              />
+              
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSkipToManual}
+                  size="lg"
+                >
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  Skip Image Upload & Enter Manually
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step: OCR Text Selection */}
+          {currentStep === 'ocr' && processedEvidence?.extractedText && (
+            <OcrTextSelector
+              extractedText={processedEvidence.extractedText}
+              onQuoteSelected={handleOcrQuoteSelected}
+              onAuthorSelected={handleOcrAuthorSelected}
+              onConfirm={handleOcrConfirm}
+              confidence={processedEvidence.confidence}
             />
           )}
 
+          {/* Step: Core Fields */}
           {currentStep === 'core' && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PenTool className="h-5 w-5" />
                   Quote Details
-                  <Badge variant="secondary" className="ml-auto">Step 2</Badge>
+                  <Badge variant="secondary" className="ml-auto">Required</Badge>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Review and refine the extracted information
+                  Review and refine the quote information
                 </p>
               </CardHeader>
               <CardContent>
@@ -242,6 +290,7 @@ export function EvidenceFirstQuoteForm({
             </Card>
           )}
 
+          {/* Step: Enhanced Fields */}
           {currentStep === 'enhanced' && (
             <Card>
               <CardHeader>
@@ -260,6 +309,7 @@ export function EvidenceFirstQuoteForm({
             </Card>
           )}
 
+          {/* Step: Review */}
           {currentStep === 'review' && (
             <Card>
               <CardHeader>
@@ -297,6 +347,7 @@ export function EvidenceFirstQuoteForm({
           {/* Navigation */}
           <div className="flex justify-between">
             <Button
+              type="button"
               variant="outline"
               onClick={() => {
                 const prevIndex = Math.max(0, currentStepIndex - 1);
@@ -309,6 +360,7 @@ export function EvidenceFirstQuoteForm({
             
             {currentStep !== 'review' ? (
               <Button
+                type="button"
                 onClick={() => {
                   const nextIndex = Math.min(steps.length - 1, currentStepIndex + 1);
                   setCurrentStep(steps[nextIndex].id as FormStep);
