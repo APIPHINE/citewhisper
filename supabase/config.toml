@@ -6,3 +6,6 @@ verify_jwt = false
 
 [functions.external-quote-submissions]
 verify_jwt = false
+
+[functions.process-evidence-image]
+verify_jwt = false

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, Eye, EyeOff, Wand2, Camera, Upload } from 'lucide-react';
-import { extractTextFromImage, ProcessedEvidence } from '@/utils/evidenceProcessor';
+import { processImageWithAI, ProcessedEvidence } from '@/utils/aiOcrProcessor';
 import { cn } from '@/lib/utils';
 
 interface SmartImageUploadProps {
@@ -40,7 +40,9 @@ export function SmartImageUpload({
         }, 300);
 
         console.log('Processing evidence image...');
-        const evidence = await extractTextFromImage(files[0]);
+        const evidence = await processImageWithAI(files[0], (p) => {
+          setProgress(p);
+        });
         setProcessedEvidence(evidence);
         setProgress(95);
         onEvidenceProcessed(evidence, files[0]);
@@ -134,11 +136,11 @@ export function SmartImageUpload({
                   </div>
 
                   {/* Extracted Text */}
-                  {processedEvidence.extractedText && (
+                  {processedEvidence.text && (
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Extracted Text:</label>
-                      <div className="p-3 bg-muted rounded-md text-sm">
-                        {processedEvidence.extractedText}
+                      <div className="p-3 bg-muted rounded-md text-sm whitespace-pre-wrap">
+                        {processedEvidence.text}
                       </div>
                     </div>
                   )}
@@ -163,30 +165,6 @@ export function SmartImageUpload({
                           <label className="text-xs font-medium text-muted-foreground">Detected Context:</label>
                           <div className="p-2 bg-primary/10 rounded text-sm">{processedEvidence.context}</div>
                         </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Enhanced Image */}
-                  {processedEvidence.processedImageBlob && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium">Enhanced Image:</label>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowProcessedImage(!showProcessedImage)}
-                        >
-                          {showProcessedImage ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          {showProcessedImage ? 'Hide' : 'Show'} Enhanced
-                        </Button>
-                      </div>
-                      {showProcessedImage && (
-                        <img
-                          src={URL.createObjectURL(processedEvidence.processedImageBlob)}
-                          alt="Enhanced Evidence"
-                          className="max-w-full h-auto rounded-md border max-h-64 object-contain bg-checkerboard"
-                        />
                       )}
                     </div>
                   )}

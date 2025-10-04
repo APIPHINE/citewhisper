@@ -9,7 +9,7 @@ import { OcrTextSelector } from './OcrTextSelector';
 import { QuoteQualityIndicator, QualityScore, QualitySuggestion } from '@/components/quote/QuoteQualityIndicator';
 import { CoreQuoteFields } from './CoreQuoteFields';
 import { EnhancedQuoteFields } from './EnhancedQuoteFields';
-import { ProcessedEvidence } from '@/utils/evidenceProcessor';
+import { ProcessedEvidence } from '@/utils/aiOcrProcessor';
 import { QuoteFormValues } from '@/utils/formSchemas';
 import { CheckCircle, ArrowRight, PenTool, Sparkles, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -57,11 +57,11 @@ export function EvidenceFirstQuoteForm({
     setProcessedEvidence(evidence);
     
     // If we have good OCR text, show the selector
-    if (evidence.extractedText && evidence.extractedText.length > 20) {
+    if (evidence.text && evidence.text.length > 20) {
       setCurrentStep('ocr');
     } else {
       // Auto-populate and skip to core if OCR is weak
-      if (evidence.extractedText) form.setValue('text', evidence.extractedText);
+      if (evidence.text) form.setValue('text', evidence.text);
       if (evidence.author) form.setValue('author', evidence.author);
       if (evidence.title) {
         form.setValue('sourceInfo', { 
@@ -262,9 +262,9 @@ export function EvidenceFirstQuoteForm({
           )}
 
           {/* Step: OCR Text Selection */}
-          {currentStep === 'ocr' && processedEvidence?.extractedText && (
+          {currentStep === 'ocr' && processedEvidence?.text && (
             <OcrTextSelector
-              extractedText={processedEvidence.extractedText}
+              extractedText={processedEvidence.text}
               onQuoteSelected={handleOcrQuoteSelected}
               onAuthorSelected={handleOcrAuthorSelected}
               onConfirm={handleOcrConfirm}
