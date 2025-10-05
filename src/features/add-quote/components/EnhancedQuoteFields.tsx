@@ -1,14 +1,22 @@
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { UseFormReturn } from 'react-hook-form';
 import type { QuoteFormValues } from '@/utils/formSchemas';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Wand2 } from 'lucide-react';
 
 interface EnhancedQuoteFieldsProps {
   form: UseFormReturn<QuoteFormValues>;
 }
 
 export function EnhancedQuoteFields({ form }: EnhancedQuoteFieldsProps) {
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+  const { toast } = useToast();
+
   const getTopicsString = () => {
     const topics = form.watch('topics');
     return topics && topics.length > 0 ? topics.join(', ') : '';
@@ -29,8 +37,73 @@ export function EnhancedQuoteFields({ form }: EnhancedQuoteFieldsProps) {
     form.setValue('keywords', keywordsString.split(',').map(item => item.trim()).filter(Boolean));
   };
 
+  const handleAutoFillContext = async () => {
+    const quoteText = form.getValues('text');
+    const author = form.getValues('author');
+    
+    if (!quoteText) {
+      toast({
+        title: "No Quote Text",
+        description: "Please enter a quote first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsAutoFilling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('autofill-quote-metadata', {
+        body: {
+          quoteText,
+          ocrContext: author ? `Author: ${author}` : ''
+        }
+      });
+
+      if (error) throw error;
+
+      // Populate context fields
+      if (data.context && !form.getValues('context')) {
+        form.setValue('context', data.context);
+      }
+      
+      // Populate topics if not already filled
+      if (data.topics && Array.isArray(data.topics) && data.topics.length > 0) {
+        const existingTopics = form.getValues('topics') || [];
+        if (existingTopics.length === 0) {
+          form.setValue('topics', data.topics);
+        }
+      }
+
+      toast({
+        title: "Context Auto-filled",
+        description: "AI has suggested context and categorization.",
+      });
+    } catch (error) {
+      console.error('Auto-fill error:', error);
+      toast({
+        title: "Auto-fill Failed",
+        description: error instanceof Error ? error.message : "Could not extract context. Please fill manually.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* AI Autofill Button */}
+      <Button
+        type="button"
+        onClick={handleAutoFillContext}
+        disabled={isAutoFilling || !form.watch('text')}
+        variant="secondary"
+        className="w-full"
+      >
+        <Wand2 className="h-4 w-4 mr-2" />
+        {isAutoFilling ? "Auto-filling Context..." : "Auto Fill Context with AI"}
+      </Button>
+
       {/* Context Section */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium text-foreground">Context & Background</h3>
