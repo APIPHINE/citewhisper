@@ -5,6 +5,7 @@ import type { QuoteFormValues } from '@/utils/formSchemas';
 import { createQuote, uploadEvidenceImage } from '@/services/quoteService';
 import type { QuoteSubmissionData } from '@/services/quotesApi/createQuote';
 import { useState } from 'react';
+import { QuoteDraftService } from '@/services/quoteDraftService';
 
 export function useQuoteSubmission() {
   const { toast } = useToast();
@@ -71,6 +72,12 @@ export function useQuoteSubmission() {
       }
 
       console.log('Quote created successfully with ID:', result.quote_id);
+      
+      // Delete the draft if it exists (based on image URL)
+      if (evidenceImageUrl && user) {
+        await QuoteDraftService.deleteDraftByImage(user.id, evidenceImageUrl);
+      }
+      
       toast({
         title: "Quote Submitted",
         description: "Your quote has been submitted successfully.",

@@ -672,6 +672,54 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_drafts: {
+        Row: {
+          author_name: string | null
+          created_at: string
+          date_original: string | null
+          evidence_image_name: string | null
+          id: string
+          image_url: string | null
+          ocr_text: string | null
+          quote_context: string | null
+          quote_text: string | null
+          source_info: Json | null
+          topics: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          created_at?: string
+          date_original?: string | null
+          evidence_image_name?: string | null
+          id?: string
+          image_url?: string | null
+          ocr_text?: string | null
+          quote_context?: string | null
+          quote_text?: string | null
+          source_info?: Json | null
+          topics?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string | null
+          created_at?: string
+          date_original?: string | null
+          evidence_image_name?: string | null
+          id?: string
+          image_url?: string | null
+          ocr_text?: string | null
+          quote_context?: string | null
+          quote_text?: string | null
+          source_info?: Json | null
+          topics?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       quote_genconten: {
         Row: {
           academic_citation_style: string | null

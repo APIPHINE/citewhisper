@@ -11,8 +11,9 @@ import { CoreQuoteFields } from './CoreQuoteFields';
 import { EnhancedQuoteFields } from './EnhancedQuoteFields';
 import { ProcessedEvidence } from '@/utils/aiOcrProcessor';
 import { QuoteFormValues } from '@/utils/formSchemas';
-import { CheckCircle, ArrowRight, PenTool, Sparkles, FileText } from 'lucide-react';
+import { CheckCircle, ArrowRight, PenTool, Sparkles, FileText, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useQuoteDraft } from '../hooks/useQuoteDraft';
 
 interface EvidenceFirstQuoteFormProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -36,6 +37,7 @@ export function EvidenceFirstQuoteForm({
     sourcing: 0
   });
   const [suggestions, setSuggestions] = useState<QualitySuggestion[]>([]);
+  const { saveDraft, isSaving } = useQuoteDraft();
 
   // Watch only the fields we need to avoid infinite re-renders
   const text = useWatch({ control: form.control, name: 'text' });
@@ -192,6 +194,40 @@ export function EvidenceFirstQuoteForm({
     }
   };
 
+  // Auto-save draft when advancing steps
+  const handleStepAdvance = useCallback(async (nextStep: FormStep) => {
+    const formValues = form.getValues();
+    const imageUrl = selectedFiles[0] ? URL.createObjectURL(selectedFiles[0]) : undefined;
+    const evidenceImageName = selectedFiles[0]?.name;
+    
+    // Auto-save without toast notification
+    await saveDraft(
+      formValues,
+      imageUrl,
+      processedEvidence?.text,
+      evidenceImageName,
+      false
+    );
+    
+    setCurrentStep(nextStep);
+  }, [form, selectedFiles, processedEvidence, saveDraft]);
+
+  // Manual save draft
+  const handleManualSave = useCallback(async () => {
+    const formValues = form.getValues();
+    const imageUrl = selectedFiles[0] ? URL.createObjectURL(selectedFiles[0]) : undefined;
+    const evidenceImageName = selectedFiles[0]?.name;
+    
+    // Manual save with toast notification
+    await saveDraft(
+      formValues,
+      imageUrl,
+      processedEvidence?.text,
+      evidenceImageName,
+      true
+    );
+  }, [form, selectedFiles, processedEvidence, saveDraft]);
+
   return (
     <div className="space-y-6">
       {/* Progress Header */}
@@ -346,7 +382,7 @@ export function EvidenceFirstQuoteForm({
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-2">
             <Button
               type="button"
               variant="outline"
@@ -358,13 +394,24 @@ export function EvidenceFirstQuoteForm({
             >
               Previous
             </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleManualSave}
+              disabled={isSaving || !text}
+              className="ml-auto"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isSaving ? 'Saving...' : 'Save Draft'}
+            </Button>
             
             {currentStep !== 'review' ? (
               <Button
                 type="button"
                 onClick={() => {
                   const nextIndex = Math.min(steps.length - 1, currentStepIndex + 1);
-                  setCurrentStep(steps[nextIndex].id as FormStep);
+                  handleStepAdvance(steps[nextIndex].id as FormStep);
                 }}
                 disabled={!canAdvanceStep()}
               >
