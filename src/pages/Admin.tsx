@@ -7,6 +7,7 @@ import { SuperAdminBulkActions } from '@/components/admin/SuperAdminBulkActions'
 import { SuperAdminQuotesManager } from '@/components/admin/SuperAdminQuotesManager';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { QuoteDataAnalysisDashboard } from './admin/QuoteDataAnalysisDashboard';
+import { CQWorkerPanel } from '@/components/admin/CQWorkerPanel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -96,11 +97,12 @@ const Admin = () => {
         )}
 
         <Tabs defaultValue="cms" className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-7' : 'grid-cols-4'}`}>
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-8' : 'grid-cols-4'}`}>
             <TabsTrigger value="cms">Blog & Content</TabsTrigger>
             <TabsTrigger value="dashboard">Admin Dashboard</TabsTrigger>
             <TabsTrigger value="submissions">Quote Submissions</TabsTrigger>
             <TabsTrigger value="research">Research & Articles</TabsTrigger>
+            {isSuperAdmin && <TabsTrigger value="cq">CQ AI Worker</TabsTrigger>}
             {isSuperAdmin && <TabsTrigger value="quotes">Quotes Manager</TabsTrigger>}
             {isSuperAdmin && <TabsTrigger value="data-analysis">Data Analysis</TabsTrigger>}
             {isSuperAdmin && <TabsTrigger value="super-admin">Super Admin</TabsTrigger>}
@@ -170,6 +172,13 @@ const Admin = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* CQ AI Worker */}
+          {isSuperAdmin && (
+            <TabsContent value="cq">
+              <CQWorkerPanel />
+            </TabsContent>
+          )}
 
           {/* Super Admin Quotes Manager */}
           {isSuperAdmin && (

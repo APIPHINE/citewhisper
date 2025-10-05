@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.autofill-quote-metadata]
 verify_jwt = true
+
+[functions.cq-generate-quotes]
+verify_jwt = true
