@@ -4,12 +4,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { useAccessControl } from '@/hooks/useAccessControl';
+import { useAuth } from '@/context/AuthContext';
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { quoteSchema, QuoteFormValues } from '@/utils/formSchemas';
 import { useQuoteSubmission } from '@/features/add-quote/hooks/useQuoteSubmission';
 import { EvidenceFirstQuoteForm } from '@/features/add-quote/components/EvidenceFirstQuoteForm';
+import { DraftQuotesSelector } from '@/features/add-quote/components/DraftQuotesSelector';
 import { JsonImportSection } from '@/features/add-quote/components/JsonImportSection';
 import { CsvImportSection } from '@/features/add-quote/components/CsvImportSection';
 import { Link } from 'react-router-dom';
@@ -18,6 +20,7 @@ import { AlertCircle, Upload, FileText, Sparkles } from 'lucide-react';
 const AddQuote = () => {
   // Check access immediately - this will redirect if not authenticated
   const { checkAccess } = useAccessControl();
+  const { user } = useAuth();
   
   React.useEffect(() => {
     checkAccess('add quotes');
@@ -78,6 +81,14 @@ const AddQuote = () => {
           Upload evidence and let AI help you create accurate, well-sourced quotes
         </p>
       </div>
+
+      {/* Draft Quotes Selector (only for authenticated users) */}
+      {user && (
+        <DraftQuotesSelector 
+          form={form}
+          onStartNew={() => setSelectedFiles([])}
+        />
+      )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
