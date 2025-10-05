@@ -11,9 +11,11 @@ import { CoreQuoteFields } from './CoreQuoteFields';
 import { EnhancedQuoteFields } from './EnhancedQuoteFields';
 import { ProcessedEvidence } from '@/utils/aiOcrProcessor';
 import { QuoteFormValues } from '@/utils/formSchemas';
-import { CheckCircle, ArrowRight, PenTool, Sparkles, FileText, Save } from 'lucide-react';
+import { CheckCircle, ArrowRight, PenTool, Sparkles, FileText, Save, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuoteDraft } from '../hooks/useQuoteDraft';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface EvidenceFirstQuoteFormProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -38,6 +40,8 @@ export function EvidenceFirstQuoteForm({
   });
   const [suggestions, setSuggestions] = useState<QualitySuggestion[]>([]);
   const { saveDraft, isSaving } = useQuoteDraft();
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+  const { toast } = useToast();
 
   // Watch only the fields we need to avoid infinite re-renders
   const text = useWatch({ control: form.control, name: 'text' });
@@ -228,6 +232,63 @@ export function EvidenceFirstQuoteForm({
     );
   }, [form, selectedFiles, processedEvidence, saveDraft]);
 
+  // Auto-fill with AI
+  const handleAutoFill = useCallback(async () => {
+    const quoteText = form.getValues('text');
+    if (!quoteText) {
+      toast({
+        title: "No Quote Text",
+        description: "Please enter or select a quote first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsAutoFilling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('autofill-quote-metadata', {
+        body: {
+          quoteText,
+          ocrContext: processedEvidence?.text || ''
+        }
+      });
+
+      if (error) throw error;
+
+      // Populate form with AI suggestions
+      if (data.author) form.setValue('author', data.author);
+      if (data.date) form.setValue('date', data.date);
+      if (data.context) form.setValue('context', data.context);
+      if (data.sourceTitle) {
+        const currentSourceInfo = form.getValues('sourceInfo') || { source_type: 'other' as const };
+        form.setValue('sourceInfo', {
+          ...currentSourceInfo,
+          title: data.sourceTitle
+        });
+      }
+      if (data.topics && Array.isArray(data.topics)) {
+        form.setValue('topics', data.topics);
+      }
+
+      toast({
+        title: "Auto-fill Complete",
+        description: "Form fields populated with AI suggestions.",
+      });
+      
+      // Auto-save after filling
+      await handleManualSave();
+    } catch (error) {
+      console.error('Auto-fill error:', error);
+      toast({
+        title: "Auto-fill Failed",
+        description: "Could not extract metadata. Please fill manually.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAutoFilling(false);
+    }
+  }, [form, processedEvidence, toast, handleManualSave]);
+
   return (
     <div className="space-y-6">
       {/* Progress Header */}
@@ -321,7 +382,19 @@ export function EvidenceFirstQuoteForm({
                   Review and refine the quote information
                 </p>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {text && (
+                  <Button
+                    type="button"
+                    onClick={handleAutoFill}
+                    disabled={isAutoFilling}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    {isAutoFilling ? "Auto-filling..." : "Auto Fill with AI"}
+                  </Button>
+                )}
                 <CoreQuoteFields form={form} />
               </CardContent>
             </Card>

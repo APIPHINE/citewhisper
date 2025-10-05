@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.process-evidence-image]
 verify_jwt = false
+
+[functions.autofill-quote-metadata]
+verify_jwt = true
