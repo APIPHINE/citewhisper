@@ -75,13 +75,17 @@ export function OcrTextSelector({
   const handleClearQuote = () => {
     setQuoteSelection('');
     onQuoteSelected('');
-    setSelectedWordIndices(new Set());
+    if (mode === 'quote') {
+      setSelectedWordIndices(new Set());
+    }
   };
 
   const handleClearAuthor = () => {
     setAuthorSelection('');
     onAuthorSelected('');
-    setSelectedWordIndices(new Set());
+    if (mode === 'author') {
+      setSelectedWordIndices(new Set());
+    }
   };
 
   const handleQuoteEdit = (value: string) => {
@@ -95,10 +99,7 @@ export function OcrTextSelector({
   };
 
   const isWordSelected = (index: number) => {
-    const word = words[index];
-    if (mode === 'quote' && quoteSelection.includes(word)) return true;
-    if (mode === 'author' && authorSelection.includes(word)) return true;
-    return false;
+    return selectedWordIndices.has(index);
   };
 
   const confidenceColor = 
@@ -231,10 +232,10 @@ export function OcrTextSelector({
             className="relative p-4 bg-muted/30 rounded-lg border-2 border-dashed min-h-[200px] select-none"
             onMouseLeave={handleMouseUp}
           >
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-0.5">
               {words.map((word, index) => {
                 const isSelected = isWordSelected(index);
-                const isBeingSelected = selectedWordIndices.has(index) && isDragging;
+                const isCurrentHover = selectedWordIndices.has(index) && isDragging && index === Math.max(...Array.from(selectedWordIndices));
                 
                 return (
                   <button
@@ -245,16 +246,15 @@ export function OcrTextSelector({
                     onMouseEnter={() => handleMouseEnter(index)}
                     className={cn(
                       "px-2 py-1 rounded text-sm transition-all relative",
-                      isSelected && mode === 'quote' && "bg-primary text-primary-foreground font-medium",
-                      isSelected && mode === 'author' && "bg-accent text-accent-foreground font-medium",
+                      isSelected && "font-medium",
                       !isSelected && "bg-background hover:bg-muted",
-                      isBeingSelected && "ring-2 ring-primary"
+                      isCurrentHover && "ring-2 ring-primary"
                     )}
                     style={{
                       backgroundColor: isSelected 
                         ? mode === 'quote' 
-                          ? 'hsl(var(--primary) / 0.9)' 
-                          : 'hsl(var(--accent) / 0.9)'
+                          ? 'hsl(var(--primary) / 0.1)' 
+                          : 'hsl(var(--accent) / 0.1)'
                         : undefined
                     }}
                   >
