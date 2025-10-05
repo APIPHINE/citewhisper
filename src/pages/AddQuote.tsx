@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { useAccessControl } from '@/hooks/useAccessControl';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { quoteSchema, QuoteFormValues } from '@/utils/formSchemas';
 import { useQuoteSubmission } from '@/features/add-quote/hooks/useQuoteSubmission';
 import { EvidenceFirstQuoteForm } from '@/features/add-quote/components/EvidenceFirstQuoteForm';
 import { DraftQuotesSelector } from '@/features/add-quote/components/DraftQuotesSelector';
+import { CQGeneratorSection } from '@/features/add-quote/components/CQGeneratorSection';
 import { JsonImportSection } from '@/features/add-quote/components/JsonImportSection';
 import { CsvImportSection } from '@/features/add-quote/components/CsvImportSection';
 import { Link } from 'react-router-dom';
@@ -21,15 +23,21 @@ const AddQuote = () => {
   // Check access immediately - this will redirect if not authenticated
   const { checkAccess } = useAccessControl();
   const { user } = useAuth();
+  const { userRole, loadRole } = useUserRoles();
   
   React.useEffect(() => {
     checkAccess('add quotes');
-  }, []);
+    if (user) {
+      loadRole(user.id);
+    }
+  }, [user]);
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [draftLoadedTrigger, setDraftLoadedTrigger] = useState(0);
   const navigate = useNavigate();
   const { handleSubmit, isSubmitting } = useQuoteSubmission();
+  
+  const isSuperAdmin = userRole === 'super_admin';
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
@@ -82,6 +90,16 @@ const AddQuote = () => {
           Upload evidence and let AI help you create accurate, well-sourced quotes
         </p>
       </div>
+
+      {/* CQ AI Generator Section (Super Admin Only) */}
+      {isSuperAdmin && (
+        <div className="mb-6">
+          <CQGeneratorSection 
+            form={form}
+            onQuoteLoaded={() => setDraftLoadedTrigger(prev => prev + 1)}
+          />
+        </div>
+      )}
 
       {/* Draft Quotes Selector (only for authenticated users) */}
       {user && (
