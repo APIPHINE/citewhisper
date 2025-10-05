@@ -25,27 +25,42 @@ export function OcrTextSelector({
   const [quoteSelection, setQuoteSelection] = useState('');
   const [authorSelection, setAuthorSelection] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [dragStartIndex, setDragStartIndex] = useState<number | null>(null);
   const [selectedWordIndices, setSelectedWordIndices] = useState<Set<number>>(new Set());
   const [isEditingQuote, setIsEditingQuote] = useState(false);
   const [isEditingAuthor, setIsEditingAuthor] = useState(false);
   const wordRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const words = extractedText.split(/\s+/).filter(Boolean);
+  // Preprocess text: remove line-break hyphens and join words
+  const preprocessText = (text: string) => {
+    return text.replace(/-\s*\n\s*/g, '').replace(/-\s+/g, '');
+  };
+
+  const words = preprocessText(extractedText).split(/\s+/).filter(Boolean);
 
   const handleMouseDown = (index: number) => {
     setIsDragging(true);
+    setDragStartIndex(index);
     setSelectedWordIndices(new Set([index]));
   };
 
   const handleMouseEnter = (index: number) => {
-    if (isDragging) {
-      setSelectedWordIndices(prev => new Set([...prev, index]));
+    if (isDragging && dragStartIndex !== null) {
+      // Select all words between start and current index (inclusive)
+      const start = Math.min(dragStartIndex, index);
+      const end = Math.max(dragStartIndex, index);
+      const newIndices = new Set<number>();
+      for (let i = start; i <= end; i++) {
+        newIndices.add(i);
+      }
+      setSelectedWordIndices(newIndices);
     }
   };
 
   const handleMouseUp = () => {
     if (isDragging) {
       setIsDragging(false);
+      setDragStartIndex(null);
       
       // Build selection from selected indices
       const sortedIndices = Array.from(selectedWordIndices).sort((a, b) => a - b);
@@ -232,7 +247,7 @@ export function OcrTextSelector({
             className="relative p-4 bg-muted/30 rounded-lg border-2 border-dashed min-h-[200px] select-none"
             onMouseLeave={handleMouseUp}
           >
-            <div className="flex flex-wrap gap-0.5">
+            <div className="flex flex-wrap gap-[2px]">
               {words.map((word, index) => {
                 const isSelected = isWordSelected(index);
                 const isCurrentHover = selectedWordIndices.has(index) && isDragging && index === Math.max(...Array.from(selectedWordIndices));
