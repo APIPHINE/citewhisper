@@ -27,6 +27,7 @@ const AddQuote = () => {
   }, []);
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [draftLoadedTrigger, setDraftLoadedTrigger] = useState(0);
   const navigate = useNavigate();
   const { handleSubmit, isSubmitting } = useQuoteSubmission();
   
@@ -86,6 +87,7 @@ const AddQuote = () => {
       {user && (
         <DraftQuotesSelector 
           form={form}
+          onLoadDraft={() => setDraftLoadedTrigger(prev => prev + 1)}
           onStartNew={() => setSelectedFiles([])}
         />
       )}
@@ -96,6 +98,7 @@ const AddQuote = () => {
             form={form} 
             onFilesSelected={handleFilesSelected}
             selectedFiles={selectedFiles}
+            onDraftLoaded={draftLoadedTrigger > 0 ? () => {} : undefined}
           />
         </form>
       </Form>

@@ -21,6 +21,7 @@ interface EvidenceFirstQuoteFormProps {
   form: UseFormReturn<QuoteFormValues>;
   onFilesSelected: (files: File[]) => void;
   selectedFiles?: File[];
+  onDraftLoaded?: () => void;
 }
 
 type FormStep = 'upload' | 'ocr' | 'core' | 'enhanced' | 'review';
@@ -28,7 +29,8 @@ type FormStep = 'upload' | 'ocr' | 'core' | 'enhanced' | 'review';
 export function EvidenceFirstQuoteForm({ 
   form, 
   onFilesSelected, 
-  selectedFiles = [] 
+  selectedFiles = [],
+  onDraftLoaded
 }: EvidenceFirstQuoteFormProps) {
   const [currentStep, setCurrentStep] = useState<FormStep>('upload');
   const [processedEvidence, setProcessedEvidence] = useState<ProcessedEvidence | null>(null);
@@ -175,6 +177,13 @@ export function EvidenceFirstQuoteForm({
     const newSuggestions = generateSuggestions();
     setSuggestions(newSuggestions);
   }, [calculateQuality, generateSuggestions]);
+
+  // Handle draft loaded - advance to core step
+  useEffect(() => {
+    if (onDraftLoaded && text && author) {
+      setCurrentStep('core');
+    }
+  }, [onDraftLoaded]);
 
   const steps = [
     { id: 'upload', label: 'Upload', icon: Sparkles, completed: selectedFiles.length > 0 || currentStep !== 'upload' },

@@ -23,7 +23,7 @@ import {
 
 interface DraftQuotesSelectorProps {
   form: UseFormReturn<QuoteFormValues>;
-  onLoadDraft?: (draftId: string) => void;
+  onLoadDraft?: () => void;
   onStartNew: () => void;
 }
 
@@ -82,11 +82,12 @@ export function DraftQuotesSelector({ form, onLoadDraft, onStartNew }: DraftQuot
     
     toast({
       title: "Draft Loaded",
-      description: "You can now continue editing this quote.",
+      description: "Click Next to continue editing this quote.",
     });
 
+    // Trigger callback to advance form step
     if (onLoadDraft) {
-      onLoadDraft(draft.id);
+      onLoadDraft();
     }
   };
 
