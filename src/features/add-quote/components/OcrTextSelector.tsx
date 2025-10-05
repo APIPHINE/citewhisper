@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Highlighter, User, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Highlighter, User, CheckCircle2, XCircle, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OcrTextSelectorProps {
@@ -20,33 +21,84 @@ export function OcrTextSelector({
   onConfirm,
   confidence
 }: OcrTextSelectorProps) {
-  const [selectedText, setSelectedText] = useState('');
   const [mode, setMode] = useState<'quote' | 'author'>('quote');
   const [quoteSelection, setQuoteSelection] = useState('');
   const [authorSelection, setAuthorSelection] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const [selectedWordIndices, setSelectedWordIndices] = useState<Set<number>>(new Set());
+  const [isEditingQuote, setIsEditingQuote] = useState(false);
+  const [isEditingAuthor, setIsEditingAuthor] = useState(false);
+  const wordRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const words = extractedText.split(/\s+/).filter(Boolean);
 
-  const handleWordClick = useCallback((word: string, index: number) => {
-    if (mode === 'quote') {
-      const newSelection = quoteSelection ? `${quoteSelection} ${word}` : word;
-      setQuoteSelection(newSelection);
-      onQuoteSelected(newSelection);
-    } else {
-      const newSelection = authorSelection ? `${authorSelection} ${word}` : word;
-      setAuthorSelection(newSelection);
-      onAuthorSelected(newSelection);
+  const handleMouseDown = (index: number) => {
+    setIsDragging(true);
+    setSelectedWordIndices(new Set([index]));
+  };
+
+  const handleMouseEnter = (index: number) => {
+    if (isDragging) {
+      setSelectedWordIndices(prev => new Set([...prev, index]));
     }
-  }, [mode, quoteSelection, authorSelection, onQuoteSelected, onAuthorSelected]);
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      
+      // Build selection from selected indices
+      const sortedIndices = Array.from(selectedWordIndices).sort((a, b) => a - b);
+      const newSelection = sortedIndices.map(i => words[i]).join(' ');
+      
+      if (mode === 'quote') {
+        setQuoteSelection(newSelection);
+        onQuoteSelected(newSelection);
+      } else {
+        setAuthorSelection(newSelection);
+        onAuthorSelected(newSelection);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        handleMouseUp();
+      }
+    };
+    
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, [isDragging, selectedWordIndices, mode]);
 
   const handleClearQuote = () => {
     setQuoteSelection('');
     onQuoteSelected('');
+    setSelectedWordIndices(new Set());
   };
 
   const handleClearAuthor = () => {
     setAuthorSelection('');
     onAuthorSelected('');
+    setSelectedWordIndices(new Set());
+  };
+
+  const handleQuoteEdit = (value: string) => {
+    setQuoteSelection(value);
+    onQuoteSelected(value);
+  };
+
+  const handleAuthorEdit = (value: string) => {
+    setAuthorSelection(value);
+    onAuthorSelected(value);
+  };
+
+  const isWordSelected = (index: number) => {
+    const word = words[index];
+    if (mode === 'quote' && quoteSelection.includes(word)) return true;
+    if (mode === 'author' && authorSelection.includes(word)) return true;
+    return false;
   };
 
   const confidenceColor = 
@@ -97,66 +149,120 @@ export function OcrTextSelector({
         {/* Current Selections */}
         <div className="space-y-2">
           {quoteSelection && (
-            <div className="p-3 bg-primary/10 rounded-md">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Quote:</p>
-                  <p className="text-sm">{quoteSelection}</p>
+            <div className="p-3 bg-primary/10 rounded-md border border-primary/20">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <p className="text-xs font-medium text-muted-foreground">Quote:</p>
+                <div className="flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditingQuote(!isEditingQuote)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearQuote}
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearQuote}
-                >
-                  <XCircle className="h-4 w-4" />
-                </Button>
               </div>
+              {isEditingQuote ? (
+                <Textarea
+                  value={quoteSelection}
+                  onChange={(e) => handleQuoteEdit(e.target.value)}
+                  className="min-h-[80px]"
+                  onBlur={() => setIsEditingQuote(false)}
+                  autoFocus
+                />
+              ) : (
+                <p className="text-sm">{quoteSelection}</p>
+              )}
             </div>
           )}
           {authorSelection && (
-            <div className="p-3 bg-accent/10 rounded-md">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Author:</p>
-                  <p className="text-sm">{authorSelection}</p>
+            <div className="p-3 bg-accent/10 rounded-md border border-accent/20">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <p className="text-xs font-medium text-muted-foreground">Author:</p>
+                <div className="flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditingAuthor(!isEditingAuthor)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearAuthor}
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearAuthor}
-                >
-                  <XCircle className="h-4 w-4" />
-                </Button>
               </div>
+              {isEditingAuthor ? (
+                <Textarea
+                  value={authorSelection}
+                  onChange={(e) => handleAuthorEdit(e.target.value)}
+                  className="min-h-[60px]"
+                  onBlur={() => setIsEditingAuthor(false)}
+                  autoFocus
+                />
+              ) : (
+                <p className="text-sm">{authorSelection}</p>
+              )}
             </div>
           )}
         </div>
 
-        {/* Word Selection Area */}
-        <div className="p-4 bg-muted/30 rounded-lg border-2 border-dashed min-h-[200px]">
-          <div className="flex flex-wrap gap-2">
-            {words.map((word, index) => {
-              const isInQuote = quoteSelection.includes(word);
-              const isInAuthor = authorSelection.includes(word);
-              
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleWordClick(word, index)}
-                  className={cn(
-                    "px-2 py-1 rounded text-sm transition-all hover:scale-105",
-                    isInQuote && "bg-primary text-primary-foreground font-medium",
-                    isInAuthor && "bg-accent text-accent-foreground font-medium",
-                    !isInQuote && !isInAuthor && "bg-background hover:bg-muted"
-                  )}
-                >
-                  {word}
-                </button>
-              );
-            })}
+        {/* Word Selection Area with Image Overlay */}
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Click and drag to select words for {mode === 'quote' ? 'quote' : 'author'}
+          </p>
+          <div 
+            className="relative p-4 bg-muted/30 rounded-lg border-2 border-dashed min-h-[200px] select-none"
+            onMouseLeave={handleMouseUp}
+          >
+            <div className="flex flex-wrap gap-2">
+              {words.map((word, index) => {
+                const isSelected = isWordSelected(index);
+                const isBeingSelected = selectedWordIndices.has(index) && isDragging;
+                
+                return (
+                  <button
+                    key={index}
+                    ref={el => wordRefs.current[index] = el}
+                    type="button"
+                    onMouseDown={() => handleMouseDown(index)}
+                    onMouseEnter={() => handleMouseEnter(index)}
+                    className={cn(
+                      "px-2 py-1 rounded text-sm transition-all relative",
+                      isSelected && mode === 'quote' && "bg-primary text-primary-foreground font-medium",
+                      isSelected && mode === 'author' && "bg-accent text-accent-foreground font-medium",
+                      !isSelected && "bg-background hover:bg-muted",
+                      isBeingSelected && "ring-2 ring-primary"
+                    )}
+                    style={{
+                      backgroundColor: isSelected 
+                        ? mode === 'quote' 
+                          ? 'hsl(var(--primary) / 0.9)' 
+                          : 'hsl(var(--accent) / 0.9)'
+                        : undefined
+                    }}
+                  >
+                    {word}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
