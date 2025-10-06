@@ -645,6 +645,69 @@ export type Database = {
         }
         Relationships: []
       }
+      popular_unverified_quotes: {
+        Row: {
+          actual_author_if_known: string | null
+          alternative_attributions: Json | null
+          attribution_notes: string | null
+          commonly_attributed_to: string | null
+          confidence_score: number | null
+          created_at: string
+          created_by: string | null
+          earliest_known_date: string | null
+          earliest_known_source: string | null
+          id: string
+          popularity_score: number | null
+          quote_text: string
+          research_notes: string | null
+          source_app: string | null
+          status: Database["public"]["Enums"]["popular_quote_status"] | null
+          updated_at: string
+          verification_attempts: Json | null
+          verified_by: string | null
+        }
+        Insert: {
+          actual_author_if_known?: string | null
+          alternative_attributions?: Json | null
+          attribution_notes?: string | null
+          commonly_attributed_to?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          earliest_known_date?: string | null
+          earliest_known_source?: string | null
+          id?: string
+          popularity_score?: number | null
+          quote_text: string
+          research_notes?: string | null
+          source_app?: string | null
+          status?: Database["public"]["Enums"]["popular_quote_status"] | null
+          updated_at?: string
+          verification_attempts?: Json | null
+          verified_by?: string | null
+        }
+        Update: {
+          actual_author_if_known?: string | null
+          alternative_attributions?: Json | null
+          attribution_notes?: string | null
+          commonly_attributed_to?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          earliest_known_date?: string | null
+          earliest_known_source?: string | null
+          id?: string
+          popularity_score?: number | null
+          quote_text?: string
+          research_notes?: string | null
+          source_app?: string | null
+          status?: Database["public"]["Enums"]["popular_quote_status"] | null
+          updated_at?: string
+          verification_attempts?: Json | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -671,6 +734,47 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      quote_attribution_research: {
+        Row: {
+          conclusion: string | null
+          confidence_level: number | null
+          created_at: string
+          id: string
+          quote_id: string
+          research_notes: string
+          researcher_id: string
+          sources_consulted: Json | null
+        }
+        Insert: {
+          conclusion?: string | null
+          confidence_level?: number | null
+          created_at?: string
+          id?: string
+          quote_id: string
+          research_notes: string
+          researcher_id: string
+          sources_consulted?: Json | null
+        }
+        Update: {
+          conclusion?: string | null
+          confidence_level?: number | null
+          created_at?: string
+          id?: string
+          quote_id?: string
+          research_notes?: string
+          researcher_id?: string
+          sources_consulted?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_attribution_research_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "popular_unverified_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quote_drafts: {
         Row: {
@@ -851,7 +955,13 @@ export type Database = {
           source_date: string | null
           source_manifest_url: string | null
           source_title: string
+          source_verification_status:
+            | Database["public"]["Enums"]["source_verification_status"]
+            | null
           status: string
+          target_collection:
+            | Database["public"]["Enums"]["target_collection_type"]
+            | null
           translated_quote: string | null
           translation_language: string | null
           translator_name: string | null
@@ -891,7 +1001,13 @@ export type Database = {
           source_date?: string | null
           source_manifest_url?: string | null
           source_title: string
+          source_verification_status?:
+            | Database["public"]["Enums"]["source_verification_status"]
+            | null
           status?: string
+          target_collection?:
+            | Database["public"]["Enums"]["target_collection_type"]
+            | null
           translated_quote?: string | null
           translation_language?: string | null
           translator_name?: string | null
@@ -931,7 +1047,13 @@ export type Database = {
           source_date?: string | null
           source_manifest_url?: string | null
           source_title?: string
+          source_verification_status?:
+            | Database["public"]["Enums"]["source_verification_status"]
+            | null
           status?: string
+          target_collection?:
+            | Database["public"]["Enums"]["target_collection_type"]
+            | null
           translated_quote?: string | null
           translation_language?: string | null
           translator_name?: string | null
@@ -1567,6 +1689,11 @@ export type Database = {
     Enums: {
       content_status: "draft" | "review" | "published" | "archived"
       media_type: "image" | "video" | "audio" | "document" | "other"
+      popular_quote_status:
+        | "unverified"
+        | "disputed"
+        | "misattributed"
+        | "researching"
       source_type:
         | "book"
         | "journal_article"
@@ -1586,7 +1713,9 @@ export type Database = {
         | "academic_thesis"
         | "conference_paper"
         | "other"
+      source_verification_status: "verified" | "needs_review" | "uncertain"
       suggestion_status: "pending" | "approved" | "rejected" | "implemented"
+      target_collection_type: "verified_quotes" | "popular_unverified"
       user_privilege: "user" | "moderator" | "admin" | "super_admin"
     }
     CompositeTypes: {
@@ -1717,6 +1846,12 @@ export const Constants = {
     Enums: {
       content_status: ["draft", "review", "published", "archived"],
       media_type: ["image", "video", "audio", "document", "other"],
+      popular_quote_status: [
+        "unverified",
+        "disputed",
+        "misattributed",
+        "researching",
+      ],
       source_type: [
         "book",
         "journal_article",
@@ -1737,7 +1872,9 @@ export const Constants = {
         "conference_paper",
         "other",
       ],
+      source_verification_status: ["verified", "needs_review", "uncertain"],
       suggestion_status: ["pending", "approved", "rejected", "implemented"],
+      target_collection_type: ["verified_quotes", "popular_unverified"],
       user_privilege: ["user", "moderator", "admin", "super_admin"],
     },
   },

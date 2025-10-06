@@ -4,6 +4,7 @@ export interface GenerateQuotesRequest {
   prompt: string;
   count: number;
   sourceType?: string;
+  targetCollection?: 'verified_quotes' | 'popular_unverified';
 }
 
 export interface GeneratedQuoteSubmission {

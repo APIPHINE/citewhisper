@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Sparkles, Loader2, CheckCircle, Bot, Download, Trash2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Sparkles, Loader2, CheckCircle, Bot, Download, Trash2, Info } from 'lucide-react';
 import { useCQWorker } from '@/hooks/useCQWorker';
 import { useToast } from '@/hooks/use-toast';
 import { QuoteFormValues } from '@/utils/formSchemas';
@@ -21,6 +22,7 @@ export function CQGeneratorSection({ form, onQuoteLoaded }: CQGeneratorSectionPr
   const [prompt, setPrompt] = useState('');
   const [count, setCount] = useState([3]);
   const [selectedQuotes, setSelectedQuotes] = useState<Set<string>>(new Set());
+  const [targetCollection, setTargetCollection] = useState<'verified_quotes' | 'popular_unverified'>('verified_quotes');
   const { isGenerating, generatedQuotes, generateQuotes, clearResults } = useCQWorker();
   const { toast } = useToast();
 
@@ -39,6 +41,7 @@ export function CQGeneratorSection({ form, onQuoteLoaded }: CQGeneratorSectionPr
       await generateQuotes({
         prompt: prompt.trim(),
         count: count[0],
+        targetCollection
       });
     } catch (error) {
       // Error handling is done in the hook
@@ -133,7 +136,11 @@ export function CQGeneratorSection({ form, onQuoteLoaded }: CQGeneratorSectionPr
           <Label htmlFor="cq-prompt">What quotes would you like CQ to generate?</Label>
           <Textarea
             id="cq-prompt"
-            placeholder="e.g., 'Science quotes about discovery' or 'Quotes from Albert Einstein about relativity'"
+            placeholder={
+              targetCollection === 'verified_quotes'
+                ? "e.g., 'Science quotes about discovery' or 'Quotes from Albert Einstein about relativity'"
+                : "e.g., Generate popular quotes about success that are commonly misattributed"
+            }
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={3}
@@ -141,17 +148,40 @@ export function CQGeneratorSection({ form, onQuoteLoaded }: CQGeneratorSectionPr
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="cq-count">Number of Quotes: {count[0]}</Label>
-          <Slider
-            id="cq-count"
-            min={1}
-            max={5}
-            step={1}
-            value={count}
-            onValueChange={setCount}
-            disabled={isGenerating}
-          />
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="popularMode"
+              checked={targetCollection === 'popular_unverified'}
+              onCheckedChange={(checked) => setTargetCollection(checked ? 'popular_unverified' : 'verified_quotes')}
+            />
+            <Label htmlFor="popularMode" className="cursor-pointer">
+              Generate Popular Unverified Quotes
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>When enabled, CQ will generate popular quotes where attribution may be uncertain or disputed. These go to a separate collection for research and verification.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <div>
+            <Label htmlFor="cq-count">Number of Quotes: {count[0]}</Label>
+            <Slider
+              id="cq-count"
+              min={1}
+              max={5}
+              step={1}
+              value={count}
+              onValueChange={setCount}
+              disabled={isGenerating}
+            />
+          </div>
         </div>
 
         <Button

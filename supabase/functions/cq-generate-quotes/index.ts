@@ -10,6 +10,7 @@ interface GenerateQuotesRequest {
   prompt: string;
   count: number;
   sourceType?: string;
+  targetCollection?: 'verified_quotes' | 'popular_unverified';
 }
 
 interface GeneratedQuote {
@@ -19,12 +20,16 @@ interface GeneratedQuote {
   source_date?: string;
   chapter_or_section?: string;
   source_context_text: string;
-  quote_context?: string;
+  quote_context: string;
   quote_topics?: string[];
   seo_keywords?: string[];
   original_language?: string;
   translator_name?: string;
   confidence_score: number;
+  source_verification_status: 'verified' | 'needs_review' | 'uncertain';
+  commonly_attributed_to?: string;
+  attribution_notes?: string;
+  earliest_known_source?: string;
 }
 
 serve(async (req) => {
@@ -86,7 +91,7 @@ serve(async (req) => {
       });
     }
 
-    const { prompt, count, sourceType }: GenerateQuotesRequest = await req.json();
+    const { prompt, count, sourceType, targetCollection = 'verified_quotes' }: GenerateQuotesRequest = await req.json();
 
     if (!prompt || count < 1 || count > 10) {
       return new Response(JSON.stringify({ error: 'Invalid parameters' }), {
@@ -101,44 +106,74 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const systemPrompt = `You are CQ (CiteQuotes AI), a research assistant that generates historically accurate quotes with comprehensive attribution and metadata.
+    const isPopularCollection = targetCollection === 'popular_unverified';
+    
+    const systemPrompt = isPopularCollection 
+      ? `You are CQ (CiteQuotes) AI, generating POPULAR QUOTES where attribution may be uncertain or disputed.
 
-Generate ${count} quote(s) based on this prompt: "${prompt}"${sourceType ? ` (prefer ${sourceType} sources)` : ''}
+CRITICAL INSTRUCTIONS FOR POPULAR QUOTES:
+1. Focus on well-known, widely-circulated quotes
+2. Be HONEST about attribution uncertainty
+3. If a quote is commonly misattributed, note the real author if known
+4. Include notes about why attribution is uncertain
+5. Provide earliest known source if available, even if uncertain
+6. Set confidence_score based on attribution certainty (0.3-0.7 range)
+7. Always set source_verification_status to 'uncertain' or 'needs_review'
 
-For EACH quote, you MUST provide comprehensive metadata:
+POPULAR QUOTE EXAMPLES:
+- "Be the change you wish to see in the world" (commonly attributed to Gandhi, but paraphrased)
+- "The definition of insanity is..." (often attributed to Einstein, actually unknown origin)
+- "Well-behaved women seldom make history" (attributed to many, actually Laurel Thatcher Ulrich)
 
-REQUIRED FIELDS:
-1. quote_text: The exact quote (in quotation marks)
-2. author_name: Full name of the author/speaker
-3. source_title: Complete title of the source (book, speech, article, document, etc.)
-4. source_date: Publication or speech date (YYYY-MM-DD, YYYY-MM, or YYYY format)
-5. source_context_text: 2-4 sentences explaining the historical circumstances, setting, and significance of this quote. Include: when it was said/written, what was happening at the time, why it was significant.
-6. quote_context: 1-2 sentences explaining what the author meant by this quote and its immediate context within the source.
-7. confidence_score: 0.0-1.0 (how certain you are about accuracy and attribution)
+For each popular quote, provide:
+- commonly_attributed_to: Who most people think said it
+- attribution_notes: Explanation of the attribution problem
+- earliest_known_source: If you can trace it
+- actual_author_if_known: Corrected attribution (in source_context_text)
+- confidence_score: 0.3-0.7 (lower = more uncertain)
+- source_verification_status: 'uncertain' (default for popular quotes)
 
-HIGHLY RECOMMENDED FIELDS:
-8. chapter_or_section: Specific location in source (chapter, page, section, verse, etc.)
-9. quote_topics: 3-5 relevant topics/themes as an array (e.g., ["freedom", "justice", "democracy"])
-10. seo_keywords: 3-7 searchable keywords as an array for discoverability
-11. original_language: ISO language code if not English (e.g., "de" for German, "fr" for French)
-12. translator_name: If translated, who translated it (if known)
+Generate ${count} popular but attribution-uncertain quotes based on: "${prompt}"`
+      : `You are CQ (CiteQuotes) AI, a specialized quote generation and verification assistant.
 
-CRITICAL REQUIREMENTS:
-- Generate ONLY real, verifiable quotes - NO fabrications whatsoever
-- Source attribution MUST be accurate and specific
-- Historical context MUST be factually correct
-- If translating, note original language and translator
-- Include publication dates whenever possible
-- Lower confidence score if any uncertainty exists
-- Provide enough detail for academic verification
-- Vary authors, time periods, and topics for diversity
+**CRITICAL SOURCE VERIFICATION REQUIREMENTS:**
+1. NEVER generate a quote unless you have a SPECIFIC, VERIFIABLE source
+2. source_date MUST be specific: reject "unknown", "circa", "approximately"
+3. Verify the source actually exists - no fictional or uncertain sources
+4. Set source_verification_status:
+   - 'verified': You're confident the source exists and is correct
+   - 'needs_review': Source seems correct but needs human verification
+   - 'uncertain': Cannot verify source with high confidence (DO NOT USE for verified quotes)
+5. confidence_score must be ≥ 0.7 for verified quotes
+6. If you cannot verify a source, DO NOT generate that quote
 
-Quality checklist for each quote:
-✓ Can this quote be verified in the cited source?
-✓ Is the historical context accurate and informative?
-✓ Does it have proper attribution with date?
-✓ Are topics and keywords relevant and useful?
-✓ Is the metadata comprehensive enough for citation?`;
+**REQUIRED METADATA (ALL fields must be filled):**
+1. source_title: Full title of the source work
+2. source_date: Specific publication date (YYYY, YYYY-MM-DD only)
+3. author_name: Full name of the person quoted
+4. quote_text: The exact quotation
+5. source_context_text: Historical and publication context (2-3 sentences minimum)
+6. quote_context: The meaning and significance of the quote (2-3 sentences)
+7. confidence_score: 0.7-1.0 for verified
+8. source_verification_status: 'verified' or 'needs_review'
+
+**RECOMMENDED METADATA (provide when available):**
+- chapter_or_section: Specific location in source
+- quote_topics: 2-5 relevant topics/themes
+- seo_keywords: 3-7 search-friendly keywords
+- original_language: Language code if not English (e.g., "fr", "de", "la")
+- translator_name: If quote is translated
+
+**QUALITY STANDARDS:**
+- Quotes must be historically accurate and VERIFIABLE with real sources
+- Sources must be real, published works with specific dates
+- NO vague dates like "unknown", "circa", "approximately"
+- Reject any quote where you cannot verify the source
+- Context must provide genuine historical/cultural background
+- No modern paraphrases of historical quotes
+- Translations must note original language
+
+Generate ${count} high-quality, verified quotes based on: "${prompt}"${sourceType ? ` (preferred source type: ${sourceType})` : ''}`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -160,7 +195,7 @@ Quality checklist for each quote:
             parameters: {
               type: 'object',
               properties: {
-                  quotes: {
+                quotes: {
                   type: 'array',
                   items: {
                     type: 'object',
@@ -168,17 +203,21 @@ Quality checklist for each quote:
                       quote_text: { type: 'string', description: 'The exact quote text' },
                       author_name: { type: 'string', description: 'Full name of author/speaker' },
                       source_title: { type: 'string', description: 'Complete title of the source' },
-                      source_date: { type: 'string', description: 'Publication/speech date (YYYY-MM-DD, YYYY-MM, or YYYY)' },
+                      source_date: { type: 'string', description: 'Publication/speech date' },
                       chapter_or_section: { type: 'string', description: 'Chapter, page, section, or verse reference' },
-                      source_context_text: { type: 'string', description: 'Historical context: circumstances, setting, and significance (2-4 sentences)' },
-                      quote_context: { type: 'string', description: 'What the author meant and immediate context (1-2 sentences)' },
+                      source_context_text: { type: 'string', description: 'Historical context (2-4 sentences)' },
+                      quote_context: { type: 'string', description: 'What the author meant (1-2 sentences)' },
                       quote_topics: { type: 'array', items: { type: 'string' }, description: '3-5 relevant topics/themes' },
                       seo_keywords: { type: 'array', items: { type: 'string' }, description: '3-7 searchable keywords' },
-                      original_language: { type: 'string', description: 'ISO language code if not English (e.g., "de", "fr")' },
+                      original_language: { type: 'string', description: 'ISO language code if not English' },
                       translator_name: { type: 'string', description: 'Name of translator if applicable' },
-                      confidence_score: { type: 'number', minimum: 0, maximum: 1, description: 'Confidence in accuracy (0.0-1.0)' }
+                      confidence_score: { type: 'number', minimum: 0, maximum: 1, description: 'Confidence in source accuracy' },
+                      source_verification_status: { type: 'string', enum: ['verified', 'needs_review', 'uncertain'], description: 'Source verification status' },
+                      commonly_attributed_to: { type: 'string', description: 'Who the quote is commonly attributed to (for popular quotes)' },
+                      attribution_notes: { type: 'string', description: 'Notes about attribution uncertainty (for popular quotes)' },
+                      earliest_known_source: { type: 'string', description: 'Earliest known source if traceable (for popular quotes)' }
                     },
-                    required: ['quote_text', 'author_name', 'source_title', 'source_date', 'source_context_text', 'quote_context', 'confidence_score'],
+                    required: ['quote_text', 'author_name', 'source_title', 'source_context_text', 'quote_context', 'confidence_score', 'source_verification_status'],
                     additionalProperties: false
                   }
                 }
@@ -222,9 +261,104 @@ Quality checklist for each quote:
     }
 
     const generatedQuotes: GeneratedQuote[] = JSON.parse(toolCall.function.arguments).quotes;
+    console.log(`Parsed ${generatedQuotes.length} quotes from AI response`);
 
-    // Insert into quote_submissions with comprehensive metadata
-    const submissions = generatedQuotes.map(quote => ({
+    // Validate and route quotes based on collection type and confidence
+    const routedQuotes = generatedQuotes.map(quote => {
+      const confidence = quote.confidence_score || 0;
+      const verification = quote.source_verification_status || 'needs_review';
+      
+      // Validation for verified quotes
+      if (targetCollection === 'verified_quotes') {
+        // Reject quotes with insufficient confidence
+        if (confidence < 0.7) {
+          console.log(`Rejected quote (low confidence: ${confidence}): "${quote.quote_text.substring(0, 50)}..."`);
+          return null;
+        }
+        
+        // Reject quotes with uncertain verification
+        if (verification === 'uncertain') {
+          console.log(`Rejected quote (uncertain source): "${quote.quote_text.substring(0, 50)}..."`);
+          return null;
+        }
+        
+        // Reject quotes with vague dates
+        const vagueTerms = ['unknown', 'circa', 'approximately', 'around', 'about'];
+        const hasVagueDate = vagueTerms.some(term => 
+          quote.source_date?.toLowerCase().includes(term)
+        );
+        if (hasVagueDate || !quote.source_date) {
+          console.log(`Rejected quote (vague/missing date): "${quote.quote_text.substring(0, 50)}..."`);
+          return null;
+        }
+      }
+      
+      return quote;
+    }).filter(Boolean) as GeneratedQuote[];
+
+    console.log(`${routedQuotes.length} quotes passed validation`);
+
+    if (routedQuotes.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'No quotes met the quality standards. Try a different prompt or enable "Popular Quotes" mode.' 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Route quotes to appropriate table based on confidence and collection type
+    if (targetCollection === 'popular_unverified') {
+      // Insert into popular_unverified_quotes
+      const popularQuotes = routedQuotes.map(quote => ({
+        quote_text: quote.quote_text,
+        commonly_attributed_to: quote.commonly_attributed_to || quote.author_name,
+        actual_author_if_known: quote.source_context_text?.includes('actually') ? 
+          quote.author_name : null,
+        attribution_notes: quote.attribution_notes || 'Attribution uncertain',
+        earliest_known_source: quote.earliest_known_source || quote.source_title,
+        earliest_known_date: quote.source_date,
+        status: 'unverified',
+        confidence_score: quote.confidence_score,
+        source_app: 'cq_ai_worker',
+        created_at: new Date().toISOString()
+      }));
+
+      const { data: insertedPopular, error: insertError } = await supabase
+        .from('popular_unverified_quotes')
+        .insert(popularQuotes)
+        .select();
+
+      if (insertError) {
+        console.error('Error inserting popular quotes:', insertError);
+        throw insertError;
+      }
+
+      // Log to audit trail
+      await supabase.from('admin_audit_log').insert({
+        admin_user_id: user.id,
+        action: 'CQ_GENERATE_POPULAR_QUOTES',
+        new_values: {
+          prompt,
+          count: insertedPopular.length,
+          quote_ids: insertedPopular?.map(s => s.id)
+        }
+      });
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          count: insertedPopular.length,
+          quotes: insertedPopular,
+          collection: 'popular_unverified'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Map quotes to submission format for verified collection
+    const quoteSubmissions = routedQuotes.map(quote => ({
       quote_text: quote.quote_text,
       author_name: quote.author_name,
       source_title: quote.source_title,
@@ -233,17 +367,21 @@ Quality checklist for each quote:
       source_context_text: quote.source_context_text,
       quote_topics: quote.quote_topics || [],
       seo_keywords: quote.seo_keywords || [],
-      original_language: quote.original_language || null,
-      translator_name: quote.translator_name || null,
+      original_language: quote.original_language || 'en',
+      translator_name: quote.translator_name,
       confidence_score: quote.confidence_score,
+      source_verification_status: quote.source_verification_status,
+      target_collection: 'verified_quotes',
       status: 'pending',
       source_app: 'cq_ai_worker',
-      processing_notes: `AI-generated by CQ with comprehensive attribution (Confidence: ${(quote.confidence_score * 100).toFixed(0)}%). Context: ${quote.quote_context || 'See source context'}`,
+      processing_notes: `Generated by CQ AI Worker on ${new Date().toISOString()}. Confidence: ${quote.confidence_score}. Verification: ${quote.source_verification_status}`,
+      created_at: new Date().toISOString()
     }));
 
+    // Insert into quote_submissions with comprehensive metadata
     const { data: insertedData, error: insertError } = await supabase
       .from('quote_submissions')
-      .insert(submissions)
+      .insert(quoteSubmissions)
       .select();
 
     if (insertError) {
@@ -257,17 +395,18 @@ Quality checklist for each quote:
       action: 'CQ_GENERATE_QUOTES',
       new_values: {
         prompt,
-        count: generatedQuotes.length,
+        count: routedQuotes.length,
         submission_ids: insertedData?.map(s => s.id)
       }
     });
 
-    console.log(`Successfully generated ${generatedQuotes.length} quotes`);
+    console.log(`Successfully generated ${routedQuotes.length} quotes`);
 
     return new Response(JSON.stringify({
       success: true,
-      count: generatedQuotes.length,
-      quotes: insertedData
+      count: routedQuotes.length,
+      quotes: insertedData,
+      collection: 'verified_quotes'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
