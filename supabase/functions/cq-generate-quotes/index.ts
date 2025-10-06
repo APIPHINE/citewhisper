@@ -19,9 +19,12 @@ interface GeneratedQuote {
   source_date?: string;
   chapter_or_section?: string;
   source_context_text: string;
+  quote_context?: string;
   quote_topics?: string[];
+  seo_keywords?: string[];
+  original_language?: string;
+  translator_name?: string;
   confidence_score: number;
-  processing_notes: string;
 }
 
 serve(async (req) => {
@@ -98,26 +101,44 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const systemPrompt = `You are CQ (CiteQuotes AI), a research assistant that generates historically accurate quotes with proper attribution.
+    const systemPrompt = `You are CQ (CiteQuotes AI), a research assistant that generates historically accurate quotes with comprehensive attribution and metadata.
 
 Generate ${count} quote(s) based on this prompt: "${prompt}"${sourceType ? ` (prefer ${sourceType} sources)` : ''}
 
-For each quote, provide:
-1. Exact quote text (in quotes)
-2. Author's full name
-3. Source title (book, speech, article, etc.)
-4. Publication/speech date (if known, use YYYY-MM-DD format)
-5. Chapter, section, or page reference (if applicable)
-6. Context paragraph (2-3 sentences explaining circumstances)
-7. Relevant topics/themes (2-5 keywords)
-8. Confidence score (0.0-1.0) - how certain you are about accuracy
+For EACH quote, you MUST provide comprehensive metadata:
 
-Important guidelines:
-- Generate real, verifiable quotes only - NO fabrications
-- If unsure about exact wording, note lower confidence
-- Include enough context for verification
-- Prefer well-documented historical quotes
-- Vary authors and time periods for diversity`;
+REQUIRED FIELDS:
+1. quote_text: The exact quote (in quotation marks)
+2. author_name: Full name of the author/speaker
+3. source_title: Complete title of the source (book, speech, article, document, etc.)
+4. source_date: Publication or speech date (YYYY-MM-DD, YYYY-MM, or YYYY format)
+5. source_context_text: 2-4 sentences explaining the historical circumstances, setting, and significance of this quote. Include: when it was said/written, what was happening at the time, why it was significant.
+6. quote_context: 1-2 sentences explaining what the author meant by this quote and its immediate context within the source.
+7. confidence_score: 0.0-1.0 (how certain you are about accuracy and attribution)
+
+HIGHLY RECOMMENDED FIELDS:
+8. chapter_or_section: Specific location in source (chapter, page, section, verse, etc.)
+9. quote_topics: 3-5 relevant topics/themes as an array (e.g., ["freedom", "justice", "democracy"])
+10. seo_keywords: 3-7 searchable keywords as an array for discoverability
+11. original_language: ISO language code if not English (e.g., "de" for German, "fr" for French)
+12. translator_name: If translated, who translated it (if known)
+
+CRITICAL REQUIREMENTS:
+- Generate ONLY real, verifiable quotes - NO fabrications whatsoever
+- Source attribution MUST be accurate and specific
+- Historical context MUST be factually correct
+- If translating, note original language and translator
+- Include publication dates whenever possible
+- Lower confidence score if any uncertainty exists
+- Provide enough detail for academic verification
+- Vary authors, time periods, and topics for diversity
+
+Quality checklist for each quote:
+✓ Can this quote be verified in the cited source?
+✓ Is the historical context accurate and informative?
+✓ Does it have proper attribution with date?
+✓ Are topics and keywords relevant and useful?
+✓ Is the metadata comprehensive enough for citation?`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -139,21 +160,26 @@ Important guidelines:
             parameters: {
               type: 'object',
               properties: {
-                quotes: {
+                  quotes: {
                   type: 'array',
                   items: {
                     type: 'object',
                     properties: {
-                      quote_text: { type: 'string' },
-                      author_name: { type: 'string' },
-                      source_title: { type: 'string' },
-                      source_date: { type: 'string' },
-                      chapter_or_section: { type: 'string' },
-                      source_context_text: { type: 'string' },
-                      quote_topics: { type: 'array', items: { type: 'string' } },
-                      confidence_score: { type: 'number', minimum: 0, maximum: 1 }
+                      quote_text: { type: 'string', description: 'The exact quote text' },
+                      author_name: { type: 'string', description: 'Full name of author/speaker' },
+                      source_title: { type: 'string', description: 'Complete title of the source' },
+                      source_date: { type: 'string', description: 'Publication/speech date (YYYY-MM-DD, YYYY-MM, or YYYY)' },
+                      chapter_or_section: { type: 'string', description: 'Chapter, page, section, or verse reference' },
+                      source_context_text: { type: 'string', description: 'Historical context: circumstances, setting, and significance (2-4 sentences)' },
+                      quote_context: { type: 'string', description: 'What the author meant and immediate context (1-2 sentences)' },
+                      quote_topics: { type: 'array', items: { type: 'string' }, description: '3-5 relevant topics/themes' },
+                      seo_keywords: { type: 'array', items: { type: 'string' }, description: '3-7 searchable keywords' },
+                      original_language: { type: 'string', description: 'ISO language code if not English (e.g., "de", "fr")' },
+                      translator_name: { type: 'string', description: 'Name of translator if applicable' },
+                      confidence_score: { type: 'number', minimum: 0, maximum: 1, description: 'Confidence in accuracy (0.0-1.0)' }
                     },
-                    required: ['quote_text', 'author_name', 'source_title', 'source_context_text', 'confidence_score']
+                    required: ['quote_text', 'author_name', 'source_title', 'source_date', 'source_context_text', 'quote_context', 'confidence_score'],
+                    additionalProperties: false
                   }
                 }
               },
@@ -197,7 +223,7 @@ Important guidelines:
 
     const generatedQuotes: GeneratedQuote[] = JSON.parse(toolCall.function.arguments).quotes;
 
-    // Insert into quote_submissions
+    // Insert into quote_submissions with comprehensive metadata
     const submissions = generatedQuotes.map(quote => ({
       quote_text: quote.quote_text,
       author_name: quote.author_name,
@@ -206,10 +232,13 @@ Important guidelines:
       chapter_or_section: quote.chapter_or_section || null,
       source_context_text: quote.source_context_text,
       quote_topics: quote.quote_topics || [],
+      seo_keywords: quote.seo_keywords || [],
+      original_language: quote.original_language || null,
+      translator_name: quote.translator_name || null,
       confidence_score: quote.confidence_score,
       status: 'pending',
       source_app: 'cq_ai_worker',
-      processing_notes: `AI-generated by CQ (Confidence: ${(quote.confidence_score * 100).toFixed(0)}%)`,
+      processing_notes: `AI-generated by CQ with comprehensive attribution (Confidence: ${(quote.confidence_score * 100).toFixed(0)}%). Context: ${quote.quote_context || 'See source context'}`,
     }));
 
     const { data: insertedData, error: insertError } = await supabase
