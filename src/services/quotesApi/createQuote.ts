@@ -51,6 +51,7 @@ export interface QuoteSubmissionData {
     issn?: string;
     doi?: string;
     language?: string;
+    archive_location?: string;
     confidence_score?: number;
     [key: string]: any;
   };
@@ -137,6 +138,7 @@ export const createQuote = async (
           issn: submissionData.sourceInfo.issn,
           doi: submissionData.sourceInfo.doi,
           language: submissionData.sourceInfo.language || submissionData.originalLanguage,
+          archive_location: submissionData.sourceInfo.archive_location,
           confidence_score: submissionData.sourceInfo.confidence_score,
           created_by: userId,
           updated_by: userId,

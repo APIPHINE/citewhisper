@@ -23,6 +23,12 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
       const value = row[index];
       
       switch (header) {
+        case 'text':
+          quoteData.text = value;
+          break;
+        case 'author':
+          quoteData.author = value;
+          break;
         case 'topics':
         case 'keywords':
           quoteData[header] = value.split(';').map(item => item.trim()).filter(Boolean);
@@ -50,9 +56,36 @@ export function mapCsvRowToQuote(headers: string[], row: string[]): Partial<Quot
           break;
         case 'originalLanguage':
           quoteData.originalLanguage = value;
+          if (quoteData.sourceInfo) {
+            quoteData.sourceInfo.language = value;
+          }
           break;
         case 'originalText':
           quoteData.originalText = value;
+          break;
+        case 'originalSourceTitle':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.title = value;
+          break;
+        case 'originalSourcePublisher':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.publisher = value;
+          break;
+        case 'originalSourcePublicationDate':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.publication_date = value;
+          break;
+        case 'originalSourceLocation':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.archive_location = value;
+          break;
+        case 'originalSourceIsbn':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.isbn = value;
+          break;
+        case 'originalSourceUrl':
+          if (!quoteData.sourceInfo) quoteData.sourceInfo = { source_type: 'other' };
+          quoteData.sourceInfo.backup_url = value;
           break;
         case 'context':
           quoteData.context = value;
