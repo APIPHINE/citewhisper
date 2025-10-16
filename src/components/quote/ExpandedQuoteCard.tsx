@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Quote } from '../../utils/quotesData';
 import { EmbedStyle, EmbedColor, EmbedSize } from '@/types/embed';
 import { VerificationIndicator } from './expanded/VerificationIndicator';
+import { isQuoteVerified } from '@/utils/quoteVerification';
 import { ExpandedQuoteHeader } from './expanded/ExpandedQuoteHeader';
 import { ExpandedQuoteContent } from './expanded/ExpandedQuoteContent';
 import { EditModeContent } from './expanded/EditModeContent';
@@ -40,7 +41,7 @@ export function ExpandedQuoteCard({
   if (!expanded) return null;
 
   // Check if quote is verified (has evidenceImage)
-  const isVerified = Boolean(quote.evidenceImage);
+  const isVerified = isQuoteVerified(quote);
   
   const handleSaveEdit = (updatedQuote: Quote) => {
     if (onQuoteUpdate) {

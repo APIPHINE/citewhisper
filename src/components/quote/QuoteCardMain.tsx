@@ -3,6 +3,7 @@ import { Quote } from '../../utils/quotesData';
 import { useFormatDate } from '../../hooks/use-format-date';
 import { useState } from 'react';
 import { VerificationBadge } from './card/VerificationBadge';
+import { isQuoteVerified } from '@/utils/quoteVerification';
 import { ActionButtons } from './card/ActionButtons';
 import { QuoteText } from './card/QuoteText';
 import { QuoteMetadata } from './card/QuoteMetadata';
@@ -66,7 +67,7 @@ export function QuoteCardMain({
     (quote.sourceInfo?.title || quote.source) : 
     (translation?.source || quote.sourceInfo?.title || quote.source);
     
-  const isVerified = Boolean(quote.evidenceImage);
+  const isVerified = isQuoteVerified(quote);
   const hasTranslation = (
     !Array.isArray(quote.translations) && quote.translations && !!quote.translations.fr
   ) || (
