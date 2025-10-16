@@ -86,18 +86,20 @@ QuoteCard (main container)
 - Framer Motion animations with reduced motion support
 
 ### Known Performance Bottlenecks
-- Client-side quote filtering (should be server-side)
-- No pagination on quotes listing
+- Client-side quote filtering (server-side filtering planned)
+- Limited pagination implementation
 - Large bundle size from multiple dependencies
-- No image optimization pipeline
+- Image optimization needs enhancement
+- Performance monitoring system active for tracking
 
 ## Security Implementation
 
 ### Authentication Flow
 1. User signup via Supabase Auth
 2. Automatic profile creation via database trigger
-3. Default 'user' role assignment
-4. Role-based permission checking throughout app
+3. Default 'user' role assignment with audit logging
+4. Self-registration tracking for security compliance
+5. Role-based permission checking throughout app
 
 ### Data Protection
 - Row-Level Security on sensitive tables

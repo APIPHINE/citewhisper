@@ -1,23 +1,29 @@
 
 # CiteQuotes Development Roadmap
 
-## Current Phase: Foundation & Core Features (Q1 2025)
+## Current Phase: Foundation & Core Features (Q4 2025)
 
 ### Completed ✅
 - Core quote display and management system
-- User authentication and role-based access control
+- User authentication and role-based access control (with audit logging)
 - Basic search and filtering capabilities
-- Quote submission workflow
+- Quote submission workflow with evidence upload
 - Admin panel for content management
 - IIIF manuscript viewer integration
 - Responsive design implementation
+- Standard user registration with self-registration tracking
+- CMS system for blog articles and pages
+- Quote drafts system with auto-save
+- Popular unverified quotes tracking
+- Performance monitoring system
 
 ### In Progress 🚧
 - Content curation and verification workflows
 - Translation system enhancements
 - Performance optimizations
+- Individual quote pages for SEO
 
-## Phase 1: SEO & Discoverability (Q2 2025)
+## Phase 1: SEO & Discoverability (Q1 2026)
 
 ### High Priority
 - **Individual Quote Pages**: Dedicated URLs for each quote
@@ -32,7 +38,7 @@
 - **Mobile SEO**: Enhanced mobile experience
 - **Internal Linking**: Related quotes and cross-references
 
-## Phase 2: Enhanced User Experience (Q3 2025)
+## Phase 2: Enhanced User Experience (Q2 2026)
 
 ### Content Features
 - **Advanced Search**: Boolean operators, field-specific search
@@ -46,7 +52,7 @@
 - **Notification System**: Updates on favorite authors/topics
 - **Contribution Credits**: Recognition for quality submissions
 
-## Phase 3: Academic & Professional Features (Q4 2025)
+## Phase 3: Academic & Professional Features (Q3 2026)
 
 ### Research Tools
 - **Citation Manager Integration**: Zotero, Mendeley compatibility

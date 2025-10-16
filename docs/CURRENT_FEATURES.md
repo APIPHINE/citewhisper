@@ -49,9 +49,10 @@
 
 **User Flow:**
 1. Registration with email verification
-2. Automatic profile creation
+2. Automatic profile creation with audit logging
 3. Default 'user' role assignment
 4. Progressive privilege escalation
+5. Self-registration tracking for security compliance
 
 #### Role-Based Access Control
 **Privilege Hierarchy:**
