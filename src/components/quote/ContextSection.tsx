@@ -9,25 +9,37 @@ interface ContextSectionProps {
 
 export function ContextSection({ quote }: ContextSectionProps) {
   return (
-    <SectionBox title="Historical Context" icon={<FileText size={18} />}>
-      <div className="space-y-4">
+    <SectionBox title="Enhanced Context" icon={<FileText size={18} />}>
+      <div className="space-y-6">
         {/* Quote Context */}
         <div>
-          <h4 className="font-medium text-sm mb-1">Quote Context</h4>
-          <p className="text-muted-foreground">{quote.context || "No additional context available."}</p>
+          <h4 className="font-semibold text-base mb-2">Quote Context</h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {quote.context || "No additional context available."}
+          </p>
         </div>
         
         {/* Historical Context */}
         <div>
-          <h4 className="font-medium text-sm mb-1">Historical Significance</h4>
-          <p className="text-muted-foreground">{quote.historicalContext || "No historical context available."}</p>
+          <h4 className="font-semibold text-base mb-2">Historical Context</h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {quote.historicalContext || "No historical context available."}
+          </p>
+        </div>
+        
+        {/* Historical Significance */}
+        <div>
+          <h4 className="font-semibold text-base mb-2">Historical Significance</h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            No historical significance information available.
+          </p>
         </div>
         
         {/* Impact */}
         {quote.impact && (
           <div>
-            <h4 className="font-medium text-sm mb-1">Impact</h4>
-            <p className="text-muted-foreground">{quote.impact}</p>
+            <h4 className="font-semibold text-base mb-2">Impact</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed">{quote.impact}</p>
           </div>
         )}
       </div>
