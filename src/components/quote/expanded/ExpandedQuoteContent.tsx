@@ -7,7 +7,6 @@ import { EmbedCodeSection } from '../EmbedCodeSection';
 import { QuoteActions } from './QuoteActions';
 import { EmbedStyle, EmbedColor, EmbedSize } from '@/types/embed';
 import { SourceSection } from '../SourceSection';
-import { ContextSection } from '../ContextSection';
 import { RelatedContentSection } from '../RelatedContentSection';
 import { CitedBySection } from '../CitedBySection';
 import { CitationSection } from '../CitationSection';
@@ -41,7 +40,6 @@ export function ExpandedQuoteContent({
   
   // Check what content sections to display
   const hasSourceInfo = quote.evidenceImage || quote.sourceInfo || quote.sourceUrl || quote.ocrExtractedText;
-  const hasContext = quote.context || quote.historicalContext || quote.impact;
   const hasRelatedContent = (quote.variations && quote.variations.length > 0) || 
                             (quote.crossReferencedQuotes && quote.crossReferencedQuotes.length > 0);
   const hasCitations = quote.citationAPA || quote.citationMLA || quote.citationChicago;
@@ -55,13 +53,6 @@ export function ExpandedQuoteContent({
       {hasSourceInfo && (
         <div className="mt-6">
           <SourceSection quote={quote} />
-        </div>
-      )}
-      
-      {/* Historical Context & Impact */}
-      {hasContext && (
-        <div className="mt-6">
-          <ContextSection quote={quote} />
         </div>
       )}
       

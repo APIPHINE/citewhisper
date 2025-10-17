@@ -150,15 +150,29 @@ export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
               <CardContent className="space-y-4">
                 {quote.context && (
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Context</h4>
-                    <p className="text-foreground">{quote.context}</p>
+                    <h4 className="font-semibold text-base mb-2">Quote Context</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{quote.context}</p>
                   </div>
                 )}
                 
                 {quote.historicalContext && (
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Historical Context</h4>
-                    <p className="text-foreground">{quote.historicalContext}</p>
+                    <h4 className="font-semibold text-base mb-2">Historical Context</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{quote.historicalContext}</p>
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="font-semibold text-base mb-2">Historical Significance</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    No historical significance information available.
+                  </p>
+                </div>
+
+                {quote.impact && (
+                  <div>
+                    <h4 className="font-semibold text-base mb-2">Impact</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{quote.impact}</p>
                   </div>
                 )}
 
