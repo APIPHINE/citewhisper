@@ -136,7 +136,7 @@ export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
             <CollapsibleTrigger asChild>
               <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
                 <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-secondary">
+                  <div className="flex items-center gap-2 text-foreground">
                     <span className="bg-secondary text-secondary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm">2</span>
                     Enhanced Context
                   </div>
