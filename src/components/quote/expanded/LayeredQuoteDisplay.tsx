@@ -162,12 +162,6 @@ export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
                   </div>
                 )}
 
-                <div>
-                  <h4 className="font-semibold text-base mb-2">Historical Significance</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    No historical significance information available.
-                  </p>
-                </div>
 
                 {quote.impact && (
                   <div>

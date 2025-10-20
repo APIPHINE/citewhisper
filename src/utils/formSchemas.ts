@@ -97,6 +97,18 @@ export const quoteSchema = z.object({
   originalLanguage: z.string().optional(),
   originalText: z.string().optional(),
   emotionalTone: z.string().optional(),
+  
+  // Advanced fields
+  impact: z.string().optional(),
+  translator: z.string().optional(),
+  attributionStatus: z.enum(['confirmed', 'probable', 'questionable', 'misattributed']).optional(),
+  ocrExtractedText: z.string().optional(),
+  ocrConfidenceScore: z.number().min(0).max(100).optional(),
+  originalManuscriptReference: z.string().optional(),
+  citationAPA: z.string().optional(),
+  citationMLA: z.string().optional(),
+  citationChicago: z.string().optional(),
+  
   translations: z.array(translationSchema).optional(),
   sourceInfo: sourceInfoSchema.optional(),
 });
