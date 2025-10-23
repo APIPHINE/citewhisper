@@ -5,7 +5,6 @@ import EmptyQuotes from './EmptyQuotes';
 import QuotesGrid from './QuotesGrid';
 import QuotesPagination from './QuotesPagination';
 import QuoteSidebar from '../QuoteSidebar';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface QuotesContentProps {
@@ -58,17 +57,6 @@ const QuotesContent = ({
         <div className={`transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
           {sidebarOpen && <QuoteSidebar />}
         </div>
-      )}
-      
-      {/* Mobile Sidebar Sheet */}
-      {isMobile && (
-        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="w-full p-0">
-            <div className="p-4 overflow-y-auto h-full">
-              <QuoteSidebar />
-            </div>
-          </SheetContent>
-        </Sheet>
       )}
       
       {/* Quotes Grid */}

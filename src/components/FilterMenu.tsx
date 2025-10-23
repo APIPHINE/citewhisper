@@ -105,10 +105,32 @@ const FilterMenu = () => {
       </button>
 
       {isOpen && (
-        <div 
-          className="fixed md:absolute z-[99999] mt-2 w-[90vw] md:w-80 origin-top md:origin-top-right left-[5vw] md:left-auto md:right-0 rounded-xl shadow-elevation border border-border bg-background animate-fade-in animate-slide-in overflow-hidden"
-          style={{ top: 'calc(100% + 4px)' }}
-        >
+        <>
+          {/* Mobile backdrop */}
+          <div className="md:hidden fixed inset-0 bg-black/20 z-[9998]" onClick={() => setIsOpen(false)} />
+          
+          {/* Filter menu */}
+          <div 
+            className="fixed md:absolute z-[9999] w-[90vw] md:w-80 rounded-xl shadow-elevation border border-border bg-background overflow-hidden max-h-[80vh] overflow-y-auto"
+            style={{ 
+              top: 'var(--radix-popper-available-height, 100%)',
+              left: '5vw',
+              right: 'auto',
+            }}
+            {...({
+              style: window.innerWidth >= 768 ? {
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                left: 'auto'
+              } : {
+                position: 'fixed',
+                top: '120px',
+                left: '5vw',
+                right: 'auto'
+              }
+            } as any)}
+          >
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h3 className="font-medium">Filter Quotes</h3>
             {hasActiveFilters && (
@@ -156,6 +178,7 @@ const FilterMenu = () => {
             </TabsContent>
           </Tabs>
         </div>
+        </>
       )}
     </div>
   );
