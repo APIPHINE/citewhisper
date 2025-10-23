@@ -65,7 +65,7 @@ const QuoteSidebar = () => {
       
       {/* Navigation tabs */}
       <Tabs defaultValue="categories" value={activeTab} onValueChange={(val) => setActiveTab(val as any)} className="flex-1">
-        <TabsList className="w-full grid grid-cols-3">
+        <TabsList className="w-full grid grid-cols-1 md:grid-cols-3">
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="authors">Authors</TabsTrigger>
           <TabsTrigger value="languages">Languages</TabsTrigger>
