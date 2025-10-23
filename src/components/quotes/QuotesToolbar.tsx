@@ -23,8 +23,13 @@ const QuotesToolbar = ({
 }: QuotesToolbarProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-      <div className="flex items-center text-muted-foreground">
-        <Button variant="outline" size="sm" onClick={toggleSidebar} className="md:hidden mr-4">
+      <div className="flex items-center gap-3 text-muted-foreground">
+        <Button 
+          variant={sidebarOpen ? "outline" : "default"} 
+          size="sm" 
+          onClick={toggleSidebar} 
+          className="md:hidden"
+        >
           {sidebarOpen ? 'Hide Filters' : 'Show Filters'}
         </Button>
         <span>

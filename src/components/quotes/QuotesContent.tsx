@@ -1,11 +1,12 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Quote } from '../../utils/quotesData';
 import QuotesToolbar from './QuotesToolbar';
 import EmptyQuotes from './EmptyQuotes';
 import QuotesGrid from './QuotesGrid';
 import QuotesPagination from './QuotesPagination';
 import QuoteSidebar from '../QuoteSidebar';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface QuotesContentProps {
   quotes: Quote[];
@@ -24,9 +25,17 @@ const QuotesContent = ({
   setAnyExpanded,
   isAdmin
 }: QuotesContentProps) => {
+  const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Set default sidebar state based on screen size
+  useEffect(() => {
+    if (!isMobile) {
+      setSidebarOpen(true);
+    }
+  }, [isMobile]);
   
   // Calculate pagination
   const totalPages = Math.ceil(quotes.length / QUOTES_PER_PAGE);
@@ -44,10 +53,23 @@ const QuotesContent = ({
 
   return (
     <div className="flex mt-8">
-      {/* Sidebar */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
-        {sidebarOpen && <QuoteSidebar />}
-      </div>
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <div className={`transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+          {sidebarOpen && <QuoteSidebar />}
+        </div>
+      )}
+      
+      {/* Mobile Sidebar Sheet */}
+      {isMobile && (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-full p-0">
+            <div className="p-4 overflow-y-auto h-full">
+              <QuoteSidebar />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
       
       {/* Quotes Grid */}
       <div className="flex-1 ml-0 md:ml-8">
