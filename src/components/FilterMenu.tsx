@@ -106,8 +106,8 @@ const FilterMenu = () => {
 
       {isOpen && (
         <div 
-          className="absolute z-[99999] mt-2 w-[90vw] md:w-80 origin-top-right right-0 md:right-0 left-0 md:left-auto rounded-xl shadow-elevation border border-border bg-background animate-fade-in animate-slide-in overflow-hidden"
-          style={{ position: 'absolute', top: 'calc(100% + 4px)' }}
+          className="fixed md:absolute z-[99999] mt-2 w-[90vw] md:w-80 origin-top md:origin-top-right left-[5vw] md:left-auto md:right-0 rounded-xl shadow-elevation border border-border bg-background animate-fade-in animate-slide-in overflow-hidden"
+          style={{ top: 'calc(100% + 4px)' }}
         >
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h3 className="font-medium">Filter Quotes</h3>
