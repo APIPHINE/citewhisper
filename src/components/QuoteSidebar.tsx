@@ -63,6 +63,19 @@ const QuoteSidebar = () => {
         <DateRangeFilter />
       </div>
       
+      {/* Sort button */}
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-medium">Sort</h4>
+        <Button 
+          onClick={toggleSortOrder} 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 px-2"
+        >
+          {sortOrder === "asc" ? <ArrowDownAZ size={16} /> : <ArrowUpZA size={16} />}
+        </Button>
+      </div>
+      
       {/* Navigation tabs */}
       <Tabs defaultValue="categories" value={activeTab} onValueChange={(val) => setActiveTab(val as any)} className="flex-1">
         <TabsList className="w-full grid grid-cols-1 md:grid-cols-3">
@@ -72,17 +85,6 @@ const QuoteSidebar = () => {
         </TabsList>
         
         <TabsContent value="categories" className="mt-4 flex-1">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium">Sort</h4>
-            <Button 
-              onClick={toggleSortOrder} 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 px-2"
-            >
-              {sortOrder === "asc" ? <ArrowDownAZ size={16} /> : <ArrowUpZA size={16} />}
-            </Button>
-          </div>
           
           <div className="space-y-1">
             {sortedItems.map((item) => (
@@ -102,18 +104,6 @@ const QuoteSidebar = () => {
         </TabsContent>
         
         <TabsContent value="authors" className="mt-4 flex-1">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium">Sort</h4>
-            <Button 
-              onClick={toggleSortOrder} 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 px-2"
-            >
-              {sortOrder === "asc" ? <ArrowDownAZ size={16} /> : <ArrowUpZA size={16} />}
-            </Button>
-          </div>
-          
           <div className="space-y-1">
             {sortedItems.map((item) => (
               <button
@@ -132,18 +122,6 @@ const QuoteSidebar = () => {
         </TabsContent>
         
         <TabsContent value="languages" className="mt-4 flex-1">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium">Sort</h4>
-            <Button 
-              onClick={toggleSortOrder} 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 px-2"
-            >
-              {sortOrder === "asc" ? <ArrowDownAZ size={16} /> : <ArrowUpZA size={16} />}
-            </Button>
-          </div>
-          
           <div className="space-y-1">
             {sortedItems.map((item) => (
               <button
