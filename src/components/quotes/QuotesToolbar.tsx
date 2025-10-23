@@ -28,7 +28,7 @@ const QuotesToolbar = ({
           variant={sidebarOpen ? "outline" : "default"} 
           size="sm" 
           onClick={toggleSidebar} 
-          className="md:hidden"
+          className="hidden md:inline-flex"
         >
           {sidebarOpen ? 'Hide Filters' : 'Show Filters'}
         </Button>
@@ -65,7 +65,9 @@ const QuotesToolbar = ({
         </div>
         
         <FilterMenu />
-        <SortMenu />
+        <div className="hidden md:block">
+          <SortMenu />
+        </div>
       </div>
     </div>
   );
