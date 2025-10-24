@@ -1,11 +1,11 @@
 
-import { BookOpen, ExternalLink, Maximize2 } from 'lucide-react';
+import { BookOpen, ExternalLink, Maximize2, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { SectionBox } from './SectionBox';
 import { useFormatDate } from '../../hooks/use-format-date';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+
 
 interface SourceSectionProps {
   quote: Quote;
@@ -28,38 +28,67 @@ export function SourceSection({ quote }: SourceSectionProps) {
         {quote.evidenceImage && !imageError && (
           <div className="mb-4">
             <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
-            <Dialog open={imageEnlarged} onOpenChange={setImageEnlarged}>
-              <DialogTrigger asChild>
-                <div className="border border-border rounded-md overflow-hidden cursor-pointer group relative hover:border-primary transition-colors">
-                  <img 
-                    src={quote.evidenceImage} 
-                    alt={`Evidence for quote by ${quote.author}`} 
-                    className="w-full h-auto"
-                    onError={handleImageError}
-                  />
-                  <div className="absolute top-2 right-2 bg-background/90 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Maximize2 size={16} className="text-foreground" />
-                  </div>
-                  <div className="p-2 bg-secondary/20 text-xs text-muted-foreground">
-                    <p>This excerpt is used under Fair Use (17 U.S.C. § 107) for educational and transformative commentary purposes. Source linked and attributed. Click to enlarge.</p>
+              <div
+                className="border border-border rounded-md overflow-hidden cursor-pointer group relative hover:border-primary transition-colors"
+                onClick={() => setImageEnlarged(true)}
+              >
+                <img 
+                  src={quote.evidenceImage} 
+                  alt={`Evidence for quote by ${quote.author}`} 
+                  className="w-full h-auto"
+                  onError={handleImageError}
+                />
+                <div className="absolute top-2 right-2 bg-background/90 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Maximize2 size={16} className="text-foreground" />
+                </div>
+                <div className="p-2 bg-secondary/20 text-xs text-muted-foreground">
+                  <p>This excerpt is used under Fair Use (17 U.S.C. § 107) for educational and transformative commentary purposes. Source linked and attributed. Click to enlarge.</p>
+                </div>
+              </div>
+
+              {imageEnlarged && (
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="evidence-image-title"
+                  aria-describedby="evidence-image-description"
+                  className="fixed inset-0 z-[10000] bg-background/95 backdrop-blur-sm flex items-center justify-center p-4"
+                  onClick={() => setImageEnlarged(false)}
+                >
+                  <h2 id="evidence-image-title" className="sr-only">Source Evidence Image</h2>
+                  <p id="evidence-image-description" className="sr-only">
+                    Enlarged view of the evidence image for the quote by {quote.author}
+                  </p>
+
+                  <button
+                    onClick={() => setImageEnlarged(false)}
+                    className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md bg-background/80 border border-border p-2 hover:bg-secondary transition-colors"
+                    aria-label="Close"
+                  >
+                    <X size={18} className="text-foreground" />
+                  </button>
+
+                  {quote.evidenceImage && (
+                    <a
+                      href={quote.evidenceImage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute top-4 left-4 inline-flex items-center rounded-md bg-background/80 border border-border px-3 py-1.5 text-sm hover:bg-secondary transition-colors"
+                    >
+                      Open in new tab <ExternalLink size={14} className="ml-1" />
+                    </a>
+                  )}
+
+                  <div className="relative max-w-[95vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+                    <img
+                      src={quote.evidenceImage}
+                      alt={`Evidence for quote by ${quote.author}`}
+                      className="max-w-full max-h-[90vh] object-contain"
+                      onError={handleImageError}
+                    />
                   </div>
                 </div>
-              </DialogTrigger>
-              <DialogContent className="max-w-[95vw] max-h-[95vh] p-2" aria-describedby="evidence-image-description">
-                <DialogTitle className="sr-only">Source Evidence Image</DialogTitle>
-                <DialogDescription id="evidence-image-description" className="sr-only">
-                  Enlarged view of the evidence image for the quote by {quote.author}
-                </DialogDescription>
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <img 
-                    src={quote.evidenceImage} 
-                    alt={`Evidence for quote by ${quote.author}`} 
-                    className="max-w-full max-h-[90vh] object-contain"
-                    onError={handleImageError}
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
+              )}
           </div>
         )}
         
