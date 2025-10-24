@@ -1,11 +1,11 @@
 
-import { BookOpen, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
+import { BookOpen, ExternalLink, Maximize2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { SectionBox } from './SectionBox';
 import { useFormatDate } from '../../hooks/use-format-date';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface SourceSectionProps {
   quote: Quote;
@@ -45,7 +45,11 @@ export function SourceSection({ quote }: SourceSectionProps) {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent className="max-w-[95vw] max-h-[95vh] p-2">
+              <DialogContent className="max-w-[95vw] max-h-[95vh] p-2" aria-describedby="evidence-image-description">
+                <DialogTitle className="sr-only">Source Evidence Image</DialogTitle>
+                <DialogDescription id="evidence-image-description" className="sr-only">
+                  Enlarged view of the evidence image for the quote by {quote.author}
+                </DialogDescription>
                 <div className="relative w-full h-full flex items-center justify-center">
                   <img 
                     src={quote.evidenceImage} 
