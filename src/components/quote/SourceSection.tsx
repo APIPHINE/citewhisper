@@ -1,10 +1,11 @@
 
-import { BookOpen, ExternalLink } from 'lucide-react';
+import { BookOpen, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '../../utils/quotesData';
 import { SectionBox } from './SectionBox';
 import { useFormatDate } from '../../hooks/use-format-date';
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 interface SourceSectionProps {
   quote: Quote;
@@ -13,6 +14,7 @@ interface SourceSectionProps {
 export function SourceSection({ quote }: SourceSectionProps) {
   const { formatDate } = useFormatDate();
   const [imageError, setImageError] = useState(false);
+  const [imageEnlarged, setImageEnlarged] = useState(false);
   
   const handleImageError = () => {
     console.warn('Image failed to load:', quote.evidenceImage);
@@ -26,17 +28,34 @@ export function SourceSection({ quote }: SourceSectionProps) {
         {quote.evidenceImage && !imageError && (
           <div className="mb-4">
             <h4 className="font-medium text-sm mb-2">Source Evidence</h4>
-            <div className="border border-border rounded-md overflow-hidden">
-              <img 
-                src={quote.evidenceImage} 
-                alt={`Evidence for quote by ${quote.author}`} 
-                className="w-full h-auto"
-                onError={handleImageError}
-              />
-              <div className="p-2 bg-secondary/20 text-xs text-muted-foreground">
-                <p>This excerpt is used under Fair Use (17 U.S.C. § 107) for educational and transformative commentary purposes. Source linked and attributed.</p>
-              </div>
-            </div>
+            <Dialog open={imageEnlarged} onOpenChange={setImageEnlarged}>
+              <DialogTrigger asChild>
+                <div className="border border-border rounded-md overflow-hidden cursor-pointer group relative hover:border-primary transition-colors">
+                  <img 
+                    src={quote.evidenceImage} 
+                    alt={`Evidence for quote by ${quote.author}`} 
+                    className="w-full h-auto"
+                    onError={handleImageError}
+                  />
+                  <div className="absolute top-2 right-2 bg-background/90 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Maximize2 size={16} className="text-foreground" />
+                  </div>
+                  <div className="p-2 bg-secondary/20 text-xs text-muted-foreground">
+                    <p>This excerpt is used under Fair Use (17 U.S.C. § 107) for educational and transformative commentary purposes. Source linked and attributed. Click to enlarge.</p>
+                  </div>
+                </div>
+              </DialogTrigger>
+              <DialogContent className="max-w-[95vw] max-h-[95vh] p-2">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <img 
+                    src={quote.evidenceImage} 
+                    alt={`Evidence for quote by ${quote.author}`} 
+                    className="max-w-full max-h-[90vh] object-contain"
+                    onError={handleImageError}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         )}
         
