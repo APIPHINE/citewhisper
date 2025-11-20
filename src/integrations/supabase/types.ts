@@ -1165,7 +1165,7 @@ export type Database = {
           attempt_count: number | null
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_id: string | null
           window_start: string
         }
@@ -1174,7 +1174,7 @@ export type Database = {
           attempt_count?: number | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_id?: string | null
           window_start?: string
         }
@@ -1183,7 +1183,7 @@ export type Database = {
           attempt_count?: number | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_id?: string | null
           window_start?: string
         }
@@ -1498,7 +1498,7 @@ export type Database = {
           action_type: string
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource_id: string | null
           resource_type: string
           session_id: string | null
@@ -1510,7 +1510,7 @@ export type Database = {
           action_type: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type: string
           session_id?: string | null
@@ -1522,7 +1522,7 @@ export type Database = {
           action_type?: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type?: string
           session_id?: string | null
@@ -1620,10 +1620,7 @@ export type Database = {
         Args: { submission_id: string }
         Returns: string[]
       }
-      cleanup_old_performance_metrics: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_old_performance_metrics: { Args: never; Returns: undefined }
       get_user_privilege: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_privilege"]
@@ -1645,10 +1642,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      increment_quote_share_count: {
-        Args: Record<PropertyKey, never> | { quote_id: string }
-        Returns: undefined
-      }
+      increment_quote_share_count:
+        | { Args: never; Returns: undefined }
+        | { Args: { quote_id: string }; Returns: undefined }
       log_user_activity: {
         Args: {
           p_action_details?: Json
