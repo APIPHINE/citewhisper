@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, Home, Quote, PlusCircle, Heart, Wrench, BookOpen, FileText, User2, Shield } from 'lucide-react';
+import { ChevronDown, Home, Quote, PlusCircle, Heart, Wrench, BookOpen, FileText, User2, Shield, BookText } from 'lucide-react';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import {
   DropdownMenu,
@@ -29,6 +29,7 @@ export const MainNavDropdown: React.FC<MainNavDropdownProps> = ({ onLinkClick })
     { to: '/favorites', label: 'Favorites', icon: Heart },
     { to: '/tools', label: 'Tools', icon: Wrench },
     { to: '/resources', label: 'Resources', icon: BookOpen },
+    { to: '/glossary', label: 'CSV Glossary', icon: BookText },
     { to: '/articles', label: 'Articles', icon: FileText },
     { to: '/about', label: 'About', icon: User2 },
   ];

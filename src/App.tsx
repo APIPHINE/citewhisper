@@ -25,6 +25,7 @@ import Research from './pages/Research';
 import Favorites from './pages/Favorites';
 import Tools from './pages/Tools';
 import About from './pages/About';
+import Glossary from './pages/Glossary';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import EmailVerification from './pages/EmailVerification';
@@ -55,6 +56,7 @@ function App() {
                 <Route path="/account-settings" element={<AccountSettings />} />
                 <Route path="/add-quote" element={<AddQuote />} />
                 <Route path="/resources" element={<Resources />} />
+                <Route path="/glossary" element={<Glossary />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/about" element={<About />} />
