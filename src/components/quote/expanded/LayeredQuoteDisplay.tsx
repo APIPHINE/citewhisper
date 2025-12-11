@@ -6,8 +6,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Badge } from '@/components/ui/badge';
 import { Quote } from '@/utils/quotesData';
 import { TranslationManager } from '@/components/translation/TranslationManager';
+import { TranslationFormData } from '@/components/translation/TranslationForm';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface LayeredQuoteDisplayProps {
   quote: Quote;
@@ -29,29 +31,56 @@ export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
   
   const dataLayer = hasAdvanced ? 'advanced' : hasEnhanced ? 'enhanced' : 'core';
 
-  const handleAddTranslation = async (translation: any) => {
+  const handleAddTranslation = async (translation: TranslationFormData) => {
     try {
-      const { data, error } = await supabase
+      let imageUrl: string | undefined;
+
+      // Upload image if provided
+      if (translation.imageFile) {
+        const fileExt = translation.imageFile.name.split('.').pop();
+        const fileName = `translation-${quote.id}-${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('quote_evidence')
+          .upload(fileName, translation.imageFile);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          toast.error('Failed to upload image');
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('quote_evidence')
+            .getPublicUrl(fileName);
+          imageUrl = urlData.publicUrl;
+        }
+      }
+
+      const { error } = await supabase
         .from('translations')
         .insert({
           quote_id: quote.id,
           language: translation.language,
           translated_text: translation.text,
           translator: translation.translator,
+          translator_name: translation.translator,
           translation_type: translation.translationType,
           translator_type: translation.translatorType,
-          confidence_score: translation.confidenceScore,
           ai_model: translation.aiModel,
           source: translation.source,
+          source_url: translation.sourceUrl,
+          publication: translation.publication,
+          publication_date: translation.publicationDate,
           created_by: user?.id
         });
 
       if (error) throw error;
       
-      // Refresh the page or update state to show new translation
+      toast.success('Translation added successfully');
+      // Refresh the page to show new translation
       window.location.reload();
     } catch (error) {
       console.error('Error adding translation:', error);
+      toast.error('Failed to add translation');
     }
   };
 
@@ -68,10 +97,11 @@ export function LayeredQuoteDisplay({ quote }: LayeredQuoteDisplayProps) {
 
       if (error) throw error;
       
-      // Refresh to show updated verification status
+      toast.success('Translation verified');
       window.location.reload();
     } catch (error) {
       console.error('Error verifying translation:', error);
+      toast.error('Failed to verify translation');
     }
   };
 
