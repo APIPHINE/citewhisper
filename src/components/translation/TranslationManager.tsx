@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Plus, Bot, User, Shield, Star, AlertCircle } from 'lucide-react';
+import { Plus, Bot, User, Shield, Star, AlertCircle, ExternalLink, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { TranslationForm } from './TranslationForm';
+import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { TranslationForm, TranslationFormData } from './TranslationForm';
 
 interface Translation {
   id: string;
@@ -18,15 +18,42 @@ interface Translation {
   qualityRating?: number;
   aiModel?: string;
   source?: string;
+  sourceUrl?: string;
+  publication?: string;
+  publicationDate?: string;
+  imageUrl?: string;
 }
 
 interface TranslationManagerProps {
   translations: Translation[];
   quoteId: string;
-  onAddTranslation: (translation: Omit<Translation, 'id'>) => void;
+  onAddTranslation: (translation: TranslationFormData) => void;
   onVerifyTranslation: (translationId: string) => void;
   canVerify?: boolean;
 }
+
+const languageNames: Record<string, string> = {
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+  it: 'Italian',
+  pt: 'Portuguese',
+  ru: 'Russian',
+  zh: 'Chinese',
+  ja: 'Japanese',
+  ar: 'Arabic',
+  ko: 'Korean',
+  hi: 'Hindi',
+  nl: 'Dutch',
+  pl: 'Polish',
+  tr: 'Turkish',
+  vi: 'Vietnamese',
+  th: 'Thai',
+  sv: 'Swedish',
+  el: 'Greek',
+  he: 'Hebrew',
+  la: 'Latin',
+};
 
 export function TranslationManager({ 
   translations, 
@@ -40,7 +67,7 @@ export function TranslationManager({
   const getTranslatorIcon = (translatorType?: string) => {
     switch (translatorType) {
       case 'ai': return <Bot size={14} className="text-primary" />;
-      case 'community': return <User size={14} className="text-secondary" />;
+      case 'community': return <User size={14} className="text-secondary-foreground" />;
       default: return <User size={14} className="text-foreground" />;
     }
   };
@@ -56,8 +83,16 @@ export function TranslationManager({
     ));
   };
 
-  const handleAddTranslation = (translation: Omit<Translation, 'id'>) => {
+  const handleAddTranslation = (translation: TranslationFormData) => {
     onAddTranslation(translation);
+    setShowAddDialog(false);
+  };
+
+  const handleOpenDialog = () => {
+    setShowAddDialog(true);
+  };
+
+  const handleCloseDialog = () => {
     setShowAddDialog(false);
   };
 
@@ -65,38 +100,41 @@ export function TranslationManager({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Translations</h3>
-        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Plus size={16} className="mr-2" />
-              Add Translation
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Add New Translation</DialogTitle>
-            </DialogHeader>
-            <TranslationForm 
-              onSubmit={handleAddTranslation}
-              onCancel={() => setShowAddDialog(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <Button variant="outline" size="sm" onClick={handleOpenDialog}>
+          <Plus size={16} className="mr-2" />
+          Add Translation
+        </Button>
       </div>
+
+      {/* Add Translation Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Add New Translation</DialogTitle>
+            <DialogDescription>
+              Add a translation for this quote in another language
+            </DialogDescription>
+          </DialogHeader>
+          <TranslationForm 
+            onSubmit={handleAddTranslation}
+            onCancel={handleCloseDialog}
+          />
+        </DialogContent>
+      </Dialog>
 
       <div className="space-y-3">
         {translations.map((translation) => (
           <Card key={translation.id} className="p-4">
             <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline" className="text-xs">
-                  {translation.language.toUpperCase()}
+                  {languageNames[translation.language] || translation.language.toUpperCase()}
                 </Badge>
                 <div className="flex items-center gap-1">
                   {getTranslatorIcon(translation.translatorType)}
                   <span className="text-xs text-muted-foreground">
                     {translation.translatorType === 'ai' && translation.aiModel 
-                      ? `${translation.aiModel} Translation`
+                      ? `${translation.aiModel}`
                       : translation.translator || 'Anonymous'
                     }
                   </span>
@@ -111,7 +149,7 @@ export function TranslationManager({
 
               <div className="flex items-center gap-2">
                 {translation.qualityRating && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5">
                     {getQualityStars(translation.qualityRating)}
                   </div>
                 )}
@@ -138,11 +176,40 @@ export function TranslationManager({
 
             <p className="text-sm italic mb-2">"{translation.text}"</p>
             
-            {translation.source && (
-              <p className="text-xs text-muted-foreground">
-                Source: {translation.source}
-              </p>
-            )}
+            {/* Additional metadata */}
+            <div className="space-y-1 mt-3">
+              {translation.publication && (
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium">Publication:</span> {translation.publication}
+                  {translation.publicationDate && ` (${translation.publicationDate})`}
+                </p>
+              )}
+              
+              {translation.source && (
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium">Source:</span> {translation.source}
+                </p>
+              )}
+
+              {translation.sourceUrl && (
+                <a 
+                  href={translation.sourceUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline flex items-center gap-1"
+                >
+                  <ExternalLink size={10} />
+                  View source
+                </a>
+              )}
+
+              {translation.imageUrl && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Image size={10} />
+                  <span>Evidence image attached</span>
+                </div>
+              )}
+            </div>
 
             {translation.translationType === 'ai' && translation.confidenceScore && translation.confidenceScore < 0.7 && (
               <div className="flex items-center gap-1 mt-2 text-xs text-amber-600">
