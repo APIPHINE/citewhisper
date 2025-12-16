@@ -22,13 +22,13 @@ export function EmbedCodeGenerator({ quote, embedStyle, embedColor, embedSize, o
       : embedSize === 'small' ? '180' : embedSize === 'medium' ? '240' : '300';
 
     return `<iframe 
-  src="https://citequotes.com/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
+  src="${window.location.origin}/embed/quote/${quote.id}?style=${embedStyle}&color=${embedColor}&size=${embedSize}" 
   width="${width}" 
   height="${height}" 
   frameborder="0"
   title="Quote by ${quote.author}"
 ></iframe>
-<a href="https://citequotes.com/quotes/${quote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View on CiteQuotes</a>`;
+<a href="${window.location.origin}/quotes/${quote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View Quote</a>`;
   };
 
   return (

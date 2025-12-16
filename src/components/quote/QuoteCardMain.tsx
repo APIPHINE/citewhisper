@@ -132,10 +132,7 @@ export function QuoteCardMain({
               theme={quote.theme}
             />
             
-            {/* www.CiteQuotes.com branding */}
-            <div className="absolute bottom-2 right-4 text-xs text-muted-foreground/60 select-none pointer-events-none">
-              www.CiteQuotes.com
-            </div>
+            {/* Branding removed */}
 
             {/* Footer with Language Switcher and Counts */}
             <QuoteFooter 

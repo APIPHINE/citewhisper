@@ -130,9 +130,9 @@ const About = () => {
                   We'd love to hear from you.
                 </p>
                 <div className="space-y-2">
-                  <p><strong>Email:</strong> contact@citequotes.com</p>
-                  <p><strong>Support:</strong> support@citequotes.com</p>
-                  <p><strong>Contributions:</strong> contribute@citequotes.com</p>
+                  <p><strong>Email:</strong> contact@example.com</p>
+                  <p><strong>Support:</strong> support@example.com</p>
+                  <p><strong>Contributions:</strong> contribute@example.com</p>
                 </div>
               </CardContent>
             </Card>

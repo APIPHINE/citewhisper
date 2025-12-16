@@ -120,7 +120,7 @@ export function EmbedPreview({ quote, embedStyle, embedColor, embedSize }: Embed
     <div className={renderPreviewClasses()}>
       {renderQuoteContent()}
       <div className="absolute bottom-2 left-0 right-0 text-center">
-        <span className="text-xs text-muted-foreground/60">www.CiteQuotes.com</span>
+        <span className="text-xs text-muted-foreground/60">Quote Preview</span>
       </div>
     </div>
   );

@@ -140,13 +140,13 @@ const QuoteCard = ({ quote, delay = 0, isAnyExpanded = false, onExpand, isAdmin 
           onQuoteUpdate={handleQuoteUpdate}
           copyEmbedCode={() => {
             navigator.clipboard.writeText(`<iframe 
-  src="https://citequotes.com/embed/quote/${currentQuote.id}?style=standard&color=light&size=medium" 
+  src="${window.location.origin}/embed/quote/${currentQuote.id}?style=standard&color=light&size=medium" 
   width="450" 
   height="240" 
   frameborder="0"
   title="Quote by ${currentQuote.author}"
 ></iframe>
-<a href="https://citequotes.com/quotes/${currentQuote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View on CiteQuotes</a>`);
+<a href="${window.location.origin}/quotes/${currentQuote.id}" target="_blank" rel="noopener noreferrer" style="display: block; margin-top: 4px; font-size: 12px; color: #666;">View Quote</a>`);
             
             toast({
               title: "Embed code copied",

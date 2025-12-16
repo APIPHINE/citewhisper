@@ -83,7 +83,7 @@ const TermsOfService = () => {
             
             <h2>10. Contact Us</h2>
             <p>
-              If you have any questions about these Terms, please contact us at support@citequotes.com.
+              If you have any questions about these Terms, please contact us at support@example.com.
             </p>
           </div>
         </motion.div>

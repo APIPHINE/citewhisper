@@ -143,7 +143,7 @@ const Friends = () => {
                 and evidence-based research, we'd love to hear about them.
               </p>
               <Button asChild variant="outline">
-                <a href="mailto:suggestions@citequotes.com">
+                <a href="mailto:suggestions@example.com">
                   Suggest a Friend Site
                 </a>
               </Button>
