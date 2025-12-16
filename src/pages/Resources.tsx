@@ -306,7 +306,7 @@ const Resources = () => {
                 Help us build the most comprehensive collection of verification tools.
               </p>
               <Button asChild variant="outline">
-                <a href="mailto:resources@citequotes.com">
+                <a href="mailto:resources@example.com">
                   Suggest a Resource
                 </a>
               </Button>

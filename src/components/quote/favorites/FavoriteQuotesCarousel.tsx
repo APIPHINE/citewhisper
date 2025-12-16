@@ -55,10 +55,7 @@ export function FavoriteQuotesCarousel({ quotes }: FavoriteQuotesCarouselProps) 
                   </div>
                 </div>
                 
-                {/* CiteQuotes branding */}
-                <div className="absolute bottom-6 right-6 text-xs text-muted-foreground/60">
-                  www.CiteQuotes.com
-                </div>
+                {/* Branding removed */}
               </div>
             </div>
           </CarouselItem>

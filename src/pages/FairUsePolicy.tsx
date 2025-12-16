@@ -95,7 +95,7 @@ const FairUsePolicy = () => {
           <section>
             <h2 className="text-2xl font-bold">5. Corrections, Licensing & Takedown Protocol</h2>
             <p>
-              Rights holders may contact us at <a href="mailto:admin@citequotes.com" className="text-accent hover:underline">admin@citequotes.com</a>.
+              Rights holders may contact us at <a href="mailto:admin@example.com" className="text-accent hover:underline">admin@example.com</a>.
             </p>
             
             <p className="mt-3 font-medium">Response Timeline:</p>
@@ -149,7 +149,7 @@ const FairUsePolicy = () => {
               — it is a scholarly and archival platform promoting ethical quotation culture.
             </p>
             <p className="mt-2">
-              To join our outreach network or propose a licensing initiative, email <a href="mailto:admin@citequotes.com" className="text-accent hover:underline">admin@citequotes.com</a>.
+              To join our outreach network or propose a licensing initiative, email <a href="mailto:admin@example.com" className="text-accent hover:underline">admin@example.com</a>.
             </p>
           </section>
 

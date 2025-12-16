@@ -259,7 +259,7 @@ export function QuoteDataAnalysisDashboard() {
       description: 'Various embedded quote formats for external sites',
       usage: 'Website embedding, social sharing',
       fields: ['Configurable fields based on embed size/style'],
-      codeExample: `<iframe src="https://citequotes.com/embed/quote/{id}?style=card&color=light&size=medium" />`
+      codeExample: `<iframe src="/embed/quote/{id}?style=card&color=light&size=medium" />`
     }
   ];
 
