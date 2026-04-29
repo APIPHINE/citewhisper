@@ -100,7 +100,7 @@ export const createArticle = async (article: Partial<CMSArticle>): Promise<CMSAr
 export const updateArticle = async (id: string, updates: Partial<CMSArticle>): Promise<CMSArticle> => {
   const { data, error } = await supabase
     .from('cms_articles')
-    .update(updates)
+    .update(updates as any)
     .eq('id', id)
     .select()
     .single();
@@ -195,18 +195,18 @@ export const createPage = async (page: Partial<CMSPage>): Promise<CMSPage> => {
 
   const { data, error } = await supabase
     .from('cms_pages')
-    .insert(pageData)
+    .insert(pageData as any)
     .select()
     .single();
 
   if (error) throw error;
-  return data;
+  return data as any;
 };
 
 export const updatePage = async (id: string, updates: Partial<CMSPage>): Promise<CMSPage> => {
   const { data, error } = await supabase
     .from('cms_pages')
-    .update(updates)
+    .update(updates as any)
     .eq('id', id)
     .select()
     .single();
