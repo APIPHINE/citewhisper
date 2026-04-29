@@ -92,7 +92,7 @@ const UserProfileForm = () => {
     try {
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ [field]: value })
+        .update({ [field]: value } as any)
         .eq('id', user.id);
 
       if (profileError) {

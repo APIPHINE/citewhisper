@@ -71,7 +71,7 @@ export const superAdminService = {
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', quoteId)
         .select()
         .single();
@@ -92,7 +92,7 @@ export const superAdminService = {
         .update({ 
           [field]: value,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', quoteId)
         .select()
         .single();
@@ -113,7 +113,7 @@ export const superAdminService = {
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .in('id', quoteIds)
         .select();
 
