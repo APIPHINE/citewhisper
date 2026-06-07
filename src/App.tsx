@@ -23,8 +23,6 @@ function App() {
           <Route path="/quotes" element={<Index />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/glossary" element={<Glossary />} />
-          <Route path="/tools" element={<Tools />} />
-          <Route path="/tools/iiif" element={<IIIFViewer />} />
           <Route path="/about" element={<About />} />
           <Route path="/articles" element={<Research />} />
           <Route path="/research" element={<Research />} />
