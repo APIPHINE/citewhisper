@@ -5,14 +5,12 @@ import Home from './pages/Home';
 import Index from './pages/Index';
 import Resources from './pages/Resources';
 import Research from './pages/Research';
-import Tools from './pages/Tools';
 import About from './pages/About';
 import Glossary from './pages/Glossary';
 import FairUsePolicy from './pages/FairUsePolicy';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import NotFound from './pages/NotFound';
-import IIIFViewer from './pages/tools/IIIFViewer';
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
