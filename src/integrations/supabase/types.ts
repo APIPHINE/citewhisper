@@ -14,13 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      quote_enrichments: {
+        Row: {
+          author_normalized: string
+          confidence: number | null
+          created_at: string
+          enrichment: Json
+          hit_count: number
+          id: string
+          last_used_at: string
+          model: string
+          normalized_text: string
+          original_author: string | null
+          original_text: string
+          text_hash: string
+          updated_at: string
+        }
+        Insert: {
+          author_normalized?: string
+          confidence?: number | null
+          created_at?: string
+          enrichment: Json
+          hit_count?: number
+          id?: string
+          last_used_at?: string
+          model: string
+          normalized_text: string
+          original_author?: string | null
+          original_text: string
+          text_hash: string
+          updated_at?: string
+        }
+        Update: {
+          author_normalized?: string
+          confidence?: number | null
+          created_at?: string
+          enrichment?: Json
+          hit_count?: number
+          id?: string
+          last_used_at?: string
+          model?: string
+          normalized_text?: string
+          original_author?: string | null
+          original_text?: string
+          text_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      bump_enrichment_hit: { Args: { p_id: string }; Returns: undefined }
+      find_similar_enrichment: {
+        Args: {
+          p_author_normalized?: string
+          p_normalized_text: string
+          p_threshold?: number
+        }
+        Returns: {
+          author_similarity: number
+          confidence: number
+          enrichment: Json
+          id: string
+          model: string
+          text_hash: string
+          text_similarity: number
+        }[]
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
