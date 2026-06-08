@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      quote_ai_cache: {
+        Row: {
+          analysis: string | null
+          bio: string | null
+          created_at: string
+          model: string | null
+          prompt_version: number
+          quote_id: string
+          related_quote_ids: string[] | null
+          tags: string[] | null
+        }
+        Insert: {
+          analysis?: string | null
+          bio?: string | null
+          created_at?: string
+          model?: string | null
+          prompt_version?: number
+          quote_id: string
+          related_quote_ids?: string[] | null
+          tags?: string[] | null
+        }
+        Update: {
+          analysis?: string | null
+          bio?: string | null
+          created_at?: string
+          model?: string | null
+          prompt_version?: number
+          quote_id?: string
+          related_quote_ids?: string[] | null
+          tags?: string[] | null
+        }
+        Relationships: []
+      }
       quote_enrichments: {
         Row: {
           author_normalized: string
